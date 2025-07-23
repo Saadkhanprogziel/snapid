@@ -2,9 +2,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
-import 'package:snapid/constant/colors.dart';
+
 import 'package:snapid/controllers/notification/notification_controller.dart';
-import 'package:snapid/theme/text_theme.dart';
+
 import 'package:snapid/utlis/custom_header.dart';
 import 'package:snapid/utlis/custom_notification_cart.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
