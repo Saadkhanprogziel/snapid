@@ -26,7 +26,7 @@ class HistoryCustomCard extends StatelessWidget {
     this.onMoreTapDown,
   });
   
-
+  @override
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(25),
