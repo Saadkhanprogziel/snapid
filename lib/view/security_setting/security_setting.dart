@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:get/get.dart';
+
 import 'package:snapid/constant/assets.dart';
-import 'package:snapid/constant/colors.dart';
-import 'package:snapid/theme/text_theme.dart';
-import 'package:snapid/utlis/custom_elevated_button.dart';
+
 import 'package:snapid/utlis/custom_header.dart';
 import 'package:snapid/utlis/custom_setting_item.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
