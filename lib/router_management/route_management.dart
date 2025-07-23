@@ -7,10 +7,12 @@ import 'package:snapid/view/auth/otp.dart';
 import 'package:snapid/view/auth/register.dart';
 import 'package:snapid/view/auth/reset_password.dart';
 import 'package:snapid/view/auth/verify.dart';
+import 'package:snapid/view/history_fragment/history_fragment.dart';
 import 'package:snapid/view/home/home.dart';
 import 'package:snapid/view/notification/notification.dart';
 import 'package:snapid/view/onboarding/onboarding.dart';
 import 'package:snapid/view/onboarding/onboarding2.dart';
+import 'package:snapid/view/security_setting/security_setting.dart';
 import 'package:snapid/view/splash/splash.dart';
 
 class Pages {
@@ -79,6 +81,18 @@ class Pages {
       GetPage(
           name: PrimaryRoute.notification,
           page: () =>  NotificationScreen(),
+          binding: ControllerBindings(),
+          transition: Transition.fadeIn
+          ),
+      GetPage(
+          name: PrimaryRoute.history,
+          page: () =>  HistoryFragment(),
+          binding: ControllerBindings(),
+          transition: Transition.fadeIn
+          ),
+      GetPage(
+          name: PrimaryRoute.SecuritySetting,
+          page: () =>  SecuritySetting(),
           binding: ControllerBindings(),
           transition: Transition.fadeIn
           ),

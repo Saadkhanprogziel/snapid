@@ -6,8 +6,12 @@ import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 
 import 'package:snapid/controllers/profile/profile_controller.dart';
+import 'package:snapid/routes/routes.dart';
 
 import 'package:snapid/theme/text_theme.dart';
+import 'package:snapid/utlis/custom_dialog_pop.dart';
+import 'package:snapid/utlis/custom_header.dart';
+import 'package:snapid/utlis/custom_setting_Item.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
 
 class ProfileFragment extends StatelessWidget {
@@ -31,7 +35,15 @@ class ProfileFragment extends StatelessWidget {
           ),
           Column(
             children: [
-              SafeArea(child: _buildHeader()),
+              SafeArea(
+                  child: CustomHeader(
+                title: "Profile",
+               
+                rightIconPath:Assets.bellIcon,
+                onRightIconTap: () {
+                  Get.toNamed(PrimaryRoute.notification);
+                },
+              )),
               // SpaceH40(),
               Expanded(
                 child: Container(
@@ -46,12 +58,12 @@ class ProfileFragment extends StatelessWidget {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Center(
-                          child: Transform.translate(
-                            offset: const Offset(0, -60),
+                    child: Transform.translate(
+                      offset: const Offset(0, -60),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Center(
                             child: Column(
                               children: [
                                 Stack(
@@ -116,65 +128,107 @@ class ProfileFragment extends StatelessWidget {
                               ],
                             ),
                           ),
-                        ),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Account Settings',
-                            style: CustomTextTheme.regular18
-                                .copyWith(color: AppColors.whiteColor),
+                          SpaceH20(),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Account Settings',
+                              style: CustomTextTheme.regular18
+                                  .copyWith(color: AppColors.whiteColor),
+                            ),
                           ),
-                        ),
-                        SpaceH10(),
-                        Expanded(
-                          child: SingleChildScrollView(
-                            physics: AlwaysScrollableScrollPhysics(),
-                            child: Obx(()
-                               {
+                          SpaceH10(),
+                          Expanded(
+                            child: SingleChildScrollView(
+                              physics: AlwaysScrollableScrollPhysics(),
+                              child: Obx(() {
                                 return Column(
                                   children: [
-                                    buildSettingItem(
+                                    SettingItem(
                                       icon: Icons.shopping_bag_outlined,
                                       title: 'My Orders',
-                                      subtitle: 'View History And Manage Downloads',
+                                      subtitle:
+                                          'View History And Manage Downloads',
+                                      onTap: () {
+                                        Get.toNamed(PrimaryRoute.history);
+                                      },
                                     ),
-                                    const SizedBox(height: 14),
-                                    buildSettingItem(
+                                    SpaceH14(),
+                                    SettingItem(
                                       icon: Icons.straighten,
                                       title: 'Measurement Unit',
                                       subtitle: 'Set Your Preferred Unit.',
-                                       onTap: () {
-                                        print("Measurement Unit");
+                                      onTap: () {
+                                        Get.dialog(CustomDialogPop(
+                                          title: 'Select Measurement Unit',
+                                          message:
+                                              'Your account has been verified. You\'re all set to start using SnapID.',
+                                          isIcon: false,
+                                          iconData: Icons.check,
+                                          iconColor: AppColors.whiteColor,
+                                          isActionPopUp: true,
+                                          isRadio: true,
+                                          radioOptions: controller.radioOptions,
+                                          selectedOption:
+                                              controller.selectedOption,
+                                          onCancel: () {
+                                            Get.back();
+                                          },
+                                          onPressed: () {},
+                                        ));
                                       },
                                     ),
-                                    const SizedBox(height: 14),
-                                    buildSettingItem(
+                                    SpaceH14(),
+                                    SettingItem(
                                       icon: Icons.lock_outline,
                                       title: 'Security Setting',
                                       subtitle: 'Update Account Security',
                                       onTap: () {
+                                        Get.toNamed(
+                                            PrimaryRoute.SecuritySetting);
+                                      },
+                                    ),
+                                    SpaceH14(),
+                                    SettingItem(
+                                      icon: Icons.notifications,
+                                      title: 'Notification',
+                                      subtitle:
+                                          'Receive updates via push/email.',
+                                      hasToggle: true,
+                                      toggleValue:
+                                          controller.isNotificationOn.value,
+                                      onToggle: (val) {
+                                        controller.setNotification(val);
+                                      },
+                                    ),
+                                    SpaceH14(),
+                                    SettingItem(
+                                      icon: Icons.question_mark,
+                                      title: 'Help & Support',
+                                      subtitle: 'Chat Or Contact Us Directly.',
+                                      // showArrow: true,
+                                      onTap: () {
                                         print("Security Setting");
                                       },
                                     ),
-                                    const SizedBox(height: 14),
-                                    buildSettingItem(
-                                      icon: Icons.notifications,
-                                      title: 'Notification',
-                                      subtitle: 'Receive updates via push/email.',
-                                      isNotificationOn:
-                                          controller.isNotificationOn.value,
-                                      onNotificationToggle: (val) {
-                                        controller.setNotification(val);
+                                    SpaceH14(),
+                                    SettingItem(
+                                      icon: Icons.logout,
+                                      title: 'Log Out',
+                                      // subtitle: 'Return To Login',
+                                      showArrow: false,
+                                      onTap: () {
+                                        print("Security Setting");
                                       },
                                     ),
                                     SpaceH90()
                                   ],
                                 );
-                              }
+                              }),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -186,82 +240,5 @@ class ProfileFragment extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Center(
-            child: Text(
-              "Profile",
-              style: CustomTextTheme.regular24
-                  .copyWith(color: AppColors.whiteColor),
-            ),
-          ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(20, 223, 222, 222),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: SvgPicture.asset(Assets.bellIcon),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildSettingItem({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    bool isNotificationOn = false,
-    ValueChanged<bool>? onNotificationToggle,
-      VoidCallback? onTap,
-
-  }) {
-    return InkWell(
-    onTap: title == "Notification" ? null : onTap, 
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 14, vertical: 25),
-        decoration: BoxDecoration(
-          color: const Color.fromARGB(61, 82, 79, 112),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: Colors.white70),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title,
-                      style: CustomTextTheme.regular16
-                          .copyWith(color: AppColors.whiteColor)),
-                  const SizedBox(height: 4),
-                  Text(subtitle,
-                      style: CustomTextTheme.regular12
-                          .copyWith(color: AppColors.grey)),
-                ],
-              ),
-            ),
-            title == "Notification"
-                ? Switch(
-                    value: isNotificationOn,
-                    onChanged: onNotificationToggle,
-                    activeColor: AppColors.primaryColor,
-
-                  )
-                : const Icon(Icons.arrow_forward_ios,
-                    color: Colors.grey, size: 16),
-          ],
-        ),
-      ),
-    );
-  }
+  
 }

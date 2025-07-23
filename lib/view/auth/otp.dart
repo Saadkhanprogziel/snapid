@@ -155,7 +155,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   ElevatedButton(
                     onPressed: () async {
                       Get.dialog(
-                        FadeTransitionPopup(
+                        CustomMessagePopUp(
                           title: 'Verified Successfully!',
                           message:
                               'Your account has been verified. You\'re all set to start using SnapID.',

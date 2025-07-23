@@ -6,9 +6,13 @@ import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/dashboard/dashboard_controller.dart';
+import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_card.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
+
+import 'package:snapid/utlis/custom_outline_button.dart';
+
 
 class DashboardFragment extends StatefulWidget {
   @override
@@ -84,15 +88,20 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                                   ),
                                 ),
                                 SizedBox(width: 10),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 14, vertical: 14),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white24.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: SvgPicture.asset(
-                                    Assets.bellIcon,
+                                GestureDetector(
+                                  onTap:() {
+                                     Get.toNamed(PrimaryRoute.notification);
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 14, vertical: 14),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white24.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: SvgPicture.asset(
+                                      Assets.bellIcon,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -132,7 +141,6 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                   ),
                 ),
               ),
-
               Expanded(
                 child: SingleChildScrollView(
                   controller: controller.scrollController,
@@ -182,37 +190,18 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                                                 child: SizedBox(
                                                   height: 50,
                                                   width: double.infinity,
-                                                  child: OutlinedButton.icon(
-                                                    onPressed: () {},
-                                                    icon: Icon(
-                                                        Icons
-                                                            .file_upload_outlined,
-                                                        color: AppColors
-                                                            .whiteColor),
-                                                    label: Text(
-                                                      "Upload Photo",
-                                                      style: CustomTextTheme
-                                                          .regular14
-                                                          .copyWith(
-                                                        color: AppColors
-                                                            .whiteColor,
-                                                      ),
-                                                    ),
-                                                    style: OutlinedButton
-                                                        .styleFrom(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              vertical: 15),
-                                                      side: const BorderSide(
-                                                          color:
-                                                              Colors.white24),
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                      ),
-                                                    ),
+                                                  child: CustomOutlineButton(
+                                                    onPressed: () {
+                                                      
+                                                    },
+                                                    label: "Upload Photo",
+                                                    icon: Icons
+                                                        .file_upload_outlined,
+                                                    iconColor:
+                                                        AppColors.whiteColor,
+                                                    textColor:
+                                                        AppColors.whiteColor,
+                                                    borderColor: Colors.white24,
                                                   ),
                                                 ),
                                               ),

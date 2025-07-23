@@ -9,6 +9,7 @@ import 'package:snapid/controllers/history/history_controller.dart';
 import 'package:snapid/routes/routes.dart';
 
 import 'package:snapid/theme/text_theme.dart';
+import 'package:snapid/utlis/custom_header.dart';
 import 'package:snapid/utlis/custom_history_card.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
 import 'package:snapid/utlis/custom_tabbar.dart';
@@ -35,42 +36,17 @@ class HistoryFragment extends StatelessWidget {
           SafeArea(
             child: Column(
               children: [
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 18, vertical: 18),
-                        decoration: BoxDecoration(
-                          color: const Color.fromARGB(20, 223, 222, 222),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: SvgPicture.asset(Assets.asistantIcon),
-                      ),
-                      Text(
-                        "History",
-                        style: CustomTextTheme.regular24
-                            .copyWith(color: AppColors.whiteColor),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Get.toNamed(PrimaryRoute.notification);
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 18, vertical: 18),
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(20, 223, 222, 222),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: SvgPicture.asset(Assets.bellIcon),
-                        ),
-                      ),
-                    ],
-                  ),
+                CustomHeader(
+                  // leftIcon: ,
+                  title: "History",
+                  leftIconPath: Assets.asistantIcon,
+                  rightIconPath: Assets.bellIcon,
+                  onLeftIconTap: () {
+                    print("left Icon tap");
+                  },
+                  onRightIconTap: () {
+                 Get.toNamed(PrimaryRoute.notification);
+                  },
                 ),
                 const SpaceH10(),
                 Padding(

@@ -4,11 +4,11 @@ import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/theme/text_theme.dart';
 
-class FadeTransitionPopup extends StatelessWidget {
+class CustomMessagePopUp extends StatelessWidget {
   final String title;
   final String message;
 
-  FadeTransitionPopup({required this.title, required this.message});
+  CustomMessagePopUp({required this.title, required this.message});
 
   @override
   Widget build(BuildContext context) {

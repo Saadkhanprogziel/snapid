@@ -20,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     DashboardFragment(),
     HistoryFragment(),
-    const PlaceholderScreen(title: 'Upload'), // Center FAB can also open this
+    const PlaceholderScreen(title: 'Upload'),
     const PlaceholderScreen(title: 'Message'),
     ProfileFragment()
   ];

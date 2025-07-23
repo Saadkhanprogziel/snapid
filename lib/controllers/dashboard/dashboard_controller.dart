@@ -5,6 +5,9 @@ class DashboardController extends GetxController {
   final ScrollController scrollController = ScrollController();
   var showGreeting = true.obs;
 
+  
+
+
   @override
   void onInit() {
     scrollController.addListener(_onScroll);

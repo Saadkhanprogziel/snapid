@@ -5,6 +5,7 @@ import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/notification/notification_controller.dart';
 import 'package:snapid/theme/text_theme.dart';
+import 'package:snapid/utlis/custom_header.dart';
 import 'package:snapid/utlis/custom_notification_cart.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
 import 'package:snapid/utlis/custom_tabbar.dart';
@@ -62,7 +63,9 @@ class _NotificationScreenState extends State<NotificationScreen>
           SafeArea(
             child: Column(
               children: [
-                _buildHeader(),
+                CustomHeader(title: "Notifications", rightIconPath: Assets.more_vert, onRightIconTap: () {
+                  _buildPopupMenu();
+                },),
                 const SpaceH10(),
                 _buildCustomTabBar(),
                 const SpaceH20(),
@@ -75,28 +78,7 @@ class _NotificationScreenState extends State<NotificationScreen>
     );
   }
 
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Center(
-            child: Text(
-              "Notification",
-              style: CustomTextTheme.regular24
-                  .copyWith(color: AppColors.whiteColor),
-            ),
-          ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: _buildPopupMenu(),
-          ),
-        ],
-      ),
-    );
-  }
-
+ 
   Widget _buildCustomTabBar() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),

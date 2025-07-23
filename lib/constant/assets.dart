@@ -23,4 +23,5 @@ class Assets {
   static const String tick= 'assets/icons/tick.svg';
   static const String reminder= 'assets/icons/reminder.svg';
   static const String clock= 'assets/icons/clock.svg';
+  static const String more_vert= 'assets/icons/more_vert.svg';
 }

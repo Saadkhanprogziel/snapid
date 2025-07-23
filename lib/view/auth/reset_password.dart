@@ -100,7 +100,7 @@ class ResetPassowrd extends StatelessWidget {
                 ),
                 CustomElevatedButton(onPressed: () async{
                    Get.dialog(
-                        FadeTransitionPopup(
+                        CustomMessagePopUp(
                           title: 'Password Updated',
                           message:
                               'Your password has been reset successfully. You can now log in with your new credentials.',
