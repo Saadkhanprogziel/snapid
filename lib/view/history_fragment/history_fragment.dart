@@ -1,14 +1,9 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
-import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/history/history_controller.dart';
 import 'package:snapid/routes/routes.dart';
-
-import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_header.dart';
 import 'package:snapid/utlis/custom_history_card.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
@@ -45,7 +40,7 @@ class HistoryFragment extends StatelessWidget {
                     print("left Icon tap");
                   },
                   onRightIconTap: () {
-                 Get.toNamed(PrimaryRoute.notification);
+                    Get.toNamed(PrimaryRoute.notification);
                   },
                 ),
                 const SpaceH10(),
