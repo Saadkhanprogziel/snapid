@@ -2,8 +2,10 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
+import 'package:snapid/controllers/dashboard/dashboard_controller.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_card.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
@@ -14,6 +16,8 @@ class DashboardFragment extends StatefulWidget {
 }
 
 class _DashboardFragmentState extends State<DashboardFragment> {
+  final DashboardController controller = Get.put(DashboardController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,102 +31,115 @@ class _DashboardFragmentState extends State<DashboardFragment> {
               ),
             ),
           ),
-
           Column(
             children: [
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.only(top: 70, bottom: 30),
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(Assets.headerbg),
-                    fit: BoxFit.cover,
+              AnimatedSize(
+                duration: Duration(milliseconds: 300),
+                curve: Curves.linear,
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.only(top: 70, bottom: 30),
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage(Assets.headerbg),
+                      fit: BoxFit.cover,
+                    ),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(30),
+                      bottomRight: Radius.circular(30),
+                    ),
                   ),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            width: 65,
-                            height: 65,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.network(
-                                'https://www.w3schools.com/howto/img_avatar2.png',
-                                fit: BoxFit.cover,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              width: 65,
+                              height: 65,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
+                                  'https://www.w3schools.com/howto/img_avatar2.png',
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
-                          ),
-                          Row(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 14, vertical: 15),
-                                decoration: BoxDecoration(
-                                  color: Colors.white24.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8),
+                            Row(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 14, vertical: 15),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white24.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    "Credits Remaining: 03",
+                                    style: CustomTextTheme.regular14
+                                        .copyWith(color: AppColors.whiteColor),
+                                  ),
                                 ),
-                                child: Text(
-                                  "Credits Remaining: 03",
-                                  style: CustomTextTheme.regular14
-                                      .copyWith(color: AppColors.whiteColor),
+                                SizedBox(width: 10),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 14, vertical: 14),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white24.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: SvgPicture.asset(
+                                    Assets.bellIcon,
+                                  ),
                                 ),
-                              ),
-                              SizedBox(width: 10),
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 14, vertical: 14),
-                                decoration: BoxDecoration(
-                                  color: Colors.white24.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: SvgPicture.asset(
-                                  Assets.bellIcon,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        "Hello, John! 👋",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
+                              ],
+                            ),
+                          ],
                         ),
-                      ),
-                      SizedBox(height: 6),
-                      Text(
-                        "Welcome back! Let's get your next\nphoto ready in just a few steps.",
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
+                        Obx(() {
+                          return Visibility(
+                            visible: controller.showGreeting.value,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(height: 20),
+                                Text(
+                                  "Hello, John! 👋",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 6),
+                                Text(
+                                  "Welcome back! Let's get your next\nphoto ready in just a few steps.",
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
                   ),
                 ),
               ),
 
-              // Scrollable content
               Expanded(
                 child: SingleChildScrollView(
+                  controller: controller.scrollController,
                   physics: AlwaysScrollableScrollPhysics(),
                   child: Column(
                     children: [
-                      SizedBox(height: 30),
+                      SizedBox(height: 40),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20.0),
                         child: ClipRRect(

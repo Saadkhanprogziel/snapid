@@ -4,6 +4,7 @@ import 'package:snapid/constant/colors.dart';
 import 'package:snapid/view/dashboard_fragment/dashboard_fragment.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:snapid/view/history_fragment/history_fragment.dart';
+import 'package:snapid/view/profile_fragment/profile_fragment.dart';
 // import 'dashboard_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -21,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
     HistoryFragment(),
     const PlaceholderScreen(title: 'Upload'), // Center FAB can also open this
     const PlaceholderScreen(title: 'Message'),
-    const PlaceholderScreen(title: 'Profile'),
+    ProfileFragment()
   ];
 
   @override

@@ -8,7 +8,6 @@ import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/history/history_controller.dart';
 import 'package:snapid/routes/routes.dart';
 
-
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_history_card.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
@@ -57,7 +56,7 @@ class HistoryFragment extends StatelessWidget {
                             .copyWith(color: AppColors.whiteColor),
                       ),
                       GestureDetector(
-                        onTap: (){
+                        onTap: () {
                           Get.toNamed(PrimaryRoute.notification);
                         },
                         child: Container(
@@ -158,11 +157,4 @@ class HistoryFragment extends StatelessWidget {
       ),
     );
   }
-  
-
 }
-
-
-
-
-
