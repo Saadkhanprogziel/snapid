@@ -158,8 +158,7 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                               width: double.infinity,
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: const Color.fromARGB(20, 223, 222,
-                                    222), // Light translucent color
+                                color:AppColors.cardColor,
                                 borderRadius: BorderRadius.circular(25),
                               ),
                               child: Padding(

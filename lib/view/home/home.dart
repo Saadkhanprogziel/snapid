@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:snapid/constant/colors.dart';
+import 'package:snapid/routes/routes.dart';
 import 'package:snapid/view/dashboard_fragment/dashboard_fragment.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:snapid/view/history_fragment/history_fragment.dart';
@@ -20,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     DashboardFragment(),
     HistoryFragment(),
-    const PlaceholderScreen(title: 'Upload'),
+
     const PlaceholderScreen(title: 'Message'),
     ProfileFragment()
   ];
@@ -59,8 +61,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 buildNavBarItem('assets/icons/home.svg', 'Home', 0),
                 buildNavBarItem('assets/icons/clock.svg', 'History', 1),
                 const SizedBox(width: 20), // space for FAB
-                buildNavBarItem('assets/icons/assistant.svg', 'Assistant', 3),
-                buildNavBarItem('assets/icons/profile.svg', 'Profile', 4),
+                buildNavBarItem('assets/icons/assistant.svg', 'Assistant', 2),
+                buildNavBarItem('assets/icons/profile.svg', 'Profile', 3),
               ],
             ),
           ),
@@ -86,7 +88,9 @@ class _HomeScreenState extends State<HomeScreen> {
               color: AppColors.primaryColor,
               elevation: 10,
               child: InkWell(
-                onTap: () => _onItemTapped(2),
+                onTap: () {
+                  Get.toNamed(PrimaryRoute.photo_creation);
+                },
                 child: const SizedBox(
                   width: 70,
                   height: 70,
@@ -101,6 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
+    
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }

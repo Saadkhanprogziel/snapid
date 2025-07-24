@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -47,7 +49,6 @@ class ProfileFragment extends StatelessWidget {
               Expanded(
                 child: Container(
                   width: double.infinity,
-                  // padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: AppColors.cardColor, // Light translucent color
                     borderRadius: BorderRadius.only(
@@ -80,13 +81,19 @@ class ProfileFragment extends StatelessWidget {
                                     Positioned(
                                       bottom: 0,
                                       right: 0,
-                                      child: CircleAvatar(
-                                        backgroundColor: Colors.white,
-                                        radius: 14,
-                                        child: Icon(
-                                          Icons.edit,
-                                          color: Colors.black,
-                                          size: 16,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          print("object");
+                                          Get.toNamed(PrimaryRoute.editProfile);
+                                        },
+                                        child: CircleAvatar(
+                                          backgroundColor: Colors.white,
+                                          radius: 16,
+                                          child: Icon(
+                                            Icons.edit,
+                                            color: Colors.black,
+                                            size: 16,
+                                          ),
                                         ),
                                       ),
                                     )
@@ -213,14 +220,27 @@ class ProfileFragment extends StatelessWidget {
                                     SettingItem(
                                       svgPath: Assets.logout,
 
-                                   
                                       title: 'Log Out',
                                       // subtitle: 'Return To Login',
                                       showArrow: false,
                                       onTap: () {
-                                        Get.dialog(
-                                          CustomDialogPop(title: "Log Out ?", message: "Are you sure you want to log out of your Snapid account?", svgPath: Assets.logout, isActionPopUp: true, onCancel: ()=> Get.back(), onPressed: ()=> Get.toNamed(PrimaryRoute.login))
-                                        );
+                                        Get.dialog(BackdropFilter(
+                                          filter: ImageFilter.blur(
+                                              sigmaX: 15, sigmaY: 15),
+                                          child: CustomDialogPop(
+                                            solidBtnLabel: "Logout",
+                                              title: "Log Out ?",
+                                              message:
+                                                  "Are you sure you want to log out of your Snapid account?",
+                                              svgPath: Assets.logout,
+                                              isActionPopUp: true,
+                                              backgroundColor:
+                                                  AppColors.cardColor,
+                                              onCancel: () => Get.back(),
+                                              onPressed: () => Get.offAllNamed
+                                              (
+                                                  PrimaryRoute.login)),
+                                        ));
                                       },
                                     ),
                                     SpaceH90()

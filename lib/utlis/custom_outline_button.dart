@@ -11,8 +11,6 @@ class CustomOutlineButton extends StatelessWidget {
   final double verticalPadding;
   final double minHeight;
 
-
-
   const CustomOutlineButton({
     Key? key,
     required this.onPressed,
@@ -20,11 +18,22 @@ class CustomOutlineButton extends StatelessWidget {
     this.iconColor = Colors.white,
     this.textColor = Colors.white,
     this.borderColor = Colors.white24,
-    this.icon,  this.verticalPadding =0,  this.minHeight = 50,
+    this.icon,
+    this.verticalPadding = 0,
+    this.minHeight = 50,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final ButtonStyle style = OutlinedButton.styleFrom(
+      padding: EdgeInsets.symmetric(vertical: verticalPadding),
+      minimumSize: Size.fromHeight(minHeight),
+      side: BorderSide(color: borderColor),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+    );
+
     return icon != null
         ? OutlinedButton.icon(
             onPressed: onPressed,
@@ -38,14 +47,7 @@ class CustomOutlineButton extends StatelessWidget {
                 color: textColor,
               ),
             ),
-            style: OutlinedButton.styleFrom(
-              padding:  EdgeInsets.symmetric(vertical: verticalPadding),
-              side: BorderSide(color: borderColor),
-              minimumSize:  Size.fromHeight(minHeight),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
+            style: style,
           )
         : OutlinedButton(
             onPressed: onPressed,
@@ -55,13 +57,7 @@ class CustomOutlineButton extends StatelessWidget {
                 color: textColor,
               ),
             ),
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 15),
-              side: BorderSide(color: borderColor),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
+            style: style,
           );
   }
 }

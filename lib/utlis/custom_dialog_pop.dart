@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:snapid/constant/assets.dart';
+
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
@@ -11,6 +11,8 @@ import 'package:snapid/utlis/custom_spaces.dart';
 class CustomDialogPop extends StatelessWidget {
   final String title;
   final String message;
+  final String outlineLabel;
+  final String solidBtnLabel;
   final bool isIcon;
   final bool isActionPopUp;
   final bool isRadio;
@@ -21,15 +23,19 @@ class CustomDialogPop extends StatelessWidget {
   final VoidCallback onCancel;
   final VoidCallback onPressed;
   final String svgPath;
+  final Color backgroundColor;
 
   const CustomDialogPop({
     Key? key,
     required this.title,
     required this.message,
+     this.solidBtnLabel ="Submit",
+     this.outlineLabel ="Cancel",
     this.isIcon = false,
     this.isActionPopUp = false,
     this.iconData,
     this.iconColor,
+    this.backgroundColor = const Color.fromARGB(255, 48, 48, 48),
     this.isRadio = false,
     this.radioOptions,
     this.selectedOption,
@@ -50,7 +56,7 @@ class CustomDialogPop extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 40),
             margin: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 48, 48, 48),
+              color:backgroundColor,
               borderRadius: BorderRadius.circular(30),
             ),
             child: Column(
@@ -137,11 +143,11 @@ class CustomDialogPop extends StatelessWidget {
                     children: [
                       Expanded(
                           child: CustomOutlineButton(
-                              onPressed: onCancel, label: "Cancel")),
+                              onPressed: onCancel, label: outlineLabel)),
                       SpaceW10(),
                       Expanded(
                           child: CustomElevatedButton(
-                              onPressed: onPressed, text: "Submit")),
+                              onPressed: onPressed, text: solidBtnLabel)),
                     ],
                   ),
                 ],

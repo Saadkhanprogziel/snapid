@@ -105,6 +105,7 @@ class LoginScreen extends StatelessWidget {
                             CustomElevatedButton(
                               onPressed: () => Get.toNamed(PrimaryRoute.home),
                               text: "Sign In",
+                              minHeight: 60,
                             ),
                             const SizedBox(height: 30),
                             OutlinedButton.icon(

@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
-import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
-
 import 'package:snapid/utlis/custom_header.dart';
 import 'package:snapid/utlis/custom_setting_item.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
@@ -86,7 +82,7 @@ class HelpSupport extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(width: 16),
-                                 Column(
+                                  Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
@@ -127,7 +123,7 @@ class HelpSupport extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 16),
                                   Column(
-                                     crossAxisAlignment:
+                                    crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(

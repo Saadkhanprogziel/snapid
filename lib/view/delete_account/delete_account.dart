@@ -68,13 +68,16 @@ class DeleteAccount extends StatelessWidget {
                   children: [
                     Expanded(
                       child: CustomOutlineButton(
+                        minHeight: 60,
                         onPressed: () => Get.back(),
                         label: "Cancel",
                       ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
+                      
                       child: CustomElevatedButton(
+                        minHeight: 60,
                         onPressed: controller.deleteAccount,
                         text: "Delete Account",
                         backgroundColor: Colors.red,

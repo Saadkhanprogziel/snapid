@@ -15,4 +15,6 @@ class PrimaryRoute {
   static const String biometric = '/biometric';
   static const String deleteAccount = '/deleteAccount';
   static const String help_support = '/help_support';
+  static const String editProfile = '/editProfile';
+  static const String photo_creation = '/photoCreation';
 }

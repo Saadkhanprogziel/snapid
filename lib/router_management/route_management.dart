@@ -15,6 +15,8 @@ import 'package:snapid/view/home/home.dart';
 import 'package:snapid/view/notification/notification.dart';
 import 'package:snapid/view/onboarding/onboarding.dart';
 import 'package:snapid/view/onboarding/onboarding2.dart';
+import 'package:snapid/view/photo_creation/photo_creation.dart';
+import 'package:snapid/view/profile_fragment/edit_profile.dart';
 import 'package:snapid/view/security_setting/security_setting.dart';
 import 'package:snapid/view/splash/splash.dart';
 
@@ -82,6 +84,12 @@ class Pages {
           transition: Transition.fadeIn
           ),
       GetPage(
+          name: PrimaryRoute.photo_creation,
+          page: () =>  PhotoCreationScreen(),
+          binding: ControllerBindings(),
+          transition: Transition.cupertino
+          ),
+      GetPage(
           name: PrimaryRoute.notification,
           page: () =>  NotificationScreen(),
           binding: ControllerBindings(),
@@ -116,6 +124,12 @@ class Pages {
           page: () =>  HelpSupport(),
           binding: ControllerBindings(),
           transition: Transition.fadeIn
+          ),
+      GetPage(
+          name: PrimaryRoute.editProfile,
+          page: () =>  EditProfile(),
+          binding: ControllerBindings(),
+          transition: Transition.downToUp
           ),
     ];
   }
