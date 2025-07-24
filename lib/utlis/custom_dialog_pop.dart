@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
@@ -16,9 +18,9 @@ class CustomDialogPop extends StatelessWidget {
   final Color? iconColor;
   final List<Map<String, String>>? radioOptions; // id + name
   final RxString? selectedOption;
-    final VoidCallback onCancel;
-    final VoidCallback onPressed;
-
+  final VoidCallback onCancel;
+  final VoidCallback onPressed;
+  final String svgPath;
 
   const CustomDialogPop({
     Key? key,
@@ -30,7 +32,9 @@ class CustomDialogPop extends StatelessWidget {
     this.iconColor,
     this.isRadio = false,
     this.radioOptions,
-    this.selectedOption, required this.onCancel, required this.onPressed,
+    this.selectedOption,
+    required this.onCancel,
+    required this.onPressed,  this.svgPath= "",
   }) : super(key: key);
 
   @override
@@ -60,6 +64,15 @@ class CustomDialogPop extends StatelessWidget {
                       borderRadius: BorderRadius.circular(50),
                     ),
                     child: Icon(iconData, color: iconColor, size: 40),
+                  ),
+                if (svgPath.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: const Color.fromRGBO(255, 255, 255, 0.05),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: SvgPicture.asset(svgPath),
                   ),
                 const SpaceH20(),
                 Text(
@@ -95,16 +108,14 @@ class CustomDialogPop extends StatelessWidget {
                                     value: id,
                                     groupValue: selectedOption!.value,
                                     onChanged: (value) {
-                                          
-                                        selectedOption!.value = value.toString();
-                                        print(value);
+                                      selectedOption!.value = value.toString();
+                                      print(value);
                                     },
                                     activeColor: AppColors.primaryColor,
                                     materialTapTargetSize:
                                         MaterialTapTargetSize.shrinkWrap,
                                     visualDensity: VisualDensity.compact,
                                   ),
-        
                                   Flexible(
                                     child: Text(
                                       name,

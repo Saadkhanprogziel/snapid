@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
+import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/history/history_controller.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/utlis/custom_header.dart';
@@ -58,7 +59,7 @@ class HistoryFragment extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
-                                color: const Color.fromARGB(20, 223, 222, 222),
+                                color: AppColors.cardColor,
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Obx(

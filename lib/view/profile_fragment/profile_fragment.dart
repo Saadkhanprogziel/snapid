@@ -38,8 +38,7 @@ class ProfileFragment extends StatelessWidget {
               SafeArea(
                   child: CustomHeader(
                 title: "Profile",
-               
-                rightIconPath:Assets.bellIcon,
+                rightIconPath: Assets.bellIcon,
                 onRightIconTap: () {
                   Get.toNamed(PrimaryRoute.notification);
                 },
@@ -50,8 +49,7 @@ class ProfileFragment extends StatelessWidget {
                   width: double.infinity,
                   // padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(
-                        27, 223, 222, 222), // Light translucent color
+                    color: AppColors.cardColor, // Light translucent color
                     borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(60),
                         topRight: Radius.circular(60)),
@@ -145,7 +143,7 @@ class ProfileFragment extends StatelessWidget {
                                 return Column(
                                   children: [
                                     SettingItem(
-                                      icon: Icons.shopping_bag_outlined,
+                                      svgPath: Assets.history,
                                       title: 'My Orders',
                                       subtitle:
                                           'View History And Manage Downloads',
@@ -155,7 +153,7 @@ class ProfileFragment extends StatelessWidget {
                                     ),
                                     SpaceH14(),
                                     SettingItem(
-                                      icon: Icons.straighten,
+                                      svgPath: Assets.measurement,
                                       title: 'Measurement Unit',
                                       subtitle: 'Set Your Preferred Unit.',
                                       onTap: () {
@@ -185,12 +183,12 @@ class ProfileFragment extends StatelessWidget {
                                       subtitle: 'Update Account Security',
                                       onTap: () {
                                         Get.toNamed(
-                                            PrimaryRoute.SecuritySetting);
+                                            PrimaryRoute.securitySetting);
                                       },
                                     ),
                                     SpaceH14(),
                                     SettingItem(
-                                      icon: Icons.notifications,
+                                      svgPath: Assets.notification,
                                       title: 'Notification',
                                       subtitle:
                                           'Receive updates via push/email.',
@@ -208,17 +206,21 @@ class ProfileFragment extends StatelessWidget {
                                       subtitle: 'Chat Or Contact Us Directly.',
                                       // showArrow: true,
                                       onTap: () {
-                                        print("Security Setting");
+                                        Get.toNamed(PrimaryRoute.help_support);
                                       },
                                     ),
                                     SpaceH14(),
                                     SettingItem(
-                                      icon: Icons.logout,
+                                      svgPath: Assets.logout,
+
+                                   
                                       title: 'Log Out',
                                       // subtitle: 'Return To Login',
                                       showArrow: false,
                                       onTap: () {
-                                        print("Security Setting");
+                                        Get.dialog(
+                                          CustomDialogPop(title: "Log Out ?", message: "Are you sure you want to log out of your Snapid account?", svgPath: Assets.logout, isActionPopUp: true, onCancel: ()=> Get.back(), onPressed: ()=> Get.toNamed(PrimaryRoute.login))
+                                        );
                                       },
                                     ),
                                     SpaceH90()
@@ -239,6 +241,4 @@ class ProfileFragment extends StatelessWidget {
       ),
     );
   }
-
-  
 }

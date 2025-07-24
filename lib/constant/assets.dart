@@ -24,4 +24,10 @@ class Assets {
   static const String reminder= 'assets/icons/reminder.svg';
   static const String clock= 'assets/icons/clock.svg';
   static const String more_vert= 'assets/icons/more_vert.svg';
+  static const String history= 'assets/icons/history_icon2.svg';
+  static const String measurement= 'assets/icons/measurement.svg';
+  static const String logout= 'assets/icons/logout.svg';
+  static const String notification= 'assets/icons/notification.svg';
+  static const String touch_id= 'assets/icons/biometric.svg';
+  static const String face_id= 'assets/icons/face_id.svg';
 }

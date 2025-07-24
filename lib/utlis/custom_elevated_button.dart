@@ -21,9 +21,9 @@ class CustomElevatedButton extends StatelessWidget {
     this.icon,
     this.backgroundColor = AppColors.primaryColor,
     this.textColor = AppColors.whiteColor,
-    this.verticalPadding = 1,
+    this.verticalPadding = 0,
     this.borderRadius = 12,
-    this.minHeight = 60,
+    this.minHeight = 50,
     this.iconOnRight = true,
     this.textStyle,
   }) : assert(text != null || icon != null, 'Either text or icon must be provided');

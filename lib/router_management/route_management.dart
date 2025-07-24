@@ -7,6 +7,9 @@ import 'package:snapid/view/auth/otp.dart';
 import 'package:snapid/view/auth/register.dart';
 import 'package:snapid/view/auth/reset_password.dart';
 import 'package:snapid/view/auth/verify.dart';
+import 'package:snapid/view/biometric/biometric.dart';
+import 'package:snapid/view/delete_account/delete_account.dart';
+import 'package:snapid/view/help_support/help_support.dart';
 import 'package:snapid/view/history_fragment/history_fragment.dart';
 import 'package:snapid/view/home/home.dart';
 import 'package:snapid/view/notification/notification.dart';
@@ -91,8 +94,26 @@ class Pages {
           transition: Transition.fadeIn
           ),
       GetPage(
-          name: PrimaryRoute.SecuritySetting,
+          name: PrimaryRoute.securitySetting,
           page: () =>  SecuritySetting(),
+          binding: ControllerBindings(),
+          transition: Transition.fadeIn
+          ),
+      GetPage(
+          name: PrimaryRoute.biometric,
+          page: () =>  Biometric(),
+          binding: ControllerBindings(),
+          transition: Transition.fadeIn
+          ),
+      GetPage(
+          name: PrimaryRoute.deleteAccount,
+          page: () =>  DeleteAccount(),
+          binding: ControllerBindings(),
+          transition: Transition.fadeIn
+          ),
+      GetPage(
+          name: PrimaryRoute.help_support,
+          page: () =>  HelpSupport(),
           binding: ControllerBindings(),
           transition: Transition.fadeIn
           ),

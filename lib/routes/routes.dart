@@ -11,5 +11,8 @@ class PrimaryRoute {
   static const String home = '/home';
   static const String history = '/history';
   static const String notification = '/notification';
-  static const String SecuritySetting = '/securitySetting';
+  static const String securitySetting = '/securitySetting';
+  static const String biometric = '/biometric';
+  static const String deleteAccount = '/deleteAccount';
+  static const String help_support = '/help_support';
 }

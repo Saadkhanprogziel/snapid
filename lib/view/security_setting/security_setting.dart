@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'package:snapid/constant/assets.dart';
+import 'package:snapid/routes/routes.dart';
 
 import 'package:snapid/utlis/custom_header.dart';
 import 'package:snapid/utlis/custom_setting_item.dart';
@@ -41,18 +43,27 @@ class SecuritySetting extends StatelessWidget {
                           title: "Change Password",
                           subtitle: "Update account security",
                           icon: Icons.lock,
+                          onTap: () {
+                            Get.toNamed(PrimaryRoute.resetPassword);
+                          },
                         ),
                         SpaceH10(),
                         SettingItem(
                           title: "Enable Biometric Login",
                           subtitle: "Toggle Face ID / Touch ID",
                           icon: Icons.lock,
+                          onTap: () {
+                            Get.toNamed(PrimaryRoute.biometric);
+                          },
                         ),
                         SpaceH10(),
                         SettingItem(
                           title: "Delete My Account",
                           subtitle: "Permanently remove account",
                           icon: Icons.delete,
+                          onTap: () {
+                            Get.toNamed(PrimaryRoute.deleteAccount);
+                          },
                         ),
                       ],
                     ),

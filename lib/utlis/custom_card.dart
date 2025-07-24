@@ -24,8 +24,7 @@ class CountryCard extends StatelessWidget {
         child: Container(
           width: 250,
           decoration: BoxDecoration(
-            color: const Color.fromARGB(
-                19, 195, 194, 194), // Light translucent color
+            color: AppColors.cardColor, // Light translucent color
             borderRadius: BorderRadius.circular(15),
           ),
           padding: const EdgeInsets.all(15),

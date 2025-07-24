@@ -13,25 +13,23 @@ class CustomHeader extends StatelessWidget {
 
   // Left icon
   final bool showBackButton;
- 
   final VoidCallback? onLeftIconTap;
 
-  // Right icon
-  
+  // Right icon or widget
   final String rightIconPath;
   final String leftIconPath;
   final VoidCallback? onRightIconTap;
+  final Widget? rightWidget;
 
   const CustomHeader({
     Key? key,
     required this.title,
     this.showBackButton = false,
- 
     this.onLeftIconTap,
-    
     this.onRightIconTap,
     this.leftIconPath = "",
     this.rightIconPath = "",
+    this.rightWidget,
   }) : super(key: key);
 
   @override
@@ -39,24 +37,23 @@ class CustomHeader extends StatelessWidget {
     Widget? buildLeftWidget() {
       if (leftIconPath.isNotEmpty) {
         return GestureDetector(
-                onTap: onLeftIconTap,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(20, 223, 222, 222),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: SvgPicture.asset(leftIconPath),
-                ),
-              );
+          onTap: onLeftIconTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
+            decoration: BoxDecoration(
+              color: AppColors.cardColor,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: SvgPicture.asset(leftIconPath),
+          ),
+        );
       } else if (showBackButton) {
         return SizedBox(
-          height: 54,
-          width: 54,
+          height: 50,
+          width: 50,
           child: CustomElevatedButton(
             onPressed: onLeftIconTap ?? () => Get.back(),
-            backgroundColor: const Color.fromARGB(100, 96, 66, 255),
+            backgroundColor: AppColors.backBtnColor,
             icon: Icon(
               Icons.arrow_back,
               size: 26,
@@ -65,6 +62,26 @@ class CustomHeader extends StatelessWidget {
           ),
         );
       }
+      return null;
+    }
+
+    Widget? buildRightWidget() {
+      if (rightWidget != null) return rightWidget;
+
+      if (rightIconPath.isNotEmpty) {
+        return GestureDetector(
+          onTap: onRightIconTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
+            decoration: BoxDecoration(
+              color: AppColors.cardColor,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: SvgPicture.asset(rightIconPath),
+          ),
+        );
+      }
+
       return null;
     }
 
@@ -81,55 +98,19 @@ class CustomHeader extends StatelessWidget {
           Center(
             child: Text(
               title,
-              style: CustomTextTheme.regular24.copyWith(
+              style: CustomTextTheme.regular22.copyWith(
                 color: AppColors.whiteColor,
+                fontWeight:FontWeight.w400
               ),
             ),
           ),
-          if (rightIconPath.isNotEmpty)
+          if (buildRightWidget() != null)
             Align(
               alignment: Alignment.centerRight,
-              child: GestureDetector(
-                onTap: onRightIconTap,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(20, 223, 222, 222),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: SvgPicture.asset(rightIconPath),
-                ),
-              ),
+              child: buildRightWidget()!,
             ),
         ],
       ),
     );
   }
 }
-
-
-// 1. Default back button:
-
-// CustomHeader(
-//   title: "Security Setting",
-//   showBackButton: true,
-// )
-
-
-
-// 2. Custom left & right icons:
-
-// CustomHeader(
-//   title: "Profile",
-//   leftIcon: Icon(Icons.menu, color: Colors.white),
-//   onLeftIconTap: () => print("Menu tapped"),
-//   rightIcon: SvgPicture.asset(Assets.bellIcon),
-//   onRightIconTap: () => print("Bell tapped"),
-// )
-
-
-
-// 3. No icons, just title:
-
-// CustomHeader(title: "Welcome")

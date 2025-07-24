@@ -35,7 +35,7 @@ class HistoryCustomCard extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           decoration: BoxDecoration(
-            color: const Color.fromARGB(20, 223, 222, 222),
+            color: AppColors.cardColor,
             borderRadius: BorderRadius.circular(20),
           ),
           child: Column(

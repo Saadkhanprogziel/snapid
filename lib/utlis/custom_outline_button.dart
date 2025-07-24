@@ -8,6 +8,10 @@ class CustomOutlineButton extends StatelessWidget {
   final Color textColor;
   final Color borderColor;
   final IconData? icon; // Nullable icon
+  final double verticalPadding;
+  final double minHeight;
+
+
 
   const CustomOutlineButton({
     Key? key,
@@ -16,7 +20,7 @@ class CustomOutlineButton extends StatelessWidget {
     this.iconColor = Colors.white,
     this.textColor = Colors.white,
     this.borderColor = Colors.white24,
-    this.icon,
+    this.icon,  this.verticalPadding =0,  this.minHeight = 50,
   }) : super(key: key);
 
   @override
@@ -35,8 +39,9 @@ class CustomOutlineButton extends StatelessWidget {
               ),
             ),
             style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 15),
+              padding:  EdgeInsets.symmetric(vertical: verticalPadding),
               side: BorderSide(color: borderColor),
+              minimumSize:  Size.fromHeight(minHeight),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),

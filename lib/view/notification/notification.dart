@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
+import 'package:snapid/constant/colors.dart';
 
 import 'package:snapid/controllers/notification/notification_controller.dart';
 
@@ -63,9 +64,17 @@ class _NotificationScreenState extends State<NotificationScreen>
           SafeArea(
             child: Column(
               children: [
-                CustomHeader(title: "Notifications", rightIconPath: Assets.more_vert, onRightIconTap: () {
-                  _buildPopupMenu();
-                },),
+                CustomHeader(
+                  title: "Notifications",
+                  showBackButton: true,
+                    rightWidget: _buildPopupMenu(), // This replaces the SVG icon
+
+                  // rightIconPath: Assets.more_vert,
+                  // onRightIconTap: () {
+                  //   // print("object");
+                  //   // _buildPopupMenu();
+                  // },
+                ),
                 const SpaceH10(),
                 _buildCustomTabBar(),
                 const SpaceH20(),
@@ -78,7 +87,6 @@ class _NotificationScreenState extends State<NotificationScreen>
     );
   }
 
- 
   Widget _buildCustomTabBar() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -173,11 +181,12 @@ class _NotificationScreenState extends State<NotificationScreen>
 
   PopupMenuButton<String> _buildPopupMenu() {
     return PopupMenuButton<String>(
-      color: const Color.fromARGB(194, 46, 46, 46),
+      color: const Color.fromARGB(210, 46, 46, 46),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       onSelected: (value) => print('Selected: $value'),
       itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-        _buildMenuItem(Icons.file_download_outlined, 'Re-Download', 'redownload'),
+        _buildMenuItem(
+            Icons.file_download_outlined, 'Re-Download', 'redownload'),
         _buildDivider(),
         _buildMenuItem(Icons.replay, 'Reuse Setting', 'reuse_setting'),
         _buildDivider(),
@@ -186,8 +195,8 @@ class _NotificationScreenState extends State<NotificationScreen>
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: const Color.fromARGB(181, 46, 46, 46),
-          borderRadius: BorderRadius.circular(30),
+          color: AppColors.cardColor,
+          borderRadius: BorderRadius.circular(10),
         ),
         child: const Icon(Icons.more_vert, color: Colors.white),
       ),

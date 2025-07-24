@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/theme/text_theme.dart';
 
 class SettingItem extends StatelessWidget {
   final IconData? icon;
+  final String svgPath;
   final String title;
   final String? subtitle;
   final bool hasToggle;
@@ -22,6 +24,7 @@ class SettingItem extends StatelessWidget {
     this.onToggle,
     this.onTap,
     this.showArrow = true,
+    this.svgPath = '',
   });
 
   @override
@@ -31,13 +34,37 @@ class SettingItem extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 25),
         decoration: BoxDecoration(
-          color: const Color.fromARGB(61, 82, 79, 112),
+          color: AppColors.cardColor,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
           children: [
             if (icon != null) ...[
-              Icon(icon, color: Colors.white70),
+              Container(
+               width: 40,
+               height: 40,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                  color: AppColors.cardColor,
+                ),
+                child: Center(
+                  child: Icon(icon, color: Colors.white70),
+                ),
+              ),
+              const SizedBox(width: 16),
+            ],
+            if (svgPath.isNotEmpty) ...[
+              Container(
+               width: 40,
+               height: 40,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                  color: AppColors.cardColor,
+                ),
+                child: Center(
+                  child: SvgPicture.asset(svgPath,width: 20,),
+                ),
+              ),
               const SizedBox(width: 16),
             ],
             Expanded(
@@ -67,8 +94,7 @@ class SettingItem extends StatelessWidget {
                 activeColor: AppColors.primaryColor,
               )
             else if (showArrow)
-              const Icon(Icons.arrow_forward_ios,
-                  color: Colors.grey, size: 16),
+              const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 16),
           ],
         ),
       ),
