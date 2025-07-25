@@ -30,4 +30,7 @@ class Assets {
   static const String notification= 'assets/icons/notification.svg';
   static const String touch_id= 'assets/icons/biometric.svg';
   static const String face_id= 'assets/icons/face_id.svg';
+  static const String bulletIcon= 'assets/icons/start_bullet.svg';
+  static const String edit_icon= 'assets/icons/edit_icon.svg';
+  static const String demoResult= 'assets/images/demoresult.png';
 }

@@ -16,6 +16,7 @@ import 'package:snapid/view/notification/notification.dart';
 import 'package:snapid/view/onboarding/onboarding.dart';
 import 'package:snapid/view/onboarding/onboarding2.dart';
 import 'package:snapid/view/photo_creation/photo_creation.dart';
+import 'package:snapid/view/photo_select/seletedPhotos.dart';
 import 'package:snapid/view/profile_fragment/edit_profile.dart';
 import 'package:snapid/view/security_setting/security_setting.dart';
 import 'package:snapid/view/splash/splash.dart';
@@ -128,6 +129,12 @@ class Pages {
       GetPage(
           name: PrimaryRoute.editProfile,
           page: () =>  EditProfile(),
+          binding: ControllerBindings(),
+          transition: Transition.downToUp
+          ),
+      GetPage(
+          name: PrimaryRoute.selectedPhoto,
+          page: () =>  SelectedPhotosScreen(),
           binding: ControllerBindings(),
           transition: Transition.downToUp
           ),

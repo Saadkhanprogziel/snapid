@@ -13,7 +13,6 @@ import 'package:snapid/utlis/custom_elevated_button.dart';
 
 import 'package:snapid/utlis/custom_outline_button.dart';
 
-
 class DashboardFragment extends StatefulWidget {
   @override
   State<DashboardFragment> createState() => _DashboardFragmentState();
@@ -89,8 +88,8 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                                 ),
                                 SizedBox(width: 10),
                                 GestureDetector(
-                                  onTap:() {
-                                     Get.toNamed(PrimaryRoute.notification);
+                                  onTap: () {
+                                    Get.toNamed(PrimaryRoute.notification);
                                   },
                                   child: Container(
                                     padding: EdgeInsets.symmetric(
@@ -158,7 +157,7 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                               width: double.infinity,
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color:AppColors.cardColor,
+                                color: AppColors.cardColor,
                                 borderRadius: BorderRadius.circular(25),
                               ),
                               child: Padding(
@@ -191,7 +190,8 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                                                   width: double.infinity,
                                                   child: CustomOutlineButton(
                                                     onPressed: () {
-                                                      
+                                                      Get.toNamed(PrimaryRoute
+                                                          .selectedPhoto);
                                                     },
                                                     label: "Upload Photo",
                                                     icon: Icons

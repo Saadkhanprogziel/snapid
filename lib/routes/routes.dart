@@ -17,4 +17,5 @@ class PrimaryRoute {
   static const String help_support = '/help_support';
   static const String editProfile = '/editProfile';
   static const String photo_creation = '/photoCreation';
+  static const String selectedPhoto = '/selectedPhoto';
 }

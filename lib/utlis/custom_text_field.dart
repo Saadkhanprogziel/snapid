@@ -48,29 +48,30 @@ class CustomTextField extends StatelessWidget {
           style: const TextStyle(color: Colors.white),
           onChanged: onChanged,
           decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: const TextStyle(color: Colors.white70),
-            filled: true,
-            fillColor:AppColors.cardColor, // Or use your fillColor
-            contentPadding: const EdgeInsets.symmetric(vertical: 18),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            prefixIcon: prefixIcon != null
-                ? Icon(prefixIcon, color: Colors.white70)
-                : null,
-            suffixIcon: suffixIcon != null
-                ? IconButton(
-                    icon: Icon(suffixIcon, color: Colors.white54),
-                    onPressed: onSuffixIconPressed,
-                  )
-                : null,
-          ),
+  hintText: hintText,
+  hintStyle: const TextStyle(color: Colors.white70),
+  filled: true,
+  fillColor: AppColors.cardColor,
+  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18), // <-- FIXED
+  border: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(12),
+    borderSide: BorderSide.none,
+  ),
+  enabledBorder: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(12),
+    borderSide: BorderSide.none,
+  ),
+  prefixIcon: prefixIcon != null
+      ? Icon(prefixIcon, color: Colors.white70)
+      : null,
+  suffixIcon: suffixIcon != null
+      ? IconButton(
+          icon: Icon(suffixIcon, color: Colors.white54),
+          onPressed: onSuffixIconPressed,
+        )
+      : null,
+),
+
         ),
       ],
     );
