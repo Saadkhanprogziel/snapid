@@ -1,4 +1,3 @@
-import 'package:csc_picker_plus/csc_picker_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -7,11 +6,15 @@ import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/photoController/photo_controller.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
+import 'package:snapid/utlis/countries.dart';
+import 'package:snapid/utlis/country_model.dart';
 import 'package:snapid/utlis/custom_bullets.dart';
+import 'package:snapid/utlis/custom_dialog_pop.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
 import 'package:snapid/utlis/custom_outline_button.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
 import 'package:snapid/utlis/custom_text_field.dart';
+import 'package:snapid/utlis/subscription_card.dart';
 
 class PhotoCreationScreen extends StatelessWidget {
   const PhotoCreationScreen({super.key});
@@ -39,6 +42,21 @@ class PhotoCreationScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              Obx(() {
+                return controller.currentStep.value > 1
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                        child: CustomElevatedButton(
+                          minHeight: 60,
+                          onPressed: () {
+                            controller.goToNextStep();
+                          },
+                          text: "Next",
+                        ),
+                      )
+                    : SizedBox.shrink(); // or Container() if you prefer
+              }),
             ],
           ),
         ],
@@ -77,7 +95,58 @@ class PhotoCreationScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const SpaceH60(),
+                const SpaceH20(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () => controller.goToPreviousStep(),
+                      child: Container(
+                        padding: EdgeInsets.all(5),
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors
+                              .transparent, // Optional: Add background color if needed
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back,
+                          color: AppColors.whiteColor,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Get.dialog(CustomDialogPop(
+                          svgPath: Assets.closeIcon,
+                          title: "Exit Photo Creation?",
+                          message:
+                              "You haven’t completed all steps. Are you sure you want to exit? Your progress may be lost.",
+                          onCancel: () {
+                            Get.back();
+                          },
+                          onPressed: () {
+                            Get.toNamed(PrimaryRoute.home);
+                          },
+                          solidBtnLabel: "Exit Aniway",
+                          isActionPopUp: true,
+                          solidBtnBg: AppColors.red,
+                        ));
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.transparent,
+                        ),
+                        child: const Icon(
+                          Icons.close,
+                          color: AppColors.whiteColor,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                const SpaceH30(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -168,7 +237,8 @@ class PhotoCreationScreen extends StatelessWidget {
         ));
   }
 
-  Widget _step1() {
+  Widget _step1(controller) {
+    print(controller.currentStep);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 70.0, vertical: 20),
       child: Column(
@@ -194,8 +264,11 @@ class PhotoCreationScreen extends StatelessWidget {
               const SpaceH20(),
               CustomElevatedButton(
                 onPressed: () async {
-                  await Get.toNamed(PrimaryRoute.selectedPhoto);
-                  // controller.setStep(2); // Update step on return
+                  await Get.toNamed(PrimaryRoute.selectedPhoto)?.then((_) {
+                    if (controller.currentStep != 1) {
+                      controller.setStep(1);
+                    }
+                  });
                 },
                 text: "Upload from Gallery",
                 minHeight: 60,
@@ -312,39 +385,63 @@ class PhotoCreationScreen extends StatelessWidget {
         ),
         const SpaceH20(),
         Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  child: CSCPickerPlus(
-                    layout: Layout.vertical,
-                    showStates: false,
-                    showCities: false,
-                    dropdownDecoration: BoxDecoration(
-                      color: AppColors.cardColor,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    disabledDropdownDecoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(10)),
-                      color: Colors.grey.shade200,
-                      border: Border.all(color: Colors.grey.shade300, width: 1),
-                    ),
-                    selectedItemStyle: TextStyle(color: AppColors.whiteColor),
-                    dropdownHeadingStyle: TextStyle(
-                      // Style for the dropdown heading
-                      color: AppColors.whiteColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    dropdownDialogRadius: 12.0,
-                    searchBarRadius: 12.0,
-                    onCountryChanged: (value) {
-                      print("Selected country: $value");
-                    },
-                  ),
+                Text(
+                  "Select Country",
+                  style: CustomTextTheme.regular18
+                      .copyWith(color: AppColors.whiteColor),
                 ),
                 SpaceH15(),
+                Obx(() {
+                  final country = controller.selectedCountry.value;
+                  return OutlinedButton(
+                    onPressed: () => _showCountryPicker(controller),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: Colors.grey.shade800),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                    ),
+                    child: Row(
+                      children: [
+                        if (country != null)
+                          Row(
+                            children: [
+                              SvgPicture.asset(
+                                country.flag,
+                                width: 24,
+                                height: 24,
+                              ),
+                              SizedBox(width: 12),
+                              Text(
+                                country.name,
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          )
+                        else
+                          Text(
+                            "Select Country",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        Spacer(),
+                        Icon(Icons.arrow_drop_down, color: Colors.white),
+                      ],
+                    ),
+                  );
+                }),
+                SpaceH25(),
+                Text(
+                  "Select Document Type",
+                  style: CustomTextTheme.regular18
+                      .copyWith(color: AppColors.whiteColor),
+                ),
+                SpaceH10(),
                 Obx(() => Wrap(
                       spacing: 16,
                       runSpacing: 8,
@@ -396,21 +493,13 @@ class PhotoCreationScreen extends StatelessWidget {
                   } else
                     return SizedBox();
                 }),
-                SpaceH40(),
-                CustomElevatedButton(
-                  minHeight: 60,
-                  onPressed: () {
-                    controller.setStep(3);
-                  },
-                  text: "Next",
-                )
               ],
             )),
       ],
     );
   }
 
-  Widget _step3(controller) {
+  Widget _step3(PhotoController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -445,7 +534,7 @@ class PhotoCreationScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SpaceH20(), 
+                      SpaceH20(),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -456,27 +545,92 @@ class PhotoCreationScreen extends StatelessWidget {
                           ),
                           GestureDetector(
                             onTap: () {
-                              print("Tap tap");
+                              controller.setStep(2);
                             },
-                            child: SvgPicture.asset(Assets.edit_icon,width: 20,),
+                            child: SvgPicture.asset(
+                              Assets.edit_icon,
+                              width: 20,
+                            ),
                           )
                         ],
                       ),
-                      SpaceH30(), 
-                      infoRow("Country:", "🇺🇸 United States"),
+                      SpaceH30(),
+                      infoRow("Country:",
+                          "${controller.selectedCountry.value!.name}",
+                          flagPath: controller.selectedCountry.value!.flag),
                       const Divider(color: Colors.white12),
-                      infoRow("Document:", "Passport"),
+                      infoRow("Document:", controller.selectedType.value.name),
                       const Divider(color: Colors.white12),
                       infoRow("Size:", "50x50 Cm"),
                     ],
                   ),
                 ),
                 SpaceH40(),
-                CustomElevatedButton(
-                  minHeight: 60,
-                  onPressed: () {},
-                  text: "Next",
-                )
+              ],
+            )),
+      ],
+    );
+  }
+
+  Widget _step4(PhotoController controller) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SpaceH10(),
+        Center(
+          child: Container(
+            width: 350,
+            height: 250,
+            child: Image.asset(Assets.demoResult2),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 10),
+          child: Text(
+            "Download Both Files After Payment.",
+            textAlign: TextAlign.center,
+            style: CustomTextTheme.regular20
+                .copyWith(color: Colors.white, fontWeight: FontWeight.w400),
+          ),
+        ),
+        Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      SubscriptionCard(
+                        title: "Standard",
+                        photoCount: 1,
+                        price: "\$6.99",
+                        description: "Perfect for one time",
+                        isPopular: false,
+                        savings: "",
+                      ),
+                      SizedBox(width: 8),
+                      SubscriptionCard(
+                        title: "Smart Pack",
+                        photoCount: 3,
+                        price: "\$14.99",
+                        description: "Perfect for three photos",
+                        isPopular: true,
+                        savings: "Save - 28 %",
+                      ),
+                      SizedBox(width: 8),
+                      SubscriptionCard(
+                        title: "Family Pack",
+                        photoCount: 5,
+                        price: "\$19.99",
+                        description: "Ideal for families or agencies",
+                        isPopular: false,
+                        savings: "Save - 43 %",
+                      ),
+                    ],
+                  ),
+                ),
               ],
             )),
       ],
@@ -535,7 +689,7 @@ class PhotoCreationScreen extends StatelessWidget {
     );
   }
 
-  Widget infoRow(String label, String value) {
+  Widget infoRow(String label, String value, {String? flagPath}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 20),
       child: Row(
@@ -543,27 +697,123 @@ class PhotoCreationScreen extends StatelessWidget {
         children: [
           Text(
             label,
-            style:
-                CustomTextTheme.regular16.copyWith(color: AppColors.whiteColor),
+            style: CustomTextTheme.regular14.copyWith(
+              color: AppColors.whiteColor,
+              fontWeight: FontWeight.w400,
+            ),
           ),
-          Text(
-            value,
-            style:
-                CustomTextTheme.regular16.copyWith(color: AppColors.whiteColor),
-          )
+          Row(
+            children: [
+              if (flagPath != null && flagPath.isNotEmpty) ...[
+                SvgPicture.asset(
+                  flagPath,
+                  width: 30,
+                ),
+                SpaceW12(),
+              ],
+              Text(
+                value,
+                style: CustomTextTheme.regular14.copyWith(
+                  color: AppColors.whiteColor,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
+    );
+  }
+
+  void _showCountryPicker(controller) {
+    showModalBottomSheet(
+      context: Get.context!,
+      isScrollControlled: true,
+      backgroundColor: const Color.fromARGB(255, 41, 42, 50),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) {
+        TextEditingController searchController = TextEditingController();
+        RxList<Country> filteredCountries = allCountries.obs;
+
+        return Padding(
+          padding: EdgeInsets.only(
+              bottom: MediaQuery.of(Get.context!).viewInsets.bottom),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: searchController,
+                  cursorColor: AppColors.whiteColor,
+                  style:
+                      TextStyle(color: AppColors.whiteColor), // <-- important
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.search, color: AppColors.whiteColor),
+                    labelText: 'Search country',
+                    labelStyle: TextStyle(color: AppColors.whiteColor),
+                    hintStyle: CustomTextTheme.regular14
+                        .copyWith(color: AppColors.whiteColor),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey.shade800),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onChanged: (value) {
+                    filteredCountries.value = allCountries
+                        .where((c) =>
+                            c.name.toLowerCase().contains(value.toLowerCase()))
+                        .toList();
+                  },
+                ),
+                SizedBox(height: 16),
+                Obx(() => SizedBox(
+                      height: 300,
+                      child: ListView.builder(
+                        itemCount: filteredCountries.length,
+                        itemBuilder: (_, index) {
+                          final country = filteredCountries[index];
+                          return ListTile(
+                            leading: SvgPicture.asset(
+                              country.flag,
+                              width: 24,
+                              height: 24,
+                            ),
+                            title: Text(
+                              country.name,
+                              style: CustomTextTheme.regular14.copyWith(
+                                color: AppColors.whiteColor,
+                              ),
+                            ),
+                            onTap: () => controller.selectCountry(country),
+                          );
+                        },
+                      ),
+                    )),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildBodyData(PhotoController controller) {
     switch (controller.currentStep.value) {
       case 1:
-        return _step1();
+        return _step1(controller);
       case 2:
         return _step2(controller);
       case 3:
         return _step3(controller);
+      case 4:
+        return _step4(controller);
 
       default:
         return Container();

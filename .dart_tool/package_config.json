@@ -74,12 +74,6 @@
       "languageVersion": "3.3"
     },
     {
-      "name": "csc_picker_plus",
-      "rootUri": "file:///C:/Users/CC/AppData/Local/Pub/Cache/hosted/pub.dev/csc_picker_plus-0.0.3",
-      "packageUri": "lib/",
-      "languageVersion": "3.4"
-    },
-    {
       "name": "cupertino_icons",
       "rootUri": "file:///C:/Users/CC/AppData/Local/Pub/Cache/hosted/pub.dev/cupertino_icons-1.0.8",
       "packageUri": "lib/",
@@ -482,7 +476,7 @@
       "languageVersion": "3.6"
     }
   ],
-  "generated": "2025-07-25T11:05:04.824407Z",
+  "generated": "2025-07-26T04:37:55.116806Z",
   "generator": "pub",
   "generatorVersion": "3.6.2",
   "flutterRoot": "file:///C:/src/flutter3.24",

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/routes/routes.dart';
+import 'package:snapid/view/assistant_fragment/assistant.dart';
 import 'package:snapid/view/dashboard_fragment/dashboard_fragment.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:snapid/view/history_fragment/history_fragment.dart';
@@ -22,8 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     DashboardFragment(),
     HistoryFragment(),
-
-    const PlaceholderScreen(title: 'Message'),
+    AssistantFragment(),
     ProfileFragment()
   ];
 

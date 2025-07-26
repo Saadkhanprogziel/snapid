@@ -18,6 +18,7 @@ class CustomDialogPop extends StatelessWidget {
   final bool isRadio;
   final IconData? iconData;
   final Color? iconColor;
+  final Color solidBtnBg;
   final List<Map<String, String>>? radioOptions; // id + name
   final RxString? selectedOption;
   final VoidCallback onCancel;
@@ -29,8 +30,8 @@ class CustomDialogPop extends StatelessWidget {
     Key? key,
     required this.title,
     required this.message,
-     this.solidBtnLabel ="Submit",
-     this.outlineLabel ="Cancel",
+    this.solidBtnLabel = "Submit",
+    this.outlineLabel = "Cancel",
     this.isIcon = false,
     this.isActionPopUp = false,
     this.iconData,
@@ -40,7 +41,9 @@ class CustomDialogPop extends StatelessWidget {
     this.radioOptions,
     this.selectedOption,
     required this.onCancel,
-    required this.onPressed,  this.svgPath= "",
+    required this.onPressed,
+    this.svgPath = "",
+    this.solidBtnBg = AppColors.primaryColor,
   }) : super(key: key);
 
   @override
@@ -56,7 +59,7 @@ class CustomDialogPop extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 40),
             margin: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color:backgroundColor,
+              color: backgroundColor,
               borderRadius: BorderRadius.circular(30),
             ),
             child: Column(
@@ -147,7 +150,9 @@ class CustomDialogPop extends StatelessWidget {
                       SpaceW10(),
                       Expanded(
                           child: CustomElevatedButton(
-                              onPressed: onPressed, text: solidBtnLabel)),
+                              backgroundColor: solidBtnBg,
+                              onPressed: onPressed,
+                              text: solidBtnLabel)),
                     ],
                   ),
                 ],

@@ -16,6 +16,7 @@ class AppColors {
   static const Color themeGreyColor1       = Color(0xffD9D9D9);
   static const Color themeGreyColor2       = Color(0xffF5F5F5);
   static const Color cardColor             = Color.fromARGB(25, 223, 222,222);
+  static const Color cardColorsolid        = Color.fromARGB(100, 223, 222,222);
   static const Color backBtnColor          = Color.fromARGB(100, 96, 66, 255);
   
 
