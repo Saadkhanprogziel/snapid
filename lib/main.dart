@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/constant/strings.dart';
 import 'package:snapid/router_management/route_management.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/utlis/custom_scroll.dart';
+final appStorage = GetStorage();
 
 void main() {
   runApp(const MyApp());

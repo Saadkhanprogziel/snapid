@@ -76,6 +76,8 @@ class CustomDialogPop extends StatelessWidget {
                   ),
                 if (svgPath.isNotEmpty)
                   Container(
+                    width: 100,
+                    height: 100,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: const Color.fromRGBO(255, 255, 255, 0.05),
@@ -146,10 +148,12 @@ class CustomDialogPop extends StatelessWidget {
                     children: [
                       Expanded(
                           child: CustomOutlineButton(
+                            minHeight: 60,
                               onPressed: onCancel, label: outlineLabel)),
                       SpaceW10(),
                       Expanded(
                           child: CustomElevatedButton(
+                            minHeight: 60,
                               backgroundColor: solidBtnBg,
                               onPressed: onPressed,
                               text: solidBtnLabel)),

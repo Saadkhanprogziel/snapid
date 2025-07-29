@@ -5,14 +5,8 @@ import 'package:snapid/constant/colors.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
 
-class Onboarding3 extends StatefulWidget {
-  const Onboarding3({super.key});
-
-  @override
-  State<Onboarding3> createState() => _Onboarding3State();
-}
-
-class _Onboarding3State extends State<Onboarding3> {
+class Onboarding3 extends StatelessWidget {
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,9 +1,3 @@
-
-
-
-
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:snapid/constant/assets.dart';
@@ -11,12 +5,8 @@ import 'package:snapid/constant/colors.dart';
 import 'package:snapid/theme/text_theme.dart';
 
 
-class DashboardFragment extends StatefulWidget {
-  @override
-  State<DashboardFragment> createState() => _DashboardFragmentState();
-}
-
-class _DashboardFragmentState extends State<DashboardFragment> {
+class DashboardFragment extends StatelessWidget {
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(

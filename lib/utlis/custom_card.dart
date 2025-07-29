@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/theme/text_theme.dart';
 
@@ -22,7 +23,7 @@ class CountryCard extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
         child: Container(
-          width: 250,
+          width: 300,
           decoration: BoxDecoration(
             color: AppColors.cardColor, // Light translucent color
             borderRadius: BorderRadius.circular(15),
@@ -31,7 +32,19 @@ class CountryCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset(flagAsset, width: 70, height: 50),
+              Container(
+                width: 90,
+                height: 60,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.white, // Optional: background color
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: SvgPicture.asset(
+                  flagAsset,
+                  fit: BoxFit.cover,
+                ),
+              ),
               const SizedBox(height: 20),
               Text(countryName,
                   style: CustomTextTheme.regular16

@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/colors.dart';
+import 'package:snapid/constant/strings.dart';
 import 'package:snapid/controllers/onboarding/onbording_controller.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
@@ -102,7 +103,7 @@ class OnBoardingView extends GetView<OnBoardingController> {
                           controller.goToLastPage();
                         },
                         child: const Text(
-                          "Skip",
+                          Strings.skip,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 16,

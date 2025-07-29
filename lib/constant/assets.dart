@@ -34,6 +34,7 @@ class Assets {
   static const String edit_icon= 'assets/icons/edit_icon.svg';
   static const String bot= 'assets/icons/bot.svg';
   static const String closeIcon= 'assets/icons/close_icon.svg';
+  static const String clearIcon= 'assets/icons/clear_icon.svg';
   static const String demoResult= 'assets/images/demoresult.png';
   static const String demoResult2= 'assets/images/demoresult2.png';
   static const String skin= 'assets/images/skin.png';

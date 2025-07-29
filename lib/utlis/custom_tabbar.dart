@@ -4,14 +4,14 @@ import 'package:snapid/theme/text_theme.dart';
 class TabBarWidget extends StatelessWidget {
   final List<String> tabs;
   final ValueChanged<int>? onTabSelected;
-  final int selectedIndex; // Renamed from initialIndex for clarity
+  final int selectedIndex;
 
   const TabBarWidget({
-    Key? key,
+    super.key,
     required this.tabs,
     required this.selectedIndex,
     this.onTabSelected,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

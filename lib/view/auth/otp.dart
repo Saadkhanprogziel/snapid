@@ -2,123 +2,56 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
+import 'package:snapid/controllers/opt/otp_controller.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/message_popup.dart';
+class OtpScreen extends StatelessWidget {
+  final OtpController controller = Get.put(OtpController());
 
-class OtpScreen extends StatefulWidget {
-  @override
-  _OtpScreenState createState() => _OtpScreenState();
-}
-
-class _OtpScreenState extends State<OtpScreen> {
-  List<FocusNode> focusNodes = List.generate(6, (index) => FocusNode());
-  List<TextEditingController> controllers =
-      List.generate(6, (index) => TextEditingController());
-  late bool isPasswordForgot;
-
-  int secondsRemaining = 30;
-  Timer? timer;
-
-  @override
-  void initState() {
-    super.initState();
-    final args = Get.arguments as Map<String, dynamic>?;
-    isPasswordForgot = args?['isPasswordForgot'] ?? false;
-    startTimer();
-
-    for (int i = 0; i < focusNodes.length; i++) {
-      focusNodes[i].addListener(() {
-        if (focusNodes[i].hasFocus && controllers[i].text.isNotEmpty) {
-          controllers[i].selection = TextSelection(
-            baseOffset: 0,
-            extentOffset: controllers[i].text.length,
-          );
-        }
-      });
-    }
-  }
-
-  void startTimer() {
-    secondsRemaining = 30;
-    timer?.cancel();
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
-      if (secondsRemaining == 0) {
-        t.cancel();
-      } else {
-        setState(() {
-          secondsRemaining--;
-        });
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    for (var node in focusNodes) {
-      node.dispose();
-    }
-    for (var controller in controllers) {
-      controller.dispose();
-    }
-    timer?.cancel();
-    super.dispose();
-  }
-
-  void handleInput(String value, int index) {
-    if (value.length == 1 && index < 5) {
-      FocusScope.of(context).requestFocus(focusNodes[index + 1]);
-    } else if (value.isEmpty && index > 0) {
-      FocusScope.of(context).requestFocus(focusNodes[index - 1]);
-    }
-  }
+  OtpScreen({super.key});
 
   Widget buildOtpBox(int index) {
-    return Container(
-      width: 50,
-      height: 60,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: controllers[index].text.isNotEmpty
-            ? Border.all(color: Colors.deepPurpleAccent)
-            : Border.all(color: Colors.transparent),
-        color: Color.fromRGBO(255, 255, 255, 0.05),
-      ),
-      alignment: Alignment.center,
-      child: TextField(
-        controller: controllers[index],
-        focusNode: focusNodes[index],
-        onChanged: (value) {
-          setState(() {});
-          handleInput(value, index);
-        },
-        style: TextStyle(color: Colors.white, fontSize: 24),
-        textAlign: TextAlign.center,
-        keyboardType: TextInputType.number,
-        inputFormatters: [
-          LengthLimitingTextInputFormatter(1),
-          FilteringTextInputFormatter.digitsOnly,
-        ],
-        decoration: InputDecoration(
-          border: InputBorder.none,
-        ),
-      ),
-    );
+    return Obx(() => Container(
+          width: 50,
+          height: 60,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            border: controller.controllers[index].text.isNotEmpty
+                ? Border.all(color: Colors.deepPurpleAccent)
+                : Border.all(color: Colors.transparent),
+            color: Color.fromRGBO(255, 255, 255, 0.05),
+          ),
+          alignment: Alignment.center,
+          child: TextField(
+            controller: controller.controllers[index],
+            focusNode: controller.focusNodes[index],
+            onChanged: (value) {
+              controller.handleInput(value, index);
+            },
+            style: TextStyle(color: Colors.white, fontSize: 24),
+            textAlign: TextAlign.center,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(1),
+              FilteringTextInputFormatter.digitsOnly,
+            ],
+            decoration: InputDecoration(border: InputBorder.none),
+          ),
+        ));
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: Stack(
         children: [
           Positioned.fill(
             child: Image.asset(
-              Assets.appBg, // Replace with your actual image path
+              Assets.appBg,
               fit: BoxFit.cover,
             ),
           ),
@@ -133,7 +66,9 @@ class _OtpScreenState extends State<OtpScreen> {
                       Text(
                         "Verify Your Identity",
                         style: CustomTextTheme.headingLarge.copyWith(
-                            fontSize: 32, color: AppColors.whiteColor),
+                          fontSize: 32,
+                          color: AppColors.whiteColor,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -141,7 +76,6 @@ class _OtpScreenState extends State<OtpScreen> {
                         textAlign: TextAlign.center,
                         style: CustomTextTheme.regular16.copyWith(
                           color: Colors.white70,
-                          // fontSize: 16,
                         ),
                       ),
                     ],
@@ -162,10 +96,10 @@ class _OtpScreenState extends State<OtpScreen> {
                         ),
                         barrierDismissible: false,
                       );
-                     await Future.delayed(Duration(milliseconds: 1300), () {
-                        Get.back(); // Close the popup
-                      });
-                      if(isPasswordForgot){
+                      await Future.delayed(Duration(milliseconds: 1300));
+                      Get.back();
+
+                      if (controller.isPasswordForgot) {
                         Get.toNamed(PrimaryRoute.resetPassword);
                       }
                     },
@@ -178,7 +112,9 @@ class _OtpScreenState extends State<OtpScreen> {
                       minimumSize: const Size.fromHeight(60),
                     ),
                     child: Text(
-                      isPasswordForgot ? "Verify" : "Verify & Continue",
+                      controller.isPasswordForgot
+                          ? "Verify"
+                          : "Verify & Continue",
                       style: CustomTextTheme.regular16
                           .copyWith(color: AppColors.whiteColor),
                     ),
@@ -195,24 +131,25 @@ class _OtpScreenState extends State<OtpScreen> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  RichText(
-                    text: TextSpan(
-                      text: "Didn't receive the code?\n",
-                      style: TextStyle(color: Colors.white, fontSize: 14),
-                      children: [
-                        TextSpan(
-                          text: secondsRemaining > 0
-                              ? "Resend in ${secondsRemaining}s"
-                              : "Resend",
-                          style: TextStyle(
-                            color: Colors.deepPurpleAccent,
-                            fontWeight: FontWeight.bold,
-                          ),
+                  Obx(() => RichText(
+                        text: TextSpan(
+                          text: "Didn't receive the code?\n",
+                          style:
+                              TextStyle(color: Colors.white, fontSize: 14),
+                          children: [
+                            TextSpan(
+                              text: controller.secondsRemaining.value > 0
+                                  ? "Resend in ${controller.secondsRemaining.value}s"
+                                  : "Resend",
+                              style: TextStyle(
+                                color: Colors.deepPurpleAccent,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+                        textAlign: TextAlign.center,
+                      )),
                 ],
               ),
             ),

@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:snapid/bindings/bindings.dart';
 import 'package:snapid/routes/routes.dart';
+import 'package:snapid/view/assistant_fragment/assistant.dart';
 import 'package:snapid/view/auth/forgot_password.dart';
 import 'package:snapid/view/auth/login.dart';
 import 'package:snapid/view/auth/otp.dart';
@@ -17,6 +18,7 @@ import 'package:snapid/view/onboarding/onboarding.dart';
 import 'package:snapid/view/onboarding/onboarding2.dart';
 import 'package:snapid/view/photo_creation/photo_creation.dart';
 import 'package:snapid/view/photo_select/seletedPhotos.dart';
+import 'package:snapid/view/popular_countries.dart/popular_countries.dart';
 import 'package:snapid/view/profile_fragment/edit_profile.dart';
 import 'package:snapid/view/security_setting/security_setting.dart';
 import 'package:snapid/view/splash/splash.dart';
@@ -36,7 +38,7 @@ class Pages {
       ),
       GetPage(
         name: PrimaryRoute.onBoard3,
-        page: () => const Onboarding3(),
+        page: () =>  Onboarding3(),
         binding: ControllerBindings(),
         transition: Transition.cupertino,
       ),
@@ -137,6 +139,18 @@ class Pages {
           page: () =>  SelectedPhotosScreen(),
           binding: ControllerBindings(),
           transition: Transition.downToUp
+          ),
+      GetPage(
+          name: PrimaryRoute.assistant,
+          page: () =>  AssistantFragment(),
+          binding: ControllerBindings(),
+          transition: Transition.cupertino
+          ),
+      GetPage(
+          name: PrimaryRoute.popularCountires,
+          page: () =>  PopularCountries(),
+          binding: ControllerBindings(),
+          transition: Transition.cupertino
           ),
     ];
   }

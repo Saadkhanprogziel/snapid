@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
+import 'package:snapid/constant/strings.dart';
 import 'package:snapid/controllers/dashboard/dashboard_controller.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
@@ -13,16 +14,12 @@ import 'package:snapid/utlis/custom_elevated_button.dart';
 
 import 'package:snapid/utlis/custom_outline_button.dart';
 
-class DashboardFragment extends StatefulWidget {
-  @override
-  State<DashboardFragment> createState() => _DashboardFragmentState();
-}
-
-class _DashboardFragmentState extends State<DashboardFragment> {
-  final DashboardController controller = Get.put(DashboardController());
+class DashboardFragment extends StatelessWidget {
+  const DashboardFragment({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final DashboardController controller = Get.put(DashboardController());
     return Scaffold(
       body: Stack(
         children: [
@@ -81,7 +78,7 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
-                                    "Credits Remaining: 03",
+                                    Strings.creditsRemaining,
                                     style: CustomTextTheme.regular14
                                         .copyWith(color: AppColors.whiteColor),
                                   ),
@@ -115,7 +112,7 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                               children: [
                                 SizedBox(height: 20),
                                 Text(
-                                  "Hello, John! 👋",
+                                  Strings.helloUser,
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 22,
@@ -124,7 +121,7 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                                 ),
                                 SizedBox(height: 6),
                                 Text(
-                                  "Welcome back! Let's get your next\nphoto ready in just a few steps.",
+                                  Strings.welcomeBack,
                                   textAlign: TextAlign.left,
                                   style: TextStyle(
                                     color: Colors.white70,
@@ -165,7 +162,7 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                                     const EdgeInsets.symmetric(horizontal: 20),
                                 child: Column(
                                   children: [
-                                    Text("Upload or Take a Photo",
+                                    Text(Strings.uploadOrTakePhoto,
                                         style: CustomTextTheme.regular18
                                             .copyWith(
                                                 color: AppColors.whiteColor)),
@@ -176,10 +173,7 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                                           child: Column(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              SizedBox(
-                                                child:
-                                                    Image.asset(Assets.sample1),
-                                              ),
+                                              Image.asset(Assets.sample1),
                                               SizedBox(height: 12),
                                               Padding(
                                                 padding:
@@ -193,7 +187,7 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                                                       Get.toNamed(PrimaryRoute
                                                           .selectedPhoto);
                                                     },
-                                                    label: "Upload Photo",
+                                                    label: Strings.uploadPhoto,
                                                     icon: Icons
                                                         .file_upload_outlined,
                                                     iconColor:
@@ -207,17 +201,12 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                                             ],
                                           ),
                                         ),
-                                        SizedBox(
-                                          width: 2,
-                                        ),
+                                        SizedBox(width: 2),
                                         Expanded(
                                           child: Column(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              SizedBox(
-                                                child:
-                                                    Image.asset(Assets.sample2),
-                                              ),
+                                              Image.asset(Assets.sample2),
                                               SizedBox(height: 12),
                                               Padding(
                                                 padding:
@@ -228,7 +217,7 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                                                   width: double.infinity,
                                                   child: CustomElevatedButton(
                                                     onPressed: () {},
-                                                    text: "Take Photo",
+                                                    text: Strings.takePhoto,
                                                   ),
                                                 ),
                                               ),
@@ -252,7 +241,7 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                                         TextButton(
                                           onPressed: () {},
                                           child: Text(
-                                            "Photo Guidelines",
+                                            Strings.photoGuidelines,
                                             style: CustomTextTheme.regular14
                                                 .copyWith(
                                                     color:
@@ -274,22 +263,27 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                           Padding(
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 30.0),
-                            child: const Row(
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  'Most Popular',
+                                  Strings.mostPopular,
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Text(
-                                  'View All →',
-                                  style: TextStyle(
-                                    color: Colors.white54,
-                                    fontSize: 14,
+                                InkWell(
+                                  onTap: () {
+                                    Get.toNamed(PrimaryRoute.popularCountires);
+                                  },
+                                  child: Text(
+                                    Strings.viewAll,
+                                    style: TextStyle(
+                                      color: Colors.white54,
+                                      fontSize: 14,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -304,51 +298,51 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                                 scrollDirection: Axis.horizontal,
                                 children: const [
                                   CountryCard(
-                                    countryName: 'United State',
-                                    flagAsset: 'assets/images/us.png',
-                                    passportSize: '3.5 x 4.5 Cm',
+                                    countryName: Strings.unitedStates,
+                                    flagAsset: 'assets/flags/us.svg',
+                                    passportSize: Strings.passportSizeUS,
                                   ),
                                   SizedBox(width: 16),
                                   CountryCard(
-                                    countryName: 'United Arab Emirates',
-                                    flagAsset: 'assets/images/us.png',
-                                    passportSize: '4.3 x 5.5 Cm',
+                                    countryName: Strings.unitedArabEmirates,
+                                    flagAsset: 'assets/flags/ae.svg',
+                                    passportSize: Strings.passportSizeUAE,
                                   ),
                                   SizedBox(width: 16),
                                   CountryCard(
-                                    countryName: 'United Arab Emirates',
-                                    flagAsset: 'assets/images/us.png',
-                                    passportSize: '4.3 x 5.5 Cm',
+                                    countryName: Strings.unitedArabEmirates,
+                                    flagAsset: 'assets/flags/ag.svg',
+                                    passportSize: Strings.passportSizeUAE,
                                   ),
                                   SizedBox(width: 16),
                                   CountryCard(
-                                    countryName: 'United Arab Emirates',
-                                    flagAsset: 'assets/images/us.png',
-                                    passportSize: '4.3 x 5.5 Cm',
+                                    countryName: Strings.unitedArabEmirates,
+                                    flagAsset: 'assets/flags/ss.svg',
+                                    passportSize: Strings.passportSizeUAE,
                                   ),
                                   SizedBox(width: 16),
                                   CountryCard(
-                                    countryName: 'United Arab Emirates',
-                                    flagAsset: 'assets/images/us.png',
-                                    passportSize: '4.3 x 5.5 Cm',
+                                    countryName: Strings.unitedArabEmirates,
+                                    flagAsset: 'assets/flags/sx.svg',
+                                    passportSize: Strings.passportSizeUAE,
                                   ),
                                   SizedBox(width: 16),
                                   CountryCard(
-                                    countryName: 'United Arab Emirates',
-                                    flagAsset: 'assets/images/us.png',
-                                    passportSize: '4.3 x 5.5 Cm',
+                                    countryName: Strings.unitedArabEmirates,
+                                    flagAsset: 'assets/flags/vg.svg',
+                                    passportSize: Strings.passportSizeUAE,
                                   ),
                                   SizedBox(width: 16),
                                   CountryCard(
-                                    countryName: 'United Arab Emirates',
-                                    flagAsset: 'assets/images/us.png',
-                                    passportSize: '4.3 x 5.5 Cm',
+                                    countryName: Strings.unitedArabEmirates,
+                                    flagAsset: 'assets/flags/us.svg',
+                                    passportSize: Strings.passportSizeUAE,
                                   ),
                                 ],
                               ),
                             ),
                           ),
-                          SizedBox(height: 80), // Bottom padding
+                          SizedBox(height: 80),
                         ],
                       ),
                     ],

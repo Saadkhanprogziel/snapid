@@ -1,6 +1,7 @@
 
 import 'package:get/get.dart';
 import 'package:snapid/controllers/history/history_controller.dart';
+import 'package:snapid/controllers/home/home_controller.dart';
 import 'package:snapid/controllers/notification/notification_controller.dart';
 
 
@@ -16,6 +17,7 @@ class ControllerBindings extends Bindings {
     Get.lazyPut(() => HistoryController());
     Get.lazyPut(() => NotificationController());
     Get.lazyPut(() => PhotoController());
+    Get.lazyPut(() => HomeController());
     // Get.lazyPut(() => UserRegisterController());
     // Get.lazyPut(() => RegisterProfileController());
     // Get.lazyPut(() => LoginController());

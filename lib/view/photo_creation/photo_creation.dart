@@ -370,7 +370,7 @@ class PhotoCreationScreen extends StatelessWidget {
     );
   }
 
-  Widget _step2(controller) {
+  Widget _step2(PhotoController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

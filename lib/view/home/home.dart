@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/colors.dart';
+import 'package:snapid/controllers/home/home_controller.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/view/assistant_fragment/assistant.dart';
 import 'package:snapid/view/dashboard_fragment/dashboard_fragment.dart';
@@ -9,33 +10,24 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:snapid/view/history_fragment/history_fragment.dart';
 import 'package:snapid/view/profile_fragment/profile_fragment.dart';
 // import 'dashboard_screen.dart';
+class HomeScreen extends StatelessWidget {
+  HomeScreen({super.key});
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final HomeController controller = Get.put(HomeController());
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
+ final List<Widget> _screens = [
+  DashboardFragment(), 
+  HistoryFragment(),  
+  AssistantFragment(),
+  ProfileFragment(),    
+];
 
-class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
-
-  final List<Widget> _screens = [
-    DashboardFragment(),
-    HistoryFragment(),
-    AssistantFragment(),
-    ProfileFragment()
-  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      body: Stack(
-        children: [
-          _screens[_selectedIndex],
-        ],
-      ),
+      body: Obx(() => _screens[controller.selectedIndex.value]),
       bottomNavigationBar: ClipRRect(
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(24),
@@ -47,20 +39,20 @@ class _HomeScreenState extends State<HomeScreen> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Color.fromARGB(227, 18, 18, 18), // top: dark grey
-                Color(0xFF000000), // bottom: deep black
+                Color.fromARGB(227, 18, 18, 18),
+                Color(0xFF000000),
               ],
             ),
           ),
           child: BottomAppBar(
-            color: Colors.transparent, // Transparent to show gradient
+            color: Colors.transparent,
             elevation: 0,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 buildNavBarItem('assets/icons/home.svg', 'Home', 0),
                 buildNavBarItem('assets/icons/clock.svg', 'History', 1),
-                const SizedBox(width: 20), // space for FAB
+                const SizedBox(width: 20),
                 buildNavBarItem('assets/icons/assistant.svg', 'Assistant', 2),
                 buildNavBarItem('assets/icons/profile.svg', 'Profile', 3),
               ],
@@ -77,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: const Color.fromARGB(117, 104, 76, 243), // Glow color
+                color: const Color.fromARGB(117, 104, 76, 243),
                 blurRadius: 2,
                 spreadRadius: 5,
               ),
@@ -105,58 +97,43 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-    
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   Widget buildNavBarItem(String svgPath, String label, int index) {
-    final isSelected = _selectedIndex == index;
+    return Obx(() {
+      final isSelected = controller.selectedIndex.value == index;
 
-    return InkWell(
-      onTap: () => _onItemTapped(index),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SvgPicture.asset(
-            svgPath,
-            height: 24,
-            width: 24,
-            colorFilter: ColorFilter.mode(
-              isSelected ? const Color(0xFF7861FF) : Colors.white70,
-              BlendMode.srcIn,
+      return InkWell(
+        onTap: () {
+          if (index == 2) {
+            Get.toNamed(PrimaryRoute.assistant);
+          } else {
+            controller.setIndex(index);
+          }
+        },
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SvgPicture.asset(
+              svgPath,
+              height: 24,
+              width: 24,
+              colorFilter: ColorFilter.mode(
+                isSelected ? const Color(0xFF7861FF) : Colors.white70,
+                BlendMode.srcIn,
+              ),
             ),
-          ),
-          Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? const Color(0xFF7861FF) : Colors.white70,
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? const Color(0xFF7861FF) : Colors.white70,
+              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class PlaceholderScreen extends StatelessWidget {
-  final String title;
-
-  const PlaceholderScreen({super.key, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        title,
-        style: const TextStyle(fontSize: 24),
-      ),
-    );
+          ],
+        ),
+      );
+    });
   }
 }

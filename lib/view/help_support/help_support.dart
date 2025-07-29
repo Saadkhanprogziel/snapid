@@ -117,7 +117,7 @@ class HelpSupport extends StatelessWidget {
                                       color: AppColors.cardColor,
                                     ),
                                     child: Center(
-                                      child: Icon(Icons.email,
+                                      child: Icon(Icons.language,
                                           color: Colors.white70),
                                     ),
                                   ),
@@ -127,13 +127,13 @@ class HelpSupport extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "Email",
+                                        "Help Center Website",
                                         style: CustomTextTheme.regular16
                                             .copyWith(
                                                 color: AppColors.whiteColor),
                                       ),
                                       Text(
-                                        "support@snapid.app!",
+                                        "www.snapid.com",
                                         style: CustomTextTheme.regular12
                                             .copyWith(color: AppColors.grey),
                                       ),
