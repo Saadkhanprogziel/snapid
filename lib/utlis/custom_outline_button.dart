@@ -43,7 +43,7 @@ class CustomOutlineButton extends StatelessWidget {
             ),
             label: Text(
               label,
-              style: CustomTextTheme.regular14.copyWith(
+              style: CustomTextTheme.regular16.copyWith(
                 color: textColor,
               ),
             ),
@@ -53,7 +53,7 @@ class CustomOutlineButton extends StatelessWidget {
             onPressed: onPressed,
             child: Text(
               label,
-              style: CustomTextTheme.regular14.copyWith(
+              style: CustomTextTheme.regular16.copyWith(
                 color: textColor,
               ),
             ),

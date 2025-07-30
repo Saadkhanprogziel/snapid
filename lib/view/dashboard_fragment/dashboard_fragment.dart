@@ -7,11 +7,11 @@ import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/constant/strings.dart';
 import 'package:snapid/controllers/dashboard/dashboard_controller.dart';
+import 'package:snapid/controllers/photoController/photo_controller.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_card.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
-
 import 'package:snapid/utlis/custom_outline_button.dart';
 
 class DashboardFragment extends StatelessWidget {
@@ -20,6 +20,8 @@ class DashboardFragment extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DashboardController controller = Get.put(DashboardController());
+    final PhotoController photoController = Get.find<PhotoController>();
+
     return Scaffold(
       body: Stack(
         children: [
@@ -34,10 +36,10 @@ class DashboardFragment extends StatelessWidget {
           Column(
             children: [
               AnimatedSize(
+                alignment: Alignment.topCenter,
                 duration: Duration(milliseconds: 300),
                 curve: Curves.linear,
                 child: Container(
-                  width: double.infinity,
                   padding: EdgeInsets.only(top: 70, bottom: 30),
                   decoration: BoxDecoration(
                     image: DecorationImage(
@@ -79,8 +81,9 @@ class DashboardFragment extends StatelessWidget {
                                   ),
                                   child: Text(
                                     Strings.creditsRemaining,
-                                    style: CustomTextTheme.regular14
-                                        .copyWith(color: AppColors.whiteColor),
+                                    style: CustomTextTheme.regular14.copyWith(
+                                      color: AppColors.whiteColor,
+                                    ),
                                   ),
                                 ),
                                 SizedBox(width: 10),
@@ -104,34 +107,8 @@ class DashboardFragment extends StatelessWidget {
                             ),
                           ],
                         ),
-                        Obx(() {
-                          return Visibility(
-                            visible: controller.showGreeting.value,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(height: 20),
-                                Text(
-                                  Strings.helloUser,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(height: 6),
-                                Text(
-                                  Strings.welcomeBack,
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }),
+                        Obx(() => AnimatedGreeting(
+                            visible: controller.showGreeting.value)),
                       ],
                     ),
                   ),
@@ -162,10 +139,12 @@ class DashboardFragment extends StatelessWidget {
                                     const EdgeInsets.symmetric(horizontal: 20),
                                 child: Column(
                                   children: [
-                                    Text(Strings.uploadOrTakePhoto,
-                                        style: CustomTextTheme.regular18
-                                            .copyWith(
-                                                color: AppColors.whiteColor)),
+                                    Text(
+                                      Strings.uploadOrTakePhoto,
+                                      style: CustomTextTheme.regular18.copyWith(
+                                        color: AppColors.whiteColor,
+                                      ),
+                                    ),
                                     SizedBox(height: 20),
                                     Row(
                                       children: [
@@ -244,8 +223,8 @@ class DashboardFragment extends StatelessWidget {
                                             Strings.photoGuidelines,
                                             style: CustomTextTheme.regular14
                                                 .copyWith(
-                                                    color:
-                                                        AppColors.whiteColor),
+                                              color: AppColors.whiteColor,
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -354,5 +333,76 @@ class DashboardFragment extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class AnimatedGreeting extends StatefulWidget {
+  final bool visible;
+  const AnimatedGreeting({required this.visible, super.key});
+
+  @override
+  State<AnimatedGreeting> createState() => _AnimatedGreetingState();
+}
+
+class _AnimatedGreetingState extends State<AnimatedGreeting>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 300));
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
+
+    if (widget.visible) {
+      _controller.forward();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant AnimatedGreeting oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.visible != oldWidget.visible) {
+      widget.visible ? _controller.forward() : _controller.reverse();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizeTransition(
+      sizeFactor: _animation,
+      axisAlignment: -1.0,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 20),
+          Text(
+            Strings.helloUser,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            Strings.welcomeBack,
+            textAlign: TextAlign.left,
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }

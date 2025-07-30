@@ -16,6 +16,7 @@ import 'package:snapid/view/home/home.dart';
 import 'package:snapid/view/notification/notification.dart';
 import 'package:snapid/view/onboarding/onboarding.dart';
 import 'package:snapid/view/onboarding/onboarding2.dart';
+import 'package:snapid/view/payment_method/payment_method.dart';
 import 'package:snapid/view/photo_creation/photo_creation.dart';
 import 'package:snapid/view/photo_select/seletedPhotos.dart';
 import 'package:snapid/view/popular_countries.dart/popular_countries.dart';
@@ -149,6 +150,12 @@ class Pages {
       GetPage(
           name: PrimaryRoute.popularCountires,
           page: () =>  PopularCountries(),
+          binding: ControllerBindings(),
+          transition: Transition.cupertino
+          ),
+      GetPage(
+          name: PrimaryRoute.payment_method,
+          page: () =>  PaymentMethod(),
           binding: ControllerBindings(),
           transition: Transition.cupertino
           ),

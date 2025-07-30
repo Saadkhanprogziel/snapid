@@ -5,9 +5,6 @@ class DashboardController extends GetxController {
   final ScrollController scrollController = ScrollController();
   var showGreeting = true.obs;
 
-  
-
-
   @override
   void onInit() {
     scrollController.addListener(_onScroll);
@@ -24,8 +21,8 @@ class DashboardController extends GetxController {
 
   @override
   void onClose() {
-    scrollController.removeListener(_onScroll);
-    scrollController.dispose();
+    // scrollController.removeListener(_onScroll);
+    // scrollController.dispose();
     super.onClose();
   }
 }

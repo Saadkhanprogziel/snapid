@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
+// import 'package:snapid/controllers/dashboard/dashboard_controller.dart';
 import 'package:snapid/controllers/photoController/photo_controller.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
@@ -14,6 +15,7 @@ import 'package:snapid/utlis/custom_elevated_button.dart';
 import 'package:snapid/utlis/custom_outline_button.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
 import 'package:snapid/utlis/custom_text_field.dart';
+import 'package:snapid/utlis/screenBg.dart';
 import 'package:snapid/utlis/subscription_card.dart';
 
 class PhotoCreationScreen extends StatelessWidget {
@@ -21,55 +23,71 @@ class PhotoCreationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PhotoController controller = Get.find<PhotoController>();
+    final PhotoController controller = Get.put(PhotoController());
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          _buildBackground(),
-          Column(
-            children: [
-              _buildHeader(controller),
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Column(
-                    children: [
-                      Obx(() {
-                        return _buildBodyData(controller);
-                      }),
-                    ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return; // Back navigation already happened — do nothing
+
+        if (controller.currentStep.value == 1) {
+          Get.dialog(CustomDialogPop(
+            svgPath: Assets.closeIcon,
+            title: "Exit Photo Creation?",
+            message:
+                "You haven't completed all steps. Are you sure you want to exit? Your progress may be lost.",
+            onCancel: () {
+              Get.back();
+            },
+            onPressed: () {
+              Get.offAllNamed(PrimaryRoute.home);
+            },
+            solidBtnLabel: "Exit Aniway",
+            isActionPopUp: true,
+            solidBtnBg: AppColors.red,
+          ));
+        } else {
+          controller.goToPreviousStep();
+        }
+        ;
+      },
+      child: Scaffold(
+        body: Stack(
+          children: [
+            buildBackground(),
+            Column(
+              children: [
+                _buildHeader(controller),
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      children: [
+                        Obx(() {
+                          return _buildBodyData(controller);
+                        }),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              Obx(() {
-                return controller.currentStep.value > 1
-                    ? Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
-                        child: CustomElevatedButton(
-                          minHeight: 60,
-                          onPressed: () {
-                            controller.goToNextStep();
-                          },
-                          text: "Next",
-                        ),
-                      )
-                    : SizedBox.shrink(); // or Container() if you prefer
-              }),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBackground() {
-    return Container(
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage(Assets.appBg),
-          fit: BoxFit.cover,
+                Obx(() {
+                  return controller.currentStep.value == 2
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
+                          child: CustomElevatedButton(
+                            minHeight: 60,
+                            onPressed: () {
+                              controller.goToNextStep();
+                            },
+                            text: "Next",
+                          ),
+                        )
+                      : const SizedBox.shrink();
+                }),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -96,56 +114,63 @@ class PhotoCreationScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const SpaceH20(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: () => controller.goToPreviousStep(),
-                      child: Container(
-                        padding: EdgeInsets.all(5),
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors
-                              .transparent, // Optional: Add background color if needed
-                        ),
-                        child: const Icon(
-                          Icons.arrow_back,
-                          color: AppColors.whiteColor,
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Get.dialog(CustomDialogPop(
-                          svgPath: Assets.closeIcon,
-                          title: "Exit Photo Creation?",
-                          message:
-                              "You haven’t completed all steps. Are you sure you want to exit? Your progress may be lost.",
-                          onCancel: () {
-                            Get.back();
+                Obx(() => Row(
+                      mainAxisAlignment: controller.currentStep.value > 1
+                          ? MainAxisAlignment.spaceBetween
+                          : MainAxisAlignment.end,
+                      children: [
+                        if (controller.currentStep.value > 1)
+                          GestureDetector(
+                            onTap: () => controller.goToPreviousStep(),
+                            child: Container(
+                              padding: EdgeInsets.all(5),
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors
+                                    .transparent, // Optional: Add background color if needed
+                              ),
+                              child: const Icon(
+                                Icons.arrow_back,
+                                color: AppColors.whiteColor,
+                              ),
+                            ),
+                          )
+                        else
+                          SizedBox.shrink(),
+                        GestureDetector(
+                          onTap: () {
+                            Get.dialog(CustomDialogPop(
+                              svgPath: Assets.closeIcon,
+                              title: "Exit Photo Creation?",
+                              message:
+                                  "You haven't completed all steps. Are you sure you want to exit? Your progress may be lost.",
+                              onCancel: () {
+                                Get.back();
+                              },
+                              onPressed: () {
+                                // Get.delete<DashboardController>();
+                                // Get.delete<PhotoController>();
+                                Get.offAllNamed(PrimaryRoute.home);
+                              },
+                              solidBtnLabel: "Exit Aniway",
+                              isActionPopUp: true,
+                              solidBtnBg: AppColors.red,
+                            ));
                           },
-                          onPressed: () {
-                            Get.toNamed(PrimaryRoute.home);
-                          },
-                          solidBtnLabel: "Exit Aniway",
-                          isActionPopUp: true,
-                          solidBtnBg: AppColors.red,
-                        ));
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.transparent,
-                        ),
-                        child: const Icon(
-                          Icons.close,
-                          color: AppColors.whiteColor,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.transparent,
+                            ),
+                            child: const Icon(
+                              Icons.close,
+                              color: AppColors.whiteColor,
+                            ),
+                          ),
+                        )
+                      ],
+                    )),
                 const SpaceH30(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -265,7 +290,7 @@ class PhotoCreationScreen extends StatelessWidget {
               CustomElevatedButton(
                 onPressed: () async {
                   await Get.toNamed(PrimaryRoute.selectedPhoto)?.then((_) {
-                    if (controller.currentStep != 1) {
+                    if (controller.currentStep.value != 1) {
                       controller.setStep(1);
                     }
                   });
@@ -457,7 +482,7 @@ class PhotoCreationScreen extends StatelessWidget {
                     )),
                 SpaceH40(),
                 Obx(() {
-                  if (controller.selectedType == DocumentType.manually) {
+                  if (controller.selectedType.value == DocumentType.manually) {
                     return Column(
                       children: [
                         Row(
@@ -506,22 +531,22 @@ class PhotoCreationScreen extends StatelessWidget {
         SpaceH40(),
         Center(
           child: Container(
-            width: 200,
-            height: 240,
+            width: 170,
+            height: 200,
             child: Image.asset(Assets.demoResult),
           ),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 20),
           child: Text(
-            "Here’s what your photo will look like. Watermark will be removed after payment.",
+            "Here's what your photo will look like. Watermark will be removed after payment.",
             textAlign: TextAlign.center,
-            style: CustomTextTheme.regular20
+            style: CustomTextTheme.regular18
                 .copyWith(color: Colors.white, fontWeight: FontWeight.w400),
           ),
         ),
         Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 30, ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -534,7 +559,7 @@ class PhotoCreationScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SpaceH20(),
+                      SpaceH10(),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -554,9 +579,9 @@ class PhotoCreationScreen extends StatelessWidget {
                           )
                         ],
                       ),
-                      SpaceH30(),
+                      SpaceH20(),
                       infoRow("Country:",
-                          "${controller.selectedCountry.value!.name}",
+                          "${controller.selectedCountry.value?.name ?? 'Select Country'}",
                           flagPath: controller.selectedCountry.value!.flag),
                       const Divider(color: Colors.white12),
                       infoRow("Document:", controller.selectedType.value.name),
@@ -565,7 +590,36 @@ class PhotoCreationScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                SpaceH40(),
+                SpaceH20(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: Column(
+                    children: [
+                      Text(
+                          "Don't like this version? You can upload agian or Retake",
+                          textAlign: TextAlign.center,
+                          style: CustomTextTheme.regular16.copyWith(
+                              color: AppColors.whiteColor,
+                              fontWeight: FontWeight.w400)),
+                      SpaceH20(),
+                      CustomOutlineButton(
+                        onPressed: () {},
+                        
+                        label: "Retake or Upload Again",
+                        minHeight: 60,
+                      ),
+                      SpaceH20(),
+                      CustomElevatedButton(
+                        onPressed: () {
+                          controller.goToNextStep(); 
+                        },
+                        text: "Proceed To Download",
+                        minHeight: 60,
+                      ),
+                    ],
+                  ),
+                ),
+                SpaceH20(),
               ],
             )),
       ],
@@ -609,6 +663,9 @@ class PhotoCreationScreen extends StatelessWidget {
                         description: "Perfect for one time",
                         isPopular: false,
                         savings: "",
+                        onBuy: () {
+                          Get.toNamed(PrimaryRoute.payment_method);
+                        },
                       ),
                       SizedBox(width: 8),
                       SubscriptionCard(
@@ -618,6 +675,9 @@ class PhotoCreationScreen extends StatelessWidget {
                         description: "Perfect for three photos",
                         isPopular: true,
                         savings: "Save - 28 %",
+                        onBuy: () {
+                          Get.toNamed(PrimaryRoute.payment_method);
+                        },
                       ),
                       SizedBox(width: 8),
                       SubscriptionCard(
@@ -627,6 +687,9 @@ class PhotoCreationScreen extends StatelessWidget {
                         description: "Ideal for families or agencies",
                         isPopular: false,
                         savings: "Save - 43 %",
+                        onBuy: () {
+                          Get.toNamed(PrimaryRoute.payment_method);
+                        },
                       ),
                     ],
                   ),

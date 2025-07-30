@@ -23,7 +23,7 @@ class CustomHeader extends StatelessWidget {
 
   const CustomHeader({
     Key? key,
-    required this.title,
+    this.title="",
     this.showBackButton = false,
     this.onLeftIconTap,
     this.onRightIconTap,

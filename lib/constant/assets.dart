@@ -38,4 +38,6 @@ class Assets {
   static const String demoResult= 'assets/images/demoresult.png';
   static const String demoResult2= 'assets/images/demoresult2.png';
   static const String skin= 'assets/images/skin.png';
+  static const String apple= 'assets/icons/apple.png';
+  static const String google= 'assets/icons/google.png';
 }

@@ -20,4 +20,5 @@ class PrimaryRoute {
   static const String selectedPhoto = '/selectedPhoto';
   static const String assistant = '/assistant';
   static const String popularCountires = '/popularCountries';
+  static const String payment_method= '/payment_method';
 }

@@ -18,7 +18,7 @@ class PhotoController extends GetxController {
 
   void selectCountry(Country country) {
     selectedCountry.value = country;
-    Get.back(); // close bottom sheet
+    Get.back();
   }
 
   void changeType(DocumentType type) {
@@ -36,7 +36,7 @@ class PhotoController extends GetxController {
   void goToNextStep() {
     if (currentStep.value < 4) {
      if (currentStep.value == 2 && selectedCountry.value == null) {
-      // Maybe show an error or stop the flow
+  
       Get.snackbar('Missing Information', 'Please select a country before proceeding.',backgroundColor: AppColors.red,colorText: AppColors.whiteColor);
       return;
     }
@@ -51,6 +51,7 @@ class PhotoController extends GetxController {
 
   final selectedPhotos = <ImageProvider>[].obs;
   final ImagePicker _picker = ImagePicker();
+
 
   Future<void> pickImage() async {
     if (selectedPhotos.length >= 5) return;

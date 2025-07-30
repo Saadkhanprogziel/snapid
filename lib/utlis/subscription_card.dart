@@ -12,6 +12,8 @@ class SubscriptionCard extends StatelessWidget {
   final String savings;
   final bool isPopular;
   final Color bgColor;
+    final VoidCallback onBuy;
+
 
   const SubscriptionCard({
     required this.title,
@@ -20,7 +22,7 @@ class SubscriptionCard extends StatelessWidget {
     required this.description,
     required this.savings,
     required this.isPopular,
-    this.bgColor = AppColors.primaryColor,
+    this.bgColor = AppColors.primaryColor, required this.onBuy,
   });
 
   @override
@@ -84,7 +86,7 @@ class SubscriptionCard extends StatelessWidget {
                 ],
                 SizedBox(height: 10),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: onBuy,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,

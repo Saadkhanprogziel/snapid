@@ -35,6 +35,7 @@ class Onboarding3 extends StatelessWidget {
             SizedBox(
                width: 160, // Set desired width
                child: CustomElevatedButton(
+                minHeight: 60,
                  onPressed: () => Get.toNamed(PrimaryRoute.login),
                  text: "Get Started",
                  icon: Icon(Icons.arrow_forward,color: AppColors.whiteColor,),
