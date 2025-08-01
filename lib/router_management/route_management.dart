@@ -50,7 +50,7 @@ class Pages {
           transition: Transition.cupertino),
       GetPage(
           name: PrimaryRoute.register,
-          page: () => const RegisterScreen(),
+          page: () =>  RegisterScreen(),
           binding: ControllerBindings(),
           transition: Transition.fadeIn
           )

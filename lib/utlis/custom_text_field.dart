@@ -15,7 +15,6 @@ class CustomTextField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final FormFieldValidator<String>? validator;
   
-
   const CustomTextField({
     super.key,
     this.controller,
@@ -26,52 +25,60 @@ class CustomTextField extends StatelessWidget {
     this.onSuffixIconPressed,
     this.keyboardType,
     this.onChanged,
-    this.validator, this.label ='',
+    this.validator, 
+    this.label = '',
   });
 
   @override
   Widget build(BuildContext context) {
-   
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if(label.isNotEmpty) ...[
-          Text(label,style: CustomTextTheme.regular16.copyWith(color: Colors.white),),
-          SpaceH10()
+          Text(label, style: CustomTextTheme.regular16.copyWith(color: Colors.white)),
+          SpaceH10(),
         ],
         
-        TextField(
+        TextFormField(  // Changed from TextField to TextFormField
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
           style: const TextStyle(color: Colors.white),
           onChanged: onChanged,
+          validator: validator,
           decoration: InputDecoration(
-  hintText: hintText,
-  hintStyle: const TextStyle(color: Colors.white70),
-  filled: true,
-  fillColor: AppColors.cardColor,
-  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18), // <-- FIXED
-  border: OutlineInputBorder(
-    borderRadius: BorderRadius.circular(12),
-    borderSide: BorderSide.none,
-  ),
-  enabledBorder: OutlineInputBorder(
-    borderRadius: BorderRadius.circular(12),
-    borderSide: BorderSide.none,
-  ),
-  prefixIcon: prefixIcon != null
-      ? Icon(prefixIcon, color: Colors.white70)
-      : null,
-  suffixIcon: suffixIcon != null
-      ? IconButton(
-          icon: Icon(suffixIcon, color: Colors.white54),
-          onPressed: onSuffixIconPressed,
-        )
-      : null,
-),
-
+            hintText: hintText,
+            hintStyle: const TextStyle(color: Colors.white70),
+            filled: true,
+            fillColor: AppColors.cardColor,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            errorBorder: OutlineInputBorder(  // Added error border styling
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.red),
+            ),
+            focusedErrorBorder: OutlineInputBorder(  // Added focused error border
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.red),
+            ),
+            errorStyle: const TextStyle(color: Colors.red),  // Error text style
+            prefixIcon: prefixIcon != null
+                ? Icon(prefixIcon, color: Colors.white70)
+                : null,
+            suffixIcon: suffixIcon != null
+                ? IconButton(
+                    icon: Icon(suffixIcon, color: Colors.white54),
+                    onPressed: onSuffixIconPressed,
+                  )
+                : null,
+          ),
         ),
       ],
     );
