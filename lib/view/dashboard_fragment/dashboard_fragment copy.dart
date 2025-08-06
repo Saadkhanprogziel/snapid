@@ -50,7 +50,7 @@ class DashboardFragment extends StatelessWidget {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(8),
                               child: Image.network(
-                                'https://www.w3schools.com/howto/img_avatar2.png',
+                                'https://www.w3schools.com/howto/img_avatar1.png',
                                 fit: BoxFit.cover,
                               ),
                             ),

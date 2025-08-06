@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -9,6 +8,7 @@ import 'package:snapid/controllers/auth/opt/otp_controller.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/message_popup.dart';
+
 class OtpScreen extends StatelessWidget {
   final OtpController controller = Get.put(OtpController());
 
@@ -20,26 +20,24 @@ class OtpScreen extends StatelessWidget {
           height: 60,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            border: controller.controllers[index].text.isNotEmpty
+            border: controller.filledFields[index].value
                 ? Border.all(color: Colors.deepPurpleAccent)
                 : Border.all(color: Colors.transparent),
-            color: Color.fromRGBO(255, 255, 255, 0.05),
+            color: const Color.fromRGBO(255, 255, 255, 0.05),
           ),
           alignment: Alignment.center,
           child: TextField(
             controller: controller.controllers[index],
             focusNode: controller.focusNodes[index],
-            onChanged: (value) {
-              controller.handleInput(value, index);
-            },
-            style: TextStyle(color: Colors.white, fontSize: 24),
+            onChanged: (value) => controller.handleInput(value, index),
+            style: const TextStyle(color: Colors.white, fontSize: 24),
             textAlign: TextAlign.center,
             keyboardType: TextInputType.number,
             inputFormatters: [
               LengthLimitingTextInputFormatter(1),
               FilteringTextInputFormatter.digitsOnly,
             ],
-            decoration: InputDecoration(border: InputBorder.none),
+            decoration: const InputDecoration(border: InputBorder.none),
           ),
         ));
   }
@@ -85,7 +83,7 @@ class OtpScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: List.generate(6, (index) => buildOtpBox(index)),
                   ),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   ElevatedButton(
                     onPressed: () async {
                       Get.dialog(
@@ -96,7 +94,7 @@ class OtpScreen extends StatelessWidget {
                         ),
                         barrierDismissible: false,
                       );
-                      await Future.delayed(Duration(milliseconds: 1300));
+                      await Future.delayed(const Duration(milliseconds: 1300));
                       Get.back();
 
                       if (controller.isPasswordForgot) {
@@ -119,29 +117,28 @@ class OtpScreen extends StatelessWidget {
                           .copyWith(color: AppColors.whiteColor),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   TextButton.icon(
                     onPressed: () {
                       Get.toNamed(PrimaryRoute.verification);
                     },
-                    icon: Icon(Icons.sync, color: Colors.white54, size: 18),
-                    label: Text(
+                    icon: const Icon(Icons.sync, color: Colors.white54, size: 18),
+                    label: const Text(
                       "Change Method",
                       style: TextStyle(color: Colors.white54),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Obx(() => RichText(
                         text: TextSpan(
                           text: "Didn't receive the code?\n",
-                          style:
-                              TextStyle(color: Colors.white, fontSize: 14),
+                          style: const TextStyle(color: Colors.white, fontSize: 14),
                           children: [
                             TextSpan(
                               text: controller.secondsRemaining.value > 0
                                   ? "Resend in ${controller.secondsRemaining.value}s"
                                   : "Resend",
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.deepPurpleAccent,
                                 fontWeight: FontWeight.bold,
                               ),

@@ -3,6 +3,13 @@ allprojects {
         google()
         mavenCentral()
     }
+
+    // 🔧 This is the fix that forces a Jetifier-compatible version of bcprov
+    configurations.all {
+        resolutionStrategy {
+            force 'org.bouncycastle:bcprov-jdk18on:1.76' // Use 1.70 if this still fails
+        }
+    }
 }
 
 rootProject.buildDir = "../build"

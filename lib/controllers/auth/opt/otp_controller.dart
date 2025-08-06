@@ -4,9 +4,11 @@ import 'package:get/get.dart';
 
 class OtpController extends GetxController {
   final List<FocusNode> focusNodes = List.generate(6, (_) => FocusNode());
-  final List<TextEditingController> controllers = List.generate(6, (_) => TextEditingController());
+  final List<TextEditingController> controllers =
+      List.generate(6, (_) => TextEditingController());
 
-  var secondsRemaining = 30.obs;
+  final RxList<RxBool> filledFields = List.generate(6, (_) => false.obs).obs;
+  final secondsRemaining = 30.obs;
   late bool isPasswordForgot;
   Timer? timer;
 
@@ -42,6 +44,8 @@ class OtpController extends GetxController {
   }
 
   void handleInput(String value, int index) {
+    filledFields[index].value = value.isNotEmpty;
+
     if (value.length == 1 && index < 5) {
       focusNodes[index + 1].requestFocus();
     } else if (value.isEmpty && index > 0) {
