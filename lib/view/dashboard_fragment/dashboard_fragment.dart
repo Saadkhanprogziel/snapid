@@ -7,7 +7,7 @@ import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/constant/strings.dart';
 import 'package:snapid/controllers/dashboard/dashboard_controller.dart';
-// import 'package:snapid/controllers/photoController/photo_controller.dart';
+import 'package:snapid/controllers/photoController/photo_controller.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_card.dart';
@@ -20,7 +20,7 @@ class DashboardFragment extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DashboardController controller = Get.put(DashboardController());
-    // final PhotoController photoController = Get.find<PhotoController>();
+    final PhotoController photoController = Get.find<PhotoController>();
 
     return Scaffold(
       body: Stack(
@@ -33,300 +33,340 @@ class DashboardFragment extends StatelessWidget {
               ),
             ),
           ),
-          Column(
-            children: [
-              AnimatedSize(
-                alignment: Alignment.topCenter,
-                duration: Duration(milliseconds: 300),
-                curve: Curves.linear,
-                child: Container(
-                  padding: EdgeInsets.only(top: 70, bottom: 30),
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage(Assets.headerbg),
-                      fit: BoxFit.cover,
+          CustomScrollView(
+            controller: controller.scrollController,
+            physics: AlwaysScrollableScrollPhysics(),
+            slivers: [
+              SliverAppBar(
+                expandedHeight: 200,
+                pinned: true,
+                stretch: true,
+                backgroundColor: Colors.transparent,
+                automaticallyImplyLeading: false,
+                toolbarHeight: 100, // 👈 collapsed height
+
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: 55,
+                      height: 55,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          'https://www.w3schools.com/howto/img_avatar2.png',
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(30),
-                      bottomRight: Radius.circular(30),
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              width: 65,
-                              height: 65,
-                              child: ClipRRect(
+                    Flexible(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 12),
+                              decoration: BoxDecoration(
+                                color: Colors.white24.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(8),
-                                child: Image.network(
-                                  'https://www.w3schools.com/howto/img_avatar2.png',
-                                  fit: BoxFit.cover,
+                              ),
+                              child: Text(
+                                Strings.creditsRemaining,
+                                style: CustomTextTheme.regular14.copyWith(
+                                  color: AppColors.whiteColor,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          GestureDetector(
+                            onTap: () {
+                              Get.toNamed(PrimaryRoute.notification);
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.white24.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: SvgPicture.asset(
+                                Assets.bellIcon,
+                                height: 20,
+                                width: 20,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                // 🔹 Flexible space with background switching
+                flexibleSpace: LayoutBuilder(
+                  builder: (context, constraints) {
+                    // check if collapsed
+                    final collapsed =
+                        constraints.biggest.height <= kToolbarHeight + 20;
+
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: collapsed
+                            ? Colors.black.withOpacity(
+                                0.6) // 👈 collapsed background color
+                            : null,
+                        image: collapsed
+                            ? null
+                            : DecorationImage(
+                                image: AssetImage(Assets.headerbg),
+                                fit: BoxFit.cover,
+                              ),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(30),
+                          bottomRight: Radius.circular(30),
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (!collapsed) // 👈 show greeting only when expanded
+                            Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Obx(
+                                () => AnimatedGreeting(
+                                  visible: controller.showGreeting.value,
                                 ),
                               ),
                             ),
-                            Row(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 14, vertical: 15),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white24.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    Strings.creditsRemaining,
-                                    style: CustomTextTheme.regular14.copyWith(
-                                      color: AppColors.whiteColor,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 10),
-                                GestureDetector(
-                                  onTap: () {
-                                    Get.toNamed(PrimaryRoute.notification);
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 14, vertical: 14),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white24.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: SvgPicture.asset(
-                                      Assets.bellIcon,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Obx(() => AnimatedGreeting(
-                            visible: controller.showGreeting.value)),
-                      ],
-                    ),
-                  ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
               ),
-              Expanded(
-                child: SingleChildScrollView(
-                  controller: controller.scrollController,
-                  physics: AlwaysScrollableScrollPhysics(),
-                  child: Column(
-                    children: [
-                      SizedBox(height: 40),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                        child: ClipRRect(
+              // Content Gap
+              SliverToBoxAdapter(
+                child: SizedBox(height: 40),
+              ),
+
+              // Upload/Take Photo Card
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(25),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppColors.cardColor,
                           borderRadius: BorderRadius.circular(25),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                            child: Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: AppColors.cardColor,
-                                borderRadius: BorderRadius.circular(25),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            children: [
+                              Text(
+                                Strings.uploadOrTakePhoto,
+                                style: CustomTextTheme.regular18.copyWith(
+                                  color: AppColors.whiteColor,
+                                ),
                               ),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 20),
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      Strings.uploadOrTakePhoto,
-                                      style: CustomTextTheme.regular18.copyWith(
-                                        color: AppColors.whiteColor,
-                                      ),
-                                    ),
-                                    SizedBox(height: 20),
-                                    Row(
+                              SizedBox(height: 20),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Expanded(
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Image.asset(Assets.sample1),
-                                              SizedBox(height: 12),
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 3),
-                                                child: SizedBox(
-                                                  height: 50,
-                                                  width: double.infinity,
-                                                  child: CustomOutlineButton(
-                                                    onPressed: () {
-                                                      Get.toNamed(PrimaryRoute
-                                                          .selectedPhoto);
-                                                    },
-                                                    label: Strings.uploadPhoto,
-                                                    icon: Icons
-                                                        .file_upload_outlined,
-                                                    iconColor:
-                                                        AppColors.whiteColor,
-                                                    textColor:
-                                                        AppColors.whiteColor,
-                                                    borderColor: Colors.white24,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        SizedBox(width: 2),
-                                        Expanded(
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Image.asset(Assets.sample2),
-                                              SizedBox(height: 12),
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 3),
-                                                child: SizedBox(
-                                                  height: 50,
-                                                  width: double.infinity,
-                                                  child: CustomElevatedButton(
-                                                    onPressed: () {},
-                                                    text: Strings.takePhoto,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 10),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        GestureDetector(
-                                          child: SvgPicture.asset(
-                                            Assets.hintIcon,
-                                            height: 14,
-                                            width: 14,
-                                          ),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {},
-                                          child: Text(
-                                            Strings.photoGuidelines,
-                                            style: CustomTextTheme.regular14
-                                                .copyWith(
-                                              color: AppColors.whiteColor,
+                                        Image.asset(Assets.sample1),
+                                        SizedBox(height: 12),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 3),
+                                          child: SizedBox(
+                                            height: 50,
+                                            width: double.infinity,
+                                            child: CustomOutlineButton(
+                                              onPressed: () {
+                                                Get.toNamed(
+                                                    PrimaryRoute.selectedPhoto);
+                                              },
+                                              label: Strings.uploadPhoto,
+                                              icon: Icons.file_upload_outlined,
+                                              iconColor: AppColors.whiteColor,
+                                              textColor: AppColors.whiteColor,
+                                              borderColor: Colors.white24,
                                             ),
                                           ),
                                         ),
                                       ],
                                     ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Column(
-                        children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 30.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  Strings.mostPopular,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
                                   ),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    Get.toNamed(PrimaryRoute.popularCountires);
-                                  },
-                                  child: Text(
-                                    Strings.viewAll,
-                                    style: TextStyle(
-                                      color: Colors.white54,
-                                      fontSize: 14,
+                                  SizedBox(width: 2),
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Image.asset(Assets.sample2),
+                                        SizedBox(height: 12),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 3),
+                                          child: SizedBox(
+                                            height: 50,
+                                            width: double.infinity,
+                                            child: CustomElevatedButton(
+                                              onPressed: () async {
+                                                photoController
+                                                    .capturePhotosSimple();
+                                              },
+                                              text: Strings.takePhoto,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 20),
-                            child: Container(
-                              height: 220,
-                              child: ListView(
-                                scrollDirection: Axis.horizontal,
-                                children: const [
-                                  CountryCard(
-                                    countryName: Strings.unitedStates,
-                                    flagAsset: 'assets/flags/us.svg',
-                                    passportSize: Strings.passportSizeUS,
-                                  ),
-                                  SizedBox(width: 16),
-                                  CountryCard(
-                                    countryName: Strings.unitedArabEmirates,
-                                    flagAsset: 'assets/flags/ae.svg',
-                                    passportSize: Strings.passportSizeUAE,
-                                  ),
-                                  SizedBox(width: 16),
-                                  CountryCard(
-                                    countryName: Strings.unitedArabEmirates,
-                                    flagAsset: 'assets/flags/ag.svg',
-                                    passportSize: Strings.passportSizeUAE,
-                                  ),
-                                  SizedBox(width: 16),
-                                  CountryCard(
-                                    countryName: Strings.unitedArabEmirates,
-                                    flagAsset: 'assets/flags/ss.svg',
-                                    passportSize: Strings.passportSizeUAE,
-                                  ),
-                                  SizedBox(width: 16),
-                                  CountryCard(
-                                    countryName: Strings.unitedArabEmirates,
-                                    flagAsset: 'assets/flags/sx.svg',
-                                    passportSize: Strings.passportSizeUAE,
-                                  ),
-                                  SizedBox(width: 16),
-                                  CountryCard(
-                                    countryName: Strings.unitedArabEmirates,
-                                    flagAsset: 'assets/flags/vg.svg',
-                                    passportSize: Strings.passportSizeUAE,
-                                  ),
-                                  SizedBox(width: 16),
-                                  CountryCard(
-                                    countryName: Strings.unitedArabEmirates,
-                                    flagAsset: 'assets/flags/us.svg',
-                                    passportSize: Strings.passportSizeUAE,
                                   ),
                                 ],
                               ),
-                            ),
+                              SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  GestureDetector(
+                                    child: SvgPicture.asset(
+                                      Assets.hintIcon,
+                                      height: 14,
+                                      width: 14,
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {},
+                                    child: Text(
+                                      Strings.photoGuidelines,
+                                      style: CustomTextTheme.regular14.copyWith(
+                                        color: AppColors.whiteColor,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                          SizedBox(height: 80),
-                        ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Gap before Most Popular section
+              SliverToBoxAdapter(
+                child: SizedBox(height: 20),
+              ),
+
+              // Most Popular Section Header
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        Strings.mostPopular,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          Get.toNamed(PrimaryRoute.popularCountires);
+                        },
+                        child: Text(
+                          Strings.viewAll,
+                          style: TextStyle(
+                            color: Colors.white54,
+                            fontSize: 14,
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ),
+              ),
+
+              // Gap before horizontal list
+              SliverToBoxAdapter(
+                child: SizedBox(height: 20),
+              ),
+
+              // Horizontal Country Cards List
+              SliverToBoxAdapter(
+                child: Container(
+                  height: 220,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    padding: EdgeInsets.only(left: 20),
+                    children: const [
+                      CountryCard(
+                        countryName: Strings.unitedStates,
+                        flagAsset: 'assets/flags/us.svg',
+                        passportSize: Strings.passportSizeUS,
+                      ),
+                      SizedBox(width: 16),
+                      CountryCard(
+                        countryName: Strings.unitedArabEmirates,
+                        flagAsset: 'assets/flags/ae.svg',
+                        passportSize: Strings.passportSizeUAE,
+                      ),
+                      SizedBox(width: 16),
+                      CountryCard(
+                        countryName: Strings.unitedArabEmirates,
+                        flagAsset: 'assets/flags/ag.svg',
+                        passportSize: Strings.passportSizeUAE,
+                      ),
+                      SizedBox(width: 16),
+                      CountryCard(
+                        countryName: Strings.unitedArabEmirates,
+                        flagAsset: 'assets/flags/ss.svg',
+                        passportSize: Strings.passportSizeUAE,
+                      ),
+                      SizedBox(width: 16),
+                      CountryCard(
+                        countryName: Strings.unitedArabEmirates,
+                        flagAsset: 'assets/flags/sx.svg',
+                        passportSize: Strings.passportSizeUAE,
+                      ),
+                      SizedBox(width: 16),
+                      CountryCard(
+                        countryName: Strings.unitedArabEmirates,
+                        flagAsset: 'assets/flags/vg.svg',
+                        passportSize: Strings.passportSizeUAE,
+                      ),
+                      SizedBox(width: 16),
+                      CountryCard(
+                        countryName: Strings.unitedArabEmirates,
+                        flagAsset: 'assets/flags/us.svg',
+                        passportSize: Strings.passportSizeUAE,
+                      ),
+                      SizedBox(width: 20), // End padding
+                    ],
+                  ),
+                ),
+              ),
+
+              // Bottom spacing
+              SliverPadding(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).padding.bottom + 80),
               ),
             ],
           ),
@@ -377,7 +417,7 @@ class _AnimatedGreetingState extends State<AnimatedGreeting>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 20),
+          const SizedBox(height: 0),
           Text(
             Strings.helloUser,
             style: TextStyle(
@@ -386,7 +426,7 @@ class _AnimatedGreetingState extends State<AnimatedGreeting>
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 6),
+          // const SizedBox(height: 6),
           Text(
             Strings.welcomeBack,
             textAlign: TextAlign.left,

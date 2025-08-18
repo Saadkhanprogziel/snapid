@@ -167,7 +167,7 @@ class ProfileFragment extends StatelessWidget {
                                         Get.dialog(CustomDialogPop(
                                           title: 'Select Measurement Unit',
                                           message:
-                                              'Your account has been verified. You\'re all set to start using SnapID.',
+                                              'Select how you want photo sizes to be displayed throughout the app.',
                                           isIcon: false,
                                           iconData: Icons.check,
                                           iconColor: AppColors.whiteColor,

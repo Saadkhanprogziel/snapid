@@ -48,6 +48,7 @@ dependencies:
   dio: ^5.8.0+1
   connectivity_plus: ^6.1.4
   get_storage: ^2.1.1
+  dartz: ^0.10.1
   pretty_dio_logger: ^1.4.0
   
   

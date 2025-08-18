@@ -92,6 +92,12 @@
       "languageVersion": "3.1"
     },
     {
+      "name": "dartz",
+      "rootUri": "file:///C:/Users/CC/AppData/Local/Pub/Cache/hosted/pub.dev/dartz-0.10.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "dbus",
       "rootUri": "file:///C:/Users/CC/AppData/Local/Pub/Cache/hosted/pub.dev/dbus-0.7.11",
       "packageUri": "lib/",
@@ -524,7 +530,7 @@
       "languageVersion": "3.6"
     }
   ],
-  "generated": "2025-08-06T09:38:02.443979Z",
+  "generated": "2025-08-18T06:13:44.727363Z",
   "generator": "pub",
   "generatorVersion": "3.6.2",
   "flutterRoot": "file:///C:/src/flutter3.24",

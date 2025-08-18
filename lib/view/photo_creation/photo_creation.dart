@@ -262,7 +262,7 @@ class PhotoCreationScreen extends StatelessWidget {
         ));
   }
 
-  Widget _step1(controller) {
+  Widget _step1(PhotoController controller) {
     print(controller.currentStep);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 70.0, vertical: 20),
@@ -279,7 +279,9 @@ class PhotoCreationScreen extends StatelessWidget {
           Column(
             children: [
               CustomOutlineButton(
-                onPressed: () {},
+                onPressed: () {
+                   controller.capturePhotosSimple();
+                },
                 label: "Take a Photo",
                 icon: Icons.camera_alt_outlined,
                 iconColor: AppColors.whiteColor,
