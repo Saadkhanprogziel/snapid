@@ -1,5 +1,5 @@
 class NetworkResponse {
-  String success;
+  bool success;
   String message;
   dynamic data;
   bool failed;
@@ -7,7 +7,7 @@ class NetworkResponse {
     this.data,
     this.failed = false,
     this.message = "",
-    this.success = "",
+    this.success = false,
   });
 
   @override

@@ -21,7 +21,7 @@ class NetworkRepository {
       throw NetworkResponse(
         message: "No internet connection",
         data: null,
-        success: "false",
+        success: false,
       );
     }
 
@@ -36,7 +36,7 @@ class NetworkRepository {
             message: "Internet connection lost",
             data: null,
             failed: true,
-            success: "false",
+            success: false,
           );
           completer.completeError(networkResponse);
         }
@@ -74,7 +74,7 @@ class NetworkRepository {
         networkResponse = NetworkResponse(
           message: "An unexpected error occurred",
           data: null,
-          success: "false",
+          success: false,
           failed: true,
         );
         completer.completeError(networkResponse);

@@ -790,7 +790,7 @@ class PhotoCreationScreen extends StatelessWidget {
     );
   }
 
-  void _showCountryPicker(controller) {
+  void _showCountryPicker(PhotoController controller) {
     showModalBottomSheet(
       context: Get.context!,
       isScrollControlled: true,

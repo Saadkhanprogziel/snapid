@@ -7,6 +7,7 @@ class RegisterModel {
   String confirmPassword;
   String gender;
   String countryCode;
+  String country;
 
   RegisterModel({
     this.firstName = '',
@@ -17,14 +18,19 @@ class RegisterModel {
     this.confirmPassword = '',
     this.gender = 'Male',
     this.countryCode = '+1',
+    this.country = '',
   });
 
   Map<String, dynamic> toJson() => {
     'firstName': firstName,
     'lastName': lastName,
-    'email': email,
-    'phone': countryCode + phone,
+    'emailAddress': email,
     'password': password,
+    'confirmPassword': confirmPassword,
+    'countryCode': countryCode,
+    'phoneNo': countryCode+phone,
+    'country': country,
     'gender': gender,
+    "platform": "MOBILE_APP"
   };
 }
