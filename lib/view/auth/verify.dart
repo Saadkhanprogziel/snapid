@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
+import 'package:snapid/repositories/auth/auth_respository.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
 
-
 class VerificationScreen extends StatefulWidget {
+  const VerificationScreen({Key? key}) : super(key: key);
+
   @override
   _VerificationScreenState createState() => _VerificationScreenState();
 }
@@ -16,11 +18,21 @@ enum ContactMethod { email, mobile }
 
 class _VerificationScreenState extends State<VerificationScreen> {
   ContactMethod _selectedMethod = ContactMethod.email;
+  AuthRespository authRepository = AuthRespository();
+
+  late String email;
+  late String phone;
+
+  @override
+  void initState() {
+    super.initState();
+    final args = Get.arguments as Map<String, dynamic>;
+    email = args["email"] ?? "";
+    phone = args["phone"] ?? "";
+  }
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
       body: Stack(
         children: [
@@ -83,14 +95,14 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                   value: ContactMethod.email,
                                   groupValue: _selectedMethod,
                                   title: "Send code to email",
-                                  subtitle: "john.doe@email.com",
+                                  subtitle: email,
                                 ),
                                 SizedBox(height: 40),
                                 _buildRadioTile(
                                   value: ContactMethod.mobile,
                                   groupValue: _selectedMethod,
                                   title: "Send code to mobile",
-                                  subtitle: "+1 ••••45",
+                                  subtitle: phone,
                                 ),
                               ],
                             ),
@@ -105,9 +117,45 @@ class _VerificationScreenState extends State<VerificationScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    final identifier =
+                        _selectedMethod == ContactMethod.email ? email : phone;
+                    final sendTo = _selectedMethod == ContactMethod.email
+                        ? "emailAddress"
+                        : "phoneNumber";
+
+                    final result =
+                        await authRepository.sendOtp(identifier, sendTo);
+
+                    result.fold(
+                      (failureMessage) {
+                        // LEFT = error
+                        Get.snackbar(
+                          "Error",
+                          failureMessage,
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.redAccent,
+                          colorText: Colors.white,
+                        );
+                      },
+                      (success) {
+                        // RIGHT = success
+                        Get.toNamed(
+                          PrimaryRoute.otpScreen,
+                          arguments: {
+                            "identifier": identifier,
+                          },
+                        );
+                      },
+                    );
+
+                     Get.toNamed(
+                          PrimaryRoute.otpScreen,
+                          arguments: {
+                            "identifier": identifier,
+                          },
+                        );
                     
-                    Get.toNamed(PrimaryRoute.otpScreen);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryColor,

@@ -10,51 +10,40 @@ class AuthRespository {
   final networkRepository = NetworkRepository();
 
   Future<Either<String, dynamic>> register({
-  required RegisterModel user,
+    required RegisterModel user,
   }) async {
-    final response = await networkRepository.post(url: "/auth/register", data: user.toJson()
-    
-
-    //  {
-    //   // "firstName": firstName,
-    //   // "lastName": lastName,
-    //   // "emailAddress": email,
-    //   // "gender": gender,
-    //   // "country": country,
-    //   // "phoneNo": countryCode + phoneNumber,
-    //   // "password": password,
-    //   // "confirmPassword": confirmPassword,
-    //   // "platform": "MOBILE_APP"
-    // }
-    );
-print(response);
+    final response = await networkRepository.post(
+        url: "/auth/user-register", data: user.toJson());
+    print(response);
     {}
     if (response.success) {
       final data = UserModel.fromJson(response.data["data"]);
-      appStorage.write('user', data);
       appStorage.write("user", jsonEncode(data.toJson()));
       return right(true);
     }
     return left(response.message);
   }
-
-  Future<Either<String, UserModel>> login({
-    required String email,
-    required String password,
-  }) async {
-    final response = await networkRepository.post(url: "/auth/login", data: {
-      "email": email,
+Future<Either<String, UserModel>> login({
+  required String emailOrPhone,
+  required String password,
+}) async {
+    final response = await networkRepository.post(url: "/auth/login-user", data: {
+      "emailORphone": emailOrPhone,
       "password": password,
     });
-    if (!response.failed) {
-      final data = UserModel.fromJson(response.data["data"]);
-      appStorage.write('user', data);
 
-      appStorage.write("user", jsonEncode(data.toJson()));
-      return right(data);
-    }
-    return left(response.message);
+  if (!response.failed) {
+    final data = UserModel.fromJson(response.data["data"]["user"]);
+
+    appStorage.write("user", jsonEncode(data.toJson()));
+    appStorage.write("accessToken", response.data["data"]["accessToken"]);
+    appStorage.write("refreshToken", response.data["data"]["refreshToken"]);
+
+    return right(data);
   }
+  return left(response.message);
+}
+
 
   Future<Either<String, bool>> forgotPassword(String email) async {
     final response =
@@ -84,14 +73,14 @@ print(response);
     return left(response.message);
   }
 
-  Future<Either<String, bool>> verifyEmail({
-    required String email,
-    required String code,
+  Future<Either<String, bool>> verifyOtp({
+    required String identifier,
+    required int code,
   }) async {
     final response =
-        await networkRepository.post(url: "/auth/verify-email", data: {
-      "email": email,
-      "code": code,
+        await networkRepository.post(url: "/auth/verify-otp", data: {
+      "identifier": identifier,
+      "otp": code,
     });
     if (!response.failed) {
       return right(true);
@@ -99,12 +88,24 @@ print(response);
     return left(response.message);
   }
 
-  Future<Either<String, bool>> resendVerificationEmail(String email) async {
-    final response = await networkRepository
-        .post(url: "/auth/resend-verification-email", data: {
-      "email": email,
+  Future<Either<String, bool>> sendOtp(
+      String identifier, String emailOrPhone) async {
+    final response = await networkRepository.post(url: "/auth/send-otp", data: {
+      "identifier": identifier,
+      "sendTo": emailOrPhone,
     });
-    if (!response.failed) {
+    if (response.success) {
+      return right(true);
+    }
+    return left(response.message);
+  }
+
+  Future<Either<String, bool>> reSendOtp(
+      String identifier,) async {
+    final response = await networkRepository.post(url: "/auth/resend-otp", data: {
+      "identifier": identifier,
+    });
+    if (response.success) {
       return right(true);
     }
     return left(response.message);

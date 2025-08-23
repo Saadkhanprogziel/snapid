@@ -45,7 +45,7 @@ class Pages {
       ),
       GetPage( 
           name: PrimaryRoute.login,
-          page: () => const LoginScreen(),
+          page: () => LoginScreen(),
           binding: ControllerBindings(),
           transition: Transition.cupertino),
       GetPage(

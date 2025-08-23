@@ -8,6 +8,7 @@ import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 
 import 'package:snapid/controllers/profile/profile_controller.dart';
+import 'package:snapid/main.dart';
 import 'package:snapid/routes/routes.dart';
 
 import 'package:snapid/theme/text_theme.dart';
@@ -21,7 +22,7 @@ class ProfileFragment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ProfileController controller = Get.put(ProfileController());
+    ProfileController controller = Get.put(ProfileController());
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -100,16 +101,18 @@ class ProfileFragment extends StatelessWidget {
                                   ],
                                 ),
                                 SpaceH20(),
-                                const Text(
-                                  'John Doe',
+                                Text(
+                                  controller.user.firstName != ""
+                                      ? "${controller.user.firstName} ${controller.user.lastName}"
+                                      : "John Doe",
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                const Text(
-                                  'johndoe@gmail.com',
+                                Text(
+                                  controller.user.email ?? "",
                                   style: TextStyle(
                                     color: Colors.grey,
                                     fontSize: 14,
@@ -117,14 +120,13 @@ class ProfileFragment extends StatelessWidget {
                                 ),
                                 SpaceH10(),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(
+                                  padding: EdgeInsets.symmetric(
                                       horizontal: 16, vertical: 20),
                                   decoration: BoxDecoration(
-                                    color:
-                                        const Color.fromARGB(61, 82, 79, 112),
+                                    color: Color.fromARGB(61, 82, 79, 112),
                                     borderRadius: BorderRadius.circular(16),
                                   ),
-                                  child: const Text(
+                                  child: Text(
                                     'Credits Remaining: 03',
                                     style: TextStyle(
                                         color: Colors.white, fontSize: 14),
@@ -228,7 +230,7 @@ class ProfileFragment extends StatelessWidget {
                                           filter: ImageFilter.blur(
                                               sigmaX: 15, sigmaY: 15),
                                           child: CustomDialogPop(
-                                            solidBtnLabel: "Logout",
+                                              solidBtnLabel: "Logout",
                                               title: "Log Out ?",
                                               message:
                                                   "Are you sure you want to log out of your Snapid account?",
@@ -237,9 +239,10 @@ class ProfileFragment extends StatelessWidget {
                                               backgroundColor:
                                                   AppColors.cardColor,
                                               onCancel: () => Get.back(),
-                                              onPressed: () => Get.offAllNamed
-                                              (
-                                                  PrimaryRoute.login)),
+                                              onPressed: () {
+                                              
+                                             
+                                              }),
                                         ));
                                       },
                                     ),

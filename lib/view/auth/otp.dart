@@ -27,7 +27,7 @@ class OtpScreen extends StatelessWidget {
           ),
           alignment: Alignment.center,
           child: TextField(
-            controller: controller.controllers[index],
+            controller: controller.otp[index],
             focusNode: controller.focusNodes[index],
             onChanged: (value) => controller.handleInput(value, index),
             style: const TextStyle(color: Colors.white, fontSize: 24),
@@ -85,21 +85,8 @@ class OtpScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 30),
                   ElevatedButton(
-                    onPressed: () async {
-                      Get.dialog(
-                        CustomMessagePopUp(
-                          title: 'Verified Successfully!',
-                          message:
-                              'Your account has been verified. You\'re all set to start using SnapID.',
-                        ),
-                        barrierDismissible: false,
-                      );
-                      await Future.delayed(const Duration(milliseconds: 1300));
-                      Get.back();
-
-                      if (controller.isPasswordForgot) {
-                        Get.toNamed(PrimaryRoute.resetPassword);
-                      }
+                    onPressed: ()  {
+                      controller.verifyOtp();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryColor,
@@ -122,31 +109,42 @@ class OtpScreen extends StatelessWidget {
                     onPressed: () {
                       Get.toNamed(PrimaryRoute.verification);
                     },
-                    icon: const Icon(Icons.sync, color: Colors.white54, size: 18),
+                    icon:
+                        const Icon(Icons.sync, color: Colors.white54, size: 18),
                     label: const Text(
                       "Change Method",
                       style: TextStyle(color: Colors.white54),
                     ),
                   ),
                   const SizedBox(height: 20),
-                  Obx(() => RichText(
-                        text: TextSpan(
-                          text: "Didn't receive the code?\n",
-                          style: const TextStyle(color: Colors.white, fontSize: 14),
-                          children: [
-                            TextSpan(
-                              text: controller.secondsRemaining.value > 0
+                  Column(
+                    children: [
+                      const Text(
+                        "Didn't receive the code?",
+                        style: TextStyle(color: Colors.white, fontSize: 14),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Obx(() => TextButton(
+                            onPressed: controller.secondsRemaining.value > 0
+                                ? null
+                                : () {
+                                    controller.resendOtp();
+                                  },
+                            child: Text(
+                              controller.secondsRemaining.value > 0
                                   ? "Resend in ${controller.secondsRemaining.value}s"
                                   : "Resend",
-                              style: const TextStyle(
-                                color: Colors.deepPurpleAccent,
+                              style: TextStyle(
+                                color: controller.secondsRemaining.value > 0
+                                    ? Colors.white54
+                                    : Colors.deepPurpleAccent,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ],
-                        ),
-                        textAlign: TextAlign.center,
-                      )),
+                          )),
+                    ],
+                  ),
                 ],
               ),
             ),

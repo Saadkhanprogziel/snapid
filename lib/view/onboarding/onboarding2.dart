@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
+import 'package:snapid/controllers/onboarding/onbording_controller.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
 
@@ -9,6 +10,7 @@ class Onboarding3 extends StatelessWidget {
  
   @override
   Widget build(BuildContext context) {
+    final OnBoardingController onBoardingController = Get.find<OnBoardingController>();
     return Scaffold(
       backgroundColor: AppColors.blackColor,
       body: Container(
@@ -36,7 +38,10 @@ class Onboarding3 extends StatelessWidget {
                width: 160, // Set desired width
                child: CustomElevatedButton(
                 minHeight: 60,
-                 onPressed: () => Get.toNamed(PrimaryRoute.login),
+                 onPressed: (){
+                  onBoardingController.userOnBoarded();
+                  Get.toNamed(PrimaryRoute.login);
+                 } ,
                  text: "Get Started",
                  icon: Icon(Icons.arrow_forward,color: AppColors.whiteColor,),
                  iconOnRight: true,

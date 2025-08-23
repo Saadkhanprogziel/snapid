@@ -14,6 +14,8 @@ class OnBoardingView extends GetView<OnBoardingController> {
 
   @override
   Widget build(BuildContext context) {
+        
+
     return Scaffold(
       body: Container(
         width: double.infinity,

@@ -136,9 +136,13 @@ class NetworkRepository {
     final body = response.data;
     if (response.statusCode == 200 || response.statusCode == 201) {
       return NetworkResponse(
-        data: body,
+         data: body,
+      success: body is Map && body["success"] == true,
+      message: body is Map && body.containsKey("message")
+          ? body["message"]
+          : "",
       );
     }
-    throw NetworkResponse(failed: true, data: body);
+    throw NetworkResponse(success: false, data: body);
   }
 }

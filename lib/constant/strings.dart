@@ -29,7 +29,7 @@ class Strings {
   static const String snapIdSubtitle =
       "Create and download official\nID photos in seconds.";
 
-  static const String enterEmail = "Enter Your Email";
+  static const String enterEmail = "Email or Phone Number";
   static const String yourPassword = "Your Password";
   static const String forgotPassword = "Forgot Password?";
   static const String signInWithBiometrics = "Sign In With Biometrics";

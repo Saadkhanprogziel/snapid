@@ -4,19 +4,21 @@ import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/constant/strings.dart';
-import 'package:snapid/controllers/auth/auth_controller.dart';
+import 'package:snapid/controllers/auth/login/login_controller.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
 import 'package:snapid/utlis/custom_text_field.dart';
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+  LoginScreen({super.key});
+
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<AuthController>(
-      init: AuthController(),
+    return GetBuilder<LoginController>(
+      init: LoginController(),
       builder: (controller) {
         return Scaffold(
           body: Stack(
@@ -39,8 +41,8 @@ class LoginScreen extends StatelessWidget {
                     children: [
                       Text(
                         Strings.snapId,
-                        style: CustomTextTheme.headingLarge
-                            .copyWith(fontSize: 32, color: AppColors.whiteColor),
+                        style: CustomTextTheme.headingLarge.copyWith(
+                            fontSize: 32, color: AppColors.whiteColor),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -69,157 +71,199 @@ class LoginScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(25),
                           ),
                           child: SingleChildScrollView(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                // Email field
-                                CustomTextField(
-                                  controller: controller.emailController,
-                                  hintText: Strings.enterEmail,
-                                  prefixIcon: Icons.email,
-                                ),
-                                const SizedBox(height: 16),
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  // Email field
+                                  CustomTextField(
+                                    controller: controller.emailController,
+                                    hintText: Strings
+                                        .enterEmail, // You may want to rename to "Enter email or phone"
+                                    prefixIcon: Icons.email,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter your email or phone number';
+                                      }
 
-                                // Password field with toggle
-                                CustomTextField(
-                                  controller: controller.passwordController,
-                                  hintText: Strings.yourPassword,
-                                  obscureText: controller.isPasswordObscured,
-                                  prefixIcon: Icons.lock,
-                                  suffixIcon: controller.isPasswordObscured
-                                      ? Icons.visibility
-                                      : Icons.visibility_off,
-                                  onSuffixIconPressed:(){
+                                      if (GetUtils.isEmail(value)) {
+                                        return null; // valid email
+                                      }
 
-                                      controller.togglePasswordVisibility();
-                                      print(controller.isPasswordObscured );
-                                  }
-                                ),
-                                const SizedBox(height: 10),
+                                      if (GetUtils.isPhoneNumber(value)) {
+                                        return null; // valid phone
+                                      }
 
-                                // Forgot password
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: TextButton(
-                                    onPressed: () {
-                                      Get.toNamed(PrimaryRoute.forgotPassword);
+                                      return 'Enter a valid email or phone number';
                                     },
-                                    child: Text(
-                                      Strings.forgotPassword,
-                                      style: CustomTextTheme.regular14.copyWith(
+                                  ),
+
+                                  const SizedBox(height: 16),
+
+                                  // Password field with toggle
+                                  CustomTextField(
+                                    controller: controller.passwordController,
+                                    hintText: Strings.yourPassword,
+                                    obscureText: controller.isPasswordObscured,
+                                    prefixIcon: Icons.lock,
+                                    suffixIcon: controller.isPasswordObscured
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    onSuffixIconPressed: () {
+                                      controller.togglePasswordVisibility();
+                                    },
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter your password';
+                                      }
+                                      if (value.length < 6) {
+                                        return 'Password must be at least 6 characters';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 10),
+
+                                  // Forgot password
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: TextButton(
+                                      onPressed: () {
+                                        Get.toNamed(
+                                            PrimaryRoute.forgotPassword);
+                                      },
+                                      child: Text(
+                                        Strings.forgotPassword,
+                                        style: CustomTextTheme.regular14
+                                            .copyWith(
+                                                color: AppColors.whiteColor),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+
+                                  // Sign In Button
+                                  CustomElevatedButton(
+                                    onPressed: () {
+                                      if (_formKey.currentState!.validate()) {
+                                        controller.onLogin();
+                                        // Or navigation:
+                                        // Get.toNamed(PrimaryRoute.home);
+                                      }
+                                    },
+                                    text: Strings.signIn,
+                                    minHeight: 60,
+                                  ),
+                                  const SizedBox(height: 30),
+
+                                  // Biometrics button
+                                  OutlinedButton.icon(
+                                    onPressed: () {},
+                                    icon: const Icon(
+                                      Icons.fingerprint,
+                                      color: Colors.white70,
+                                      size: 30,
+                                    ),
+                                    label: Text(
+                                      Strings.signInWithBiometrics,
+                                      style: CustomTextTheme.regular16.copyWith(
                                           color: AppColors.whiteColor),
                                     ),
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-
-                                // Sign In Button
-                                CustomElevatedButton(
-                                  onPressed: () =>
-                                      Get.toNamed(PrimaryRoute.home),
-                                  text: Strings.signIn,
-                                  minHeight: 60,
-                                ),
-                                const SizedBox(height: 30),
-
-                                // Biometrics button
-                                OutlinedButton.icon(
-                                  onPressed: () {},
-                                  icon: const Icon(
-                                    Icons.fingerprint,
-                                    color: Colors.white70,
-                                    size: 30,
-                                  ),
-                                  label: Text(
-                                    Strings.signInWithBiometrics,
-                                    style: CustomTextTheme.regular16
-                                        .copyWith(color: AppColors.whiteColor),
-                                  ),
-                                  style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(color: Colors.white24),
-                                    minimumSize: const Size.fromHeight(60),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-
-                                // Google button
-                                OutlinedButton.icon(
-                                  onPressed: () {},
-                                  icon: Image.asset(
-                                    'assets/icons/google.png',
-                                    width: 24,
-                                    height: 24,
-                                  ),
-                                  label: Text(
-                                    Strings.continueWithGoogle,
-                                    style: CustomTextTheme.regular16
-                                        .copyWith(color: AppColors.whiteColor),
-                                  ),
-                                  style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(color: Colors.white24),
-                                    minimumSize: const Size.fromHeight(60),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-
-                                // Apple button
-                                OutlinedButton.icon(
-                                  onPressed: () {},
-                                  icon: Image.asset(
-                                    'assets/icons/apple.png',
-                                    width: 27,
-                                    height: 27,
-                                  ),
-                                  label: Text(
-                                    Strings.continueWithApple,
-                                    style: CustomTextTheme.regular16
-                                        .copyWith(color: AppColors.whiteColor),
-                                  ),
-                                  style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(color: Colors.white24),
-                                    minimumSize: const Size.fromHeight(60),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-
-                                // Sign Up row
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 16.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        Strings.dontHaveAccount,
-                                        style: CustomTextTheme.regular14.copyWith(
-                                            color: AppColors.whiteColor,
-                                            fontWeight: FontWeight.w400),
+                                    style: OutlinedButton.styleFrom(
+                                      side: const BorderSide(
+                                          color: Colors.white24),
+                                      minimumSize: const Size.fromHeight(60),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
-                                      TextButton(
-                                        onPressed: () {
-                                          Get.toNamed(PrimaryRoute.register);
-                                        },
-                                        child: Text(
-                                          Strings.signUp,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+
+                                  // Google button
+                                  OutlinedButton.icon(
+                                    onPressed: () {},
+                                    icon: Image.asset(
+                                      'assets/icons/google.png',
+                                      width: 24,
+                                      height: 24,
+                                    ),
+                                    label: Text(
+                                      Strings.continueWithGoogle,
+                                      style: CustomTextTheme.regular16.copyWith(
+                                          color: AppColors.whiteColor),
+                                    ),
+                                    style: OutlinedButton.styleFrom(
+                                      side: const BorderSide(
+                                          color: Colors.white24),
+                                      minimumSize: const Size.fromHeight(60),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+
+                                  // Apple button
+                                  OutlinedButton.icon(
+                                    onPressed: () {},
+                                    icon: Image.asset(
+                                      'assets/icons/apple.png',
+                                      width: 27,
+                                      height: 27,
+                                    ),
+                                    label: Text(
+                                      Strings.continueWithApple,
+                                      style: CustomTextTheme.regular16.copyWith(
+                                          color: AppColors.whiteColor),
+                                    ),
+                                    style: OutlinedButton.styleFrom(
+                                      side: const BorderSide(
+                                          color: Colors.white24),
+                                      minimumSize: const Size.fromHeight(60),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+
+                                  // Sign Up row
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 16.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          Strings.dontHaveAccount,
                                           style: CustomTextTheme.regular14
                                               .copyWith(
-                                                  color: AppColors.primaryColor,
+                                                  color: AppColors.whiteColor,
                                                   fontWeight: FontWeight.w400),
                                         ),
-                                      ),
-                                    ],
+                                        TextButton(
+                                          onPressed: () {
+                                            Get.toNamed(PrimaryRoute.register);
+                                          },
+                                          child: Text(
+                                            Strings.signUp,
+                                            style: CustomTextTheme.regular14
+                                                .copyWith(
+                                                    color:
+                                                        AppColors.primaryColor,
+                                                    fontWeight:
+                                                        FontWeight.w400),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),

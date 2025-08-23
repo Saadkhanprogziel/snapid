@@ -137,6 +137,7 @@ class DashboardFragment extends StatelessWidget {
                               padding: const EdgeInsets.all(20),
                               child: Obx(
                                 () => AnimatedGreeting(
+                                  userName: controller.userName.value,
                                   visible: controller.showGreeting.value,
                                 ),
                               ),
@@ -378,7 +379,8 @@ class DashboardFragment extends StatelessWidget {
 
 class AnimatedGreeting extends StatefulWidget {
   final bool visible;
-  const AnimatedGreeting({required this.visible, super.key});
+  final String userName;
+  const AnimatedGreeting({required this.visible, required this.userName, super.key});
 
   @override
   State<AnimatedGreeting> createState() => _AnimatedGreetingState();
@@ -419,14 +421,13 @@ class _AnimatedGreetingState extends State<AnimatedGreeting>
         children: [
           const SizedBox(height: 0),
           Text(
-            Strings.helloUser,
+            "Hello, ${widget.userName.isEmpty ? 'User' : widget.userName}!",
             style: TextStyle(
               color: Colors.white,
               fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
           ),
-          // const SizedBox(height: 6),
           Text(
             Strings.welcomeBack,
             textAlign: TextAlign.left,

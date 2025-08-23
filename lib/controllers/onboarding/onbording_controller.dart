@@ -25,6 +25,7 @@ class OnBoardingController extends GetxController {
       Get.toNamed(PrimaryRoute.onBoard3);
     }
   }
+  
 
   void goToLastPage() {
     pageController.animateToPage(
@@ -32,6 +33,10 @@ class OnBoardingController extends GetxController {
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
+  }
+  void userOnBoarded() {
+    
+    Get.offAllNamed(PrimaryRoute.login);
   }
 
   final List<Map<String, String>> pages = [

@@ -35,27 +35,31 @@ class CustomTextField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (label.isNotEmpty) ...[
-          Text(label,
-              style: CustomTextTheme.regular16.copyWith(color: Colors.white)),
+          Text(
+            label,
+            style: CustomTextTheme.regular16.copyWith(color: Colors.white),
+          ),
           SpaceH10(),
         ],
         TextFormField(
-          // Changed from TextField to TextFormField
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
           style: const TextStyle(color: Colors.white),
           onChanged: onChanged,
           validator: validator,
-
+          autovalidateMode:
+              AutovalidateMode.onUserInteraction, // ✅ validates only on field interaction
           decoration: InputDecoration(
-          counterText: '',
+            counterText: '',
             hintText: hintText,
             hintStyle: const TextStyle(color: Colors.white70),
             filled: true,
             fillColor: AppColors.cardColor,
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 22, // ✅ increased height
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
@@ -65,17 +69,18 @@ class CustomTextField extends StatelessWidget {
               borderSide: BorderSide.none,
             ),
             errorBorder: OutlineInputBorder(
-              // Added error border styling
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Colors.red),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              // Added focused error border
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Colors.red),
             ),
-            helperText: null, // No helper text
-            errorStyle:  TextStyle(color: Colors.red, height: 0), // Error text style
+            helperText: null,
+            errorStyle: const TextStyle(
+              color: Colors.red,
+              height: 0.8, // ✅ keeps error text close to field
+            ),
             prefixIcon: prefixIcon != null
                 ? Icon(prefixIcon, color: Colors.white70)
                 : null,

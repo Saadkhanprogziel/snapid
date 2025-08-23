@@ -3,5 +3,7 @@ class Country {
   String code;
   String flag;
   String currencySign;
-  Country({required this.name, required this.code, required this.flag, required this.currencySign});
+  String dialCode;        // New: telephone dialing prefix
+
+  Country({required this.name, required this.code, required this.flag, required this.currencySign,required this.dialCode});
 }

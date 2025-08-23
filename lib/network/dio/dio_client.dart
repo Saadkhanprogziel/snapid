@@ -38,8 +38,8 @@ class DioClient {
           retryEvaluator: (error) async {
             if (error.response?.statusCode != null &&
                 error.response!.statusCode! == 401) {
-              Get.offAllNamed(PrimaryRoute.onBoard);
-              appStorage.erase();
+              // Get.offAllNamed(PrimaryRoute.onBoard);
+              // appStorage.erase();
               return false;
             }
             if (error.type == DioExceptionType.connectionError ||
