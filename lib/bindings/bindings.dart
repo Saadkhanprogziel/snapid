@@ -1,6 +1,6 @@
 
 import 'package:get/get.dart';
-import 'package:snapid/controllers/auth/auth_controller.dart';
+import 'package:snapid/controllers/auth/forgot_password_controller.dart';
 import 'package:snapid/controllers/dashboard/dashboard_controller.dart';
 import 'package:snapid/controllers/history/history_controller.dart';
 import 'package:snapid/controllers/home/home_controller.dart';
@@ -20,7 +20,7 @@ class ControllerBindings extends Bindings {
     Get.lazyPut(() => NotificationController());
     Get.lazyPut(() => PhotoController());
     Get.lazyPut(() => HomeController());
-    Get.lazyPut(() => AuthController());
+    Get.lazyPut(() => ForgotPasswordController());
     // Get.lazyPut(() => DashboardController());
 
     // Get.lazyPut(() => UserRegisterController());

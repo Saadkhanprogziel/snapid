@@ -23,38 +23,71 @@ class AuthRespository {
     }
     return left(response.message);
   }
-Future<Either<String, UserModel>> login({
-  required String emailOrPhone,
-  required String password,
-}) async {
-    final response = await networkRepository.post(url: "/auth/login-user", data: {
+
+  Future<Either<String, UserModel>> login({
+    required String emailOrPhone,
+    required String password,
+  }) async {
+    final response =
+        await networkRepository.post(url: "/auth/login-user", data: {
       "emailORphone": emailOrPhone,
       "password": password,
     });
 
-  if (!response.failed) {
-    final data = UserModel.fromJson(response.data["data"]["user"]);
+    if (!response.failed) {
+      final data = UserModel.fromJson(response.data["data"]["user"]);
+      appStorage.write("user", jsonEncode(data.toJson()));
+      await getUserDetails();
 
-    appStorage.write("user", jsonEncode(data.toJson()));
-    appStorage.write("accessToken", response.data["data"]["accessToken"]);
-    appStorage.write("refreshToken", response.data["data"]["refreshToken"]);
 
-    return right(data);
+      // appStorage.write("accessToken", response.data["data"]["accessToken"]);
+      // appStorage.write("refreshToken", response.data["data"]["refreshToken"]);
+
+      return right(data);
+    }
+    return left(response.message);
   }
-  return left(response.message);
-}
-
 
   Future<Either<String, bool>> forgotPassword(String email) async {
     final response =
-        await networkRepository.post(url: "/auth/forgot-password", data: {
-      "email": email,
+        await networkRepository.post(url: "/auth/password-reset-link", data: {
+      "emailAddress": email,
     });
     if (!response.failed) {
       return right(true);
     }
     return left(response.message);
   }
+
+     /// ✅ Fixed and completed updateProfile
+  Future<Either<String, bool>> updateProfile({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String phone,
+    String? gender,
+    String? password,
+  }) async {
+    final response = await networkRepository.post(
+      url: "/auth/update-user-profile",
+      data: {
+        "firstName": firstName,
+        "lastName": lastName,
+        "email": email,
+        "phone": phone,
+        if (gender != null) "gender": gender,
+
+      },
+    );
+
+    if (!response.failed) {
+      // Refresh local user info
+      await getUserDetails();
+      return right(true);
+    }
+    return left(response.message);
+  }
+
 
   Future<Either<String, bool>> resetPassword({
     required String email,
@@ -101,8 +134,10 @@ Future<Either<String, UserModel>> login({
   }
 
   Future<Either<String, bool>> reSendOtp(
-      String identifier,) async {
-    final response = await networkRepository.post(url: "/auth/resend-otp", data: {
+    String identifier,
+  ) async {
+    final response =
+        await networkRepository.post(url: "/auth/resend-otp", data: {
       "identifier": identifier,
     });
     if (response.success) {
@@ -112,19 +147,19 @@ Future<Either<String, UserModel>> login({
   }
 
   Future<Either<String, bool>> logout() async {
-    final response = await networkRepository.post(url: "/auth/logout");
+    final response = await networkRepository.post(url: "/auth/logout-user");
     if (!response.failed) {
-      appStorage.erase();
+      
       return right(true);
     }
     return left(response.message);
   }
 
   Future<Either<String, UserModel>> getUserDetails() async {
-    final response = await networkRepository.get(url: "/auth/user");
+    final response = await networkRepository.get(url: "/auth/logged-user");
     if (!response.failed) {
       final data = UserModel.fromJson(response.data["data"]);
-      appStorage.write('user', data);
+      // appStorage.write('user', data);
       appStorage.write("user", jsonEncode(data.toJson()));
       return right(data);
     }

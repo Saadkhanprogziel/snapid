@@ -5,32 +5,36 @@ import 'package:snapid/models/user/user_model.dart';
 
 class DashboardController extends GetxController {
   final ScrollController scrollController = ScrollController();
+
+  // Observables
   var showGreeting = true.obs;
-  
-  // Observable user name for reactive updates
-  var userName = ''.obs;
-  
-  UserModel get user => LocalStorage.getUser() ?? UserModel();
+  var user = UserModel().obs; // store full user reactively
 
+  // Getter for convenience
+  String get userName => user.value.firstName ?? 'User';
 
-  // Load user name and update observable
-  void _loadUserName() {
+  @override
+  void onInit() {
+    super.onInit();
+    scrollController.addListener(_onScroll);
+    loadUser(); // initial load
+  }
+
+  // Load user from local storage
+  void loadUser() {
     final userData = LocalStorage.getUser();
-    if (userData != null && userData.firstName != null) {
-      userName.value = userData.firstName!;
-      print('User name loaded: ${userData.firstName}');
+    if (userData != null) {
+      user.value = userData;
+      print('User loaded: ${userData.firstName}');
     } else {
-      userName.value = 'User';
+      user.value = UserModel(firstName: 'User');
       print('No user data found, using default name');
     }
   }
 
-  @override
-  void onInit() {
-    scrollController.addListener(_onScroll);
-        _loadUserName();
-
-    super.onInit();
+  // Call this after updating user in LocalStorage
+  void refreshUser() {
+    loadUser();
   }
 
   void _onScroll() {
@@ -43,8 +47,7 @@ class DashboardController extends GetxController {
 
   @override
   void onClose() {
-    // scrollController.removeListener(_onScroll);
-    // scrollController.dispose();
+    scrollController.dispose();
     super.onClose();
   }
 }

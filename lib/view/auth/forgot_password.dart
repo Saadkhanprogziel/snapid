@@ -3,17 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
+import 'package:snapid/controllers/auth/forgot_password_controller.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
 import 'package:snapid/utlis/custom_text_field.dart';
 
 class ForgotPassword extends StatelessWidget {
-  const ForgotPassword({super.key});
+  ForgotPassword({super.key});
+
+  final ForgotPasswordController controller =
+      Get.put(ForgotPasswordController());
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController emailOrPassController = TextEditingController();
+   
+
     return Scaffold(
       body: Stack(
         children: [
@@ -24,7 +29,6 @@ class ForgotPassword extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 25),
             child: Column(
@@ -43,7 +47,6 @@ class ForgotPassword extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: CustomTextTheme.regular16.copyWith(
                         color: Colors.white70,
-                        // fontSize: 16,
                       ),
                     ),
                   ],
@@ -52,20 +55,23 @@ class ForgotPassword extends StatelessWidget {
                 CustomTextField(
                   hintText: "Enter email or number",
                   prefixIcon: Icons.email,
-                  controller: emailOrPassController,
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                CustomElevatedButton(
-                  onPressed: () {
-                    Get.toNamed(
-                      PrimaryRoute.otpScreen,
-                      arguments: {'isPasswordForgot': true},
-                    );
+                  controller: controller.emailOrPassController,
+                  onChanged: (value) {
+                    controller.email.value = value;
                   },
-                  text: "Send Code",
-                )
+                ),
+                const SizedBox(height: 20),
+                Obx(
+                  () => CustomElevatedButton(
+                    onPressed: () {
+                      controller.isLoading.value
+                          ? null
+                          : controller.sendResetCode();
+                    },
+                    text:
+                        controller.isLoading.value ? 'Sending...' : 'Send Code',
+                  ),
+                ),
               ],
             ),
           ),

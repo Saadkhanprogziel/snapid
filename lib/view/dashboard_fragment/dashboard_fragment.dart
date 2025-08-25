@@ -137,7 +137,7 @@ class DashboardFragment extends StatelessWidget {
                               padding: const EdgeInsets.all(20),
                               child: Obx(
                                 () => AnimatedGreeting(
-                                  userName: controller.userName.value,
+                                  userName: controller.user.value.firstName ?? "",
                                   visible: controller.showGreeting.value,
                                 ),
                               ),

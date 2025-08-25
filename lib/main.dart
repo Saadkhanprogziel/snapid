@@ -8,9 +8,12 @@ import 'package:snapid/constant/strings.dart';
 import 'package:snapid/router_management/route_management.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/utlis/custom_scroll.dart';
+
 final appStorage = GetStorage();
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await GetStorage.init(); // required!
   runApp(const MyApp());
 }
 
@@ -59,5 +62,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-

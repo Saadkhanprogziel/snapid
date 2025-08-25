@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
+import 'package:snapid/controllers/dashboard/dashboard_controller.dart';
 
 import 'package:snapid/controllers/profile/profile_controller.dart';
 import 'package:snapid/main.dart';
@@ -23,6 +24,7 @@ class ProfileFragment extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ProfileController controller = Get.put(ProfileController());
+    DashboardController dashboardController = Get.find<DashboardController>();
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -101,23 +103,26 @@ class ProfileFragment extends StatelessWidget {
                                   ],
                                 ),
                                 SpaceH20(),
-                                Text(
-                                  controller.user.firstName != ""
-                                      ? "${controller.user.firstName} ${controller.user.lastName}"
-                                      : "John Doe",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  controller.user.email ?? "",
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 14,
-                                  ),
-                                ),
+                                Obx(() => Text(
+                                      dashboardController
+                                                  .user.value.firstName !=
+                                              ""
+                                          ? "${dashboardController.user.value.firstName} ${dashboardController.user.value.lastName}"
+                                          : "John Doe",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )),
+                                Obx(() => Text(
+                                      dashboardController.user.value.email ??
+                                          "",
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 14,
+                                      ),
+                                    )),
                                 SpaceH10(),
                                 Container(
                                   padding: EdgeInsets.symmetric(
@@ -240,8 +245,7 @@ class ProfileFragment extends StatelessWidget {
                                                   AppColors.cardColor,
                                               onCancel: () => Get.back(),
                                               onPressed: () {
-                                              
-                                             
+                                                controller.logout();
                                               }),
                                         ));
                                       },

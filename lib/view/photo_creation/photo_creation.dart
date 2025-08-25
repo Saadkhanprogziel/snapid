@@ -71,19 +71,29 @@ class PhotoCreationScreen extends StatelessWidget {
                   ),
                 ),
                 Obx(() {
-                  return controller.currentStep.value == 2
-                      ? Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          child: CustomElevatedButton(
-                            minHeight: 60,
-                            onPressed: () {
-                              controller.goToNextStep();
-                            },
-                            text: "Next",
-                          ),
-                        )
-                      : const SizedBox.shrink();
+                  if (controller.currentStep.value == 2) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
+                      child: controller.isLoading.value
+                          ? const Center(
+                              child: SizedBox(
+                                height: 40,
+                                width: 40,
+                                child: CircularProgressIndicator(),
+                              ),
+                            )
+                          : CustomElevatedButton(
+                              minHeight: 60,
+                              onPressed: () {
+                                controller.goToNextStep();
+                              },
+                              text: "Next",
+                            ),
+                    );
+                  } else {
+                    return const SizedBox.shrink();
+                  }
                 }),
               ],
             ),
@@ -280,7 +290,7 @@ class PhotoCreationScreen extends StatelessWidget {
             children: [
               CustomOutlineButton(
                 onPressed: () {
-                   controller.capturePhotosSimple();
+                  controller.capturePhotosSimple();
                 },
                 label: "Take a Photo",
                 icon: Icons.camera_alt_outlined,
@@ -548,7 +558,9 @@ class PhotoCreationScreen extends StatelessWidget {
           ),
         ),
         Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30, ),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 30,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -606,14 +618,13 @@ class PhotoCreationScreen extends StatelessWidget {
                       SpaceH20(),
                       CustomOutlineButton(
                         onPressed: () {},
-                        
                         label: "Retake or Upload Again",
                         minHeight: 60,
                       ),
                       SpaceH20(),
                       CustomElevatedButton(
                         onPressed: () {
-                          controller.goToNextStep(); 
+                          controller.goToNextStep();
                         },
                         text: "Proceed To Download",
                         minHeight: 60,

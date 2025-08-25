@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:snapid/constant/colors.dart';
+import 'package:snapid/main.dart';
+import 'package:snapid/repositories/photo_creation_repository/photo_creation_repository.dart';
 import 'package:snapid/utlis/country_model.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
@@ -14,11 +16,16 @@ enum DocumentType { passport, visa, drivingLicense, manually }
 enum Unit { cm, inch }
 
 class PhotoController extends GetxController {
+  PhotoCreationRepository photoCreationRepository = PhotoCreationRepository();
   RxInt currentStep = 1.obs;
   var selectedUnit = Unit.cm.obs;
   var selectedType = DocumentType.visa.obs;
-
   var selectedCountry = Rxn<Country>();
+
+  final isLoading = false.obs;
+
+  // ✅ Add auth token property (you might want to get this from your auth service)
+  String? get authToken => _getAuthToken(); // Implement this method
 
   void selectCountry(Country country) {
     selectedCountry.value = country;
@@ -37,13 +44,30 @@ class PhotoController extends GetxController {
     currentStep.value = step;
   }
 
-  void goToNextStep() {
+  Future<void> goToNextStep() async {
     if (currentStep.value < 4) {
       if (currentStep.value == 2 && selectedCountry.value == null) {
         Get.snackbar(
-            'Missing Information', 'Please select a country before proceeding.',
-            backgroundColor: AppColors.red, colorText: AppColors.whiteColor);
+          'Missing Information',
+          'Please select a country before proceeding.',
+          backgroundColor: AppColors.red,
+          colorText: AppColors.whiteColor,
+        );
         return;
+      } else if (currentStep.value == 2 && selectedCountry.value != null) {
+        // ✅ Validate that photos exist before proceeding
+        if (capturedPhotos.isEmpty) {
+          Get.snackbar(
+            'Missing Photos',
+            'Please capture some photos before proceeding.',
+            backgroundColor: AppColors.red,
+            colorText: AppColors.whiteColor,
+          );
+          return;
+        }
+        print("Creating photo session...");
+        bool success = await createPhoto();
+        if (!success) return; // stop if error
       }
       currentStep.value++;
     }
@@ -56,11 +80,8 @@ class PhotoController extends GetxController {
   }
 
   final selectedPhotos = <ImageProvider>[].obs;
-  final capturedPhotos =
-      <File>[].obs; // Store actual file objects for camera photos
+  final capturedPhotos = <File>[].obs;
   final ImagePicker _picker = ImagePicker();
-
-  // Loading state for camera operations
   final isCapturingPhotos = false.obs;
 
   Future<void> pickImage() async {
@@ -68,25 +89,12 @@ class PhotoController extends GetxController {
 
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      selectedPhotos.add(FileImage(File(pickedFile.path)));
+      final file = File(pickedFile.path);
+      selectedPhotos.add(FileImage(file));
+      capturedPhotos.add(file); // ✅ Also add to capturedPhotos for consistency
     }
   }
 
-  void _finishPhotoCapture() {
-    if (capturedPhotos.isNotEmpty) {
-      // Navigate to photo selection screen
-      Get.toNamed(PrimaryRoute.selectedPhoto);
-
-      Get.snackbar(
-        'Complete',
-        'Successfully captured ${capturedPhotos.length} photos!',
-        backgroundColor: AppColors.green ?? Colors.green,
-        colorText: AppColors.whiteColor,
-      );
-    }
-  }
-
-  // Alternative simpler approach - capture photos one by one with confirmation
   Future<void> capturePhotosSimple() async {
     try {
       isCapturingPhotos.value = true;
@@ -109,22 +117,19 @@ class PhotoController extends GetxController {
           selectedPhotos.add(FileImage(file));
           photoCount++;
 
-          // Show success and ask if user wants to continue
           if (photoCount < 5) {
             shouldContinue = await _showContinueDialog(photoCount);
           }
         } else {
-          // User cancelled camera
           if (photoCount > 0) {
             shouldContinue =
                 await _showContinueDialog(photoCount, cancelled: true);
           } else {
-            break; // Exit if no photos taken
+            break;
           }
         }
       }
 
-      // Navigate to photo selection if any photos were taken
       if (capturedPhotos.isNotEmpty) {
         Get.toNamed(PrimaryRoute.selectedPhoto);
       }
@@ -138,6 +143,117 @@ class PhotoController extends GetxController {
     } finally {
       isCapturingPhotos.value = false;
     }
+  }
+
+  /// ✅ Updated: Added auth token and better error handling
+  Future<bool> createPhoto() async {
+    try {
+      isLoading.value = true;
+
+      // ✅ Validate inputs before making the request
+      if (capturedPhotos.isEmpty) {
+        Get.snackbar(
+          'Error',
+          'No photos to upload',
+          backgroundColor: AppColors.red,
+          colorText: AppColors.whiteColor,
+        );
+        return false;
+      }
+
+      if (selectedCountry.value?.code == null ||
+          selectedCountry.value!.code.isEmpty) {
+        Get.snackbar(
+          'Error',
+          'Please select a valid country',
+          backgroundColor: AppColors.red,
+          colorText: AppColors.whiteColor,
+        );
+        return false;
+      }
+
+      final response = await photoCreationRepository.createPhotoSession(
+        countryCode: selectedCountry.value!.code,
+        documentType: _mapDocumentType(selectedType.value),
+        userSessionPhotos: capturedPhotos,
+        platform: 'MOBILE_APP',
+    
+      );
+
+      return response.fold(
+        (error) {
+          Get.snackbar(
+            'Upload Failed',
+            error,
+            backgroundColor: AppColors.red,
+            colorText: AppColors.whiteColor,
+            duration: Duration(seconds: 4),
+          );
+          return false;
+        },
+        (photoCreationModel) {
+          Get.snackbar(
+            'Success',
+            'Photos uploaded successfully!',
+            backgroundColor: AppColors.green,
+            colorText: AppColors.whiteColor,
+            duration: Duration(seconds: 3),
+          );
+          // ✅ You might want to store the response data for later use
+          // _storeSessionData(photoCreationModel);
+          return true;
+        },
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Unexpected error occurred: ${e.toString()}',
+        backgroundColor: AppColors.red,
+        colorText: AppColors.whiteColor,
+        duration: Duration(seconds: 4),
+      );
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// ✅ Helper to format types correctly
+  String _mapDocumentType(DocumentType type) {
+    switch (type) {
+      case DocumentType.passport:
+        return "PASSPORT";
+      case DocumentType.visa:
+        return "VISA";
+      case DocumentType.drivingLicense:
+        return "DRIVING_LICENSE";
+      case DocumentType.manually:
+        return "MANUALLY";
+    }
+  }
+
+  /// ✅ Implement this method based on your authentication system
+  String? _getAuthToken() {
+    final token = appStorage.read("token") ?? "";
+
+    // Option 1: Get from GetX storage or another controller
+    // return Get.find<AuthController>().token;
+
+    // Option 2: Get from SharedPreferences
+    // final prefs = await SharedPreferences.getInstance();
+    // return prefs.getString('auth_token');
+
+    // Option 3: Get from secure storage
+    // return await FlutterSecureStorage().read(key: 'auth_token');
+
+    // For now, return a placeholder - REPLACE THIS WITH YOUR ACTUAL TOKEN LOGIC
+    return token;
+  }
+
+  /// ✅ Optional: Store session data for later use
+  void _storeSessionData(dynamic photoCreationModel) {
+    // Store session ID, response data, etc. for future reference
+    // This depends on your PhotoCreationModel structure
   }
 
   Future<bool> _showContinueDialog(int currentCount,
@@ -178,21 +294,24 @@ class PhotoController extends GetxController {
         ),
         actions: [
           CustomOutlineButton(
-              onPressed: () {
-                shouldContinue = false;
-                Get.back();
-              },
-              label:
-                  'Proceed with $currentCount photo${currentCount != 1 ? 's' : ''}'),
+            onPressed: () {
+              shouldContinue = false;
+              Get.back();
+            },
+            label:
+                'Proceed with $currentCount photo${currentCount != 1 ? 's' : ''}',
+          ),
           SpaceH12(),
-          CustomElevatedButton(onPressed: (){
-            shouldContinue = true;
-            Get.back();
-          }, text: 'Take More Photos'),
-      
+          CustomElevatedButton(
+            onPressed: () {
+              shouldContinue = true;
+              Get.back();
+            },
+            text: 'Take More Photos',
+          ),
         ],
       ),
-      barrierDismissible: true, // Allow closing by tapping outside
+      barrierDismissible: true,
     );
 
     return shouldContinue;
@@ -205,7 +324,6 @@ class PhotoController extends GetxController {
     }
   }
 
-  // Clear all photos
   void clearAllPhotos() {
     selectedPhotos.clear();
     capturedPhotos.clear();

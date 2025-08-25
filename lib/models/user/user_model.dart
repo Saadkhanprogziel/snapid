@@ -12,7 +12,11 @@ class UserModel {
   final String? stripeCustomerId;
   final String? defaultPaymentMethodId;
   final String? role;
-  final String? platform;
+  final String? platform; // still keeping this in case it's needed
+  final String? authProvider;
+  final List<dynamic>? photoSessions;
+  final List<dynamic>? transactions;
+  final List<dynamic>? cards;
   final UserAuthentication? userAuthentication;
 
   UserModel({
@@ -30,6 +34,10 @@ class UserModel {
     this.defaultPaymentMethodId,
     this.role,
     this.platform,
+    this.authProvider,
+    this.photoSessions,
+    this.transactions,
+    this.cards,
     this.userAuthentication,
   });
 
@@ -49,6 +57,14 @@ class UserModel {
       defaultPaymentMethodId: json['defaultPaymentMethodId'] as String?,
       role: json['role'] as String?,
       platform: json['platform'] as String?,
+      authProvider: json['authProvider'] as String?,
+      photoSessions: json['photoSessions'] != null
+          ? List<dynamic>.from(json['photoSessions'])
+          : [],
+      transactions: json['transactions'] != null
+          ? List<dynamic>.from(json['transactions'])
+          : [],
+      cards: json['cards'] != null ? List<dynamic>.from(json['cards']) : [],
       userAuthentication: json['userAuthentication'] != null
           ? UserAuthentication.fromJson(json['userAuthentication'])
           : null,
@@ -71,6 +87,10 @@ class UserModel {
       "defaultPaymentMethodId": defaultPaymentMethodId,
       "role": role,
       "platform": platform,
+      "authProvider": authProvider,
+      "photoSessions": photoSessions ?? [],
+      "transactions": transactions ?? [],
+      "cards": cards ?? [],
       "userAuthentication": userAuthentication?.toJson(),
     };
   }

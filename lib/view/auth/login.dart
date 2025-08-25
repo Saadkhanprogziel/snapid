@@ -145,17 +145,27 @@ class LoginScreen extends StatelessWidget {
                                   const SizedBox(height: 10),
 
                                   // Sign In Button
-                                  CustomElevatedButton(
-                                    onPressed: () {
-                                      if (_formKey.currentState!.validate()) {
-                                        controller.onLogin();
-                                        // Or navigation:
-                                        // Get.toNamed(PrimaryRoute.home);
-                                      }
-                                    },
-                                    text: Strings.signIn,
-                                    minHeight: 60,
-                                  ),
+                                  // Sign In Button
+                                  controller.isLoading
+                                      ? const SizedBox(
+                                          height: 60,
+                                          child: Center(
+                                            child: CircularProgressIndicator(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        )
+                                      : CustomElevatedButton(
+                                          onPressed: () {
+                                            if (_formKey.currentState!
+                                                .validate()) {
+                                              controller.onLogin();
+                                            }
+                                          },
+                                          text: Strings.signIn,
+                                          minHeight: 60,
+                                        ),
+
                                   const SizedBox(height: 30),
 
                                   // Biometrics button

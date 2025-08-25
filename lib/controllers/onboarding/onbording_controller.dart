@@ -1,8 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
+import 'package:snapid/main.dart';
 import 'package:snapid/routes/routes.dart';
+
 class OnBoardingController extends GetxController {
   var currentPage = 0.obs;
 
@@ -25,7 +26,6 @@ class OnBoardingController extends GetxController {
       Get.toNamed(PrimaryRoute.onBoard3);
     }
   }
-  
 
   void goToLastPage() {
     pageController.animateToPage(
@@ -34,8 +34,9 @@ class OnBoardingController extends GetxController {
       curve: Curves.easeInOut,
     );
   }
+
   void userOnBoarded() {
-    
+    appStorage.write("onBoarded", true);
     Get.offAllNamed(PrimaryRoute.login);
   }
 
