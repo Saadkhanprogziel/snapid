@@ -39,7 +39,7 @@ class Strings {
   static const String signUp = "Sign Up";
 
    // Dashboard-specific
-  static const String creditsRemaining = "Credits Remaining: 03";
+  static const String creditsRemaining = "Credits Remaining:";
   static const String helloUser = "Hello, John! 👋";
   static const String welcomeBack =
       "Welcome back! Let's get your next\nphoto ready in just a few steps.";

@@ -63,20 +63,26 @@ class DashboardFragment extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          
                           Flexible(
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 12),
-                              decoration: BoxDecoration(
-                                color: Colors.white24.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                Strings.creditsRemaining,
-                                style: CustomTextTheme.regular14.copyWith(
-                                  color: AppColors.whiteColor,
+                            child: GestureDetector(
+                              onTap:controller.credits == 0 ? null:  (){
+                                print("Tap Test");
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white24.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                                overflow: TextOverflow.ellipsis,
+                                child: Text(controller.credits == 0 ? "Purchase Credits":
+                                  "${Strings.creditsRemaining}  ${controller.credits}",
+                                  style: CustomTextTheme.regular14.copyWith(
+                                    color: AppColors.whiteColor,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ),
                           ),

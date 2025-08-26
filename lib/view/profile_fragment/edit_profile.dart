@@ -85,7 +85,7 @@ class EditProfile extends StatelessWidget {
                                             },
                                             child: const CircleAvatar(
                                               backgroundColor: Colors.white,
-                                              radius: 14,
+                                              radius: 16,
                                               child: Icon(
                                                 Icons.upload,
                                                 color: Colors.black,
@@ -283,72 +283,72 @@ class EditProfile extends StatelessWidget {
                                             Row(
                                               children: [
                                                 // Country Code
-                                                SizedBox(
-                                                  height: 65,
-                                                  child: OutlinedButton(
-                                                    onPressed: () =>
-                                                        _showCountryCodePicker(
-                                                            controller),
-                                                    style: OutlinedButton
-                                                        .styleFrom(
-                                                      backgroundColor:
-                                                          Colors.white10,
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
-                                                      ),
-                                                    ),
-                                                    child: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        if (controller
-                                                                .selectedCountryCode
-                                                                .value !=
-                                                            null) ...[
-                                                          SvgPicture.asset(
-                                                            controller
-                                                                .selectedCountryCode
-                                                                .value!
-                                                                .flag,
-                                                            width: 16,
-                                                            height: 16,
-                                                          ),
-                                                          const SizedBox(
-                                                              width: 4),
-                                                          Text(
-                                                            controller
-                                                                .selectedCountryCode
-                                                                .value!
-                                                                .dialCode,
-                                                            style:
-                                                                const TextStyle(
-                                                              color:
-                                                                  Colors.white,
-                                                              fontSize: 14,
-                                                            ),
-                                                          ),
-                                                        ] else
-                                                          const Text(
-                                                            "+00",
-                                                            style: TextStyle(
-                                                              color: Colors
-                                                                  .white70,
-                                                              fontSize: 14,
-                                                            ),
-                                                          ),
-                                                        const Icon(
-                                                          Icons.arrow_drop_down,
-                                                          color: Colors.white,
-                                                          size: 18,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 10),
+                                                // SizedBox(
+                                                //   height: 65,
+                                                //   child: OutlinedButton(
+                                                //     onPressed: () =>
+                                                //         _showCountryCodePicker(
+                                                //             controller),
+                                                //     style: OutlinedButton
+                                                //         .styleFrom(
+                                                //       backgroundColor:
+                                                //           Colors.white10,
+                                                //       shape:
+                                                //           RoundedRectangleBorder(
+                                                //         borderRadius:
+                                                //             BorderRadius
+                                                //                 .circular(12),
+                                                //       ),
+                                                //     ),
+                                                //     child: Row(
+                                                //       mainAxisSize:
+                                                //           MainAxisSize.min,
+                                                //       children: [
+                                                //         if (controller
+                                                //                 .selectedCountryCode
+                                                //                 .value !=
+                                                //             null) ...[
+                                                //           SvgPicture.asset(
+                                                //             controller
+                                                //                 .selectedCountryCode
+                                                //                 .value!
+                                                //                 .flag,
+                                                //             width: 16,
+                                                //             height: 16,
+                                                //           ),
+                                                //           const SizedBox(
+                                                //               width: 4),
+                                                //           Text(
+                                                //             controller
+                                                //                 .selectedCountryCode
+                                                //                 .value!
+                                                //                 .dialCode,
+                                                //             style:
+                                                //                 const TextStyle(
+                                                //               color:
+                                                //                   Colors.white,
+                                                //               fontSize: 14,
+                                                //             ),
+                                                //           ),
+                                                //         ] else
+                                                //           const Text(
+                                                //             "+00",
+                                                //             style: TextStyle(
+                                                //               color: Colors
+                                                //                   .white70,
+                                                //               fontSize: 14,
+                                                //             ),
+                                                //           ),
+                                                //         const Icon(
+                                                //           Icons.arrow_drop_down,
+                                                //           color: Colors.white,
+                                                //           size: 18,
+                                                //         ),
+                                                //       ],
+                                                //     ),
+                                                //   ),
+                                                // ),
+                                               SpaceH10(),
                                                 Expanded(
                                                   child: CustomTextField(
                                                     controller: controller
@@ -371,6 +371,7 @@ class EditProfile extends StatelessWidget {
                                                 ),
                                               ],
                                             ),
+                                                SpaceH20(),
                                           ],
                                         ),
                                       ],

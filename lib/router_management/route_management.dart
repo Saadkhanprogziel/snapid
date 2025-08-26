@@ -19,9 +19,11 @@ import 'package:snapid/view/onboarding/onboardingLastPage.dart';
 
 import 'package:snapid/view/payment_method/payment_method.dart';
 import 'package:snapid/view/photo_creation/photo_creation.dart';
+import 'package:snapid/view/photo_creation/photo_preview.dart';
 import 'package:snapid/view/photo_select/seletedPhotos.dart';
 import 'package:snapid/view/popular_countries.dart/popular_countries.dart';
 import 'package:snapid/view/profile_fragment/edit_profile.dart';
+import 'package:snapid/view/profile_fragment/report_bug/report_bug.dart';
 import 'package:snapid/view/security_setting/security_setting.dart';
 import 'package:snapid/view/splash/splash.dart';
 
@@ -139,6 +141,16 @@ class Pages {
           page: () => PaymentMethod(),
           binding: ControllerBindings(),
           transition: Transition.cupertino),
+      GetPage(
+          name: PrimaryRoute.report_bug,
+          page: () => ReportBug(),
+          binding: ControllerBindings(),
+          transition: Transition.cupertino),
+      GetPage(
+          name: PrimaryRoute.photo_preview,
+          page: () => PhotoPreview(),
+          binding: ControllerBindings(),
+          transition: Transition.downToUp),
     ];
   }
 }

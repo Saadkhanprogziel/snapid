@@ -99,6 +99,16 @@ class SelectedPhotosScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 40),
                 child: CustomElevatedButton(
                   onPressed: () {
+                    if (controller.selectedPhotos.isEmpty) {
+                      Get.snackbar("No Photos", "Please select at least one photo.", backgroundColor: Colors.red, colorText: Colors.white);
+                      return;
+                      
+                    }
+                     if (controller.selectedPhotos.length < 3) {
+                      Get.snackbar("Insufficient Photos", "Please select at least three photos for better results.", backgroundColor: Colors.orange, colorText: Colors.white);
+                      return;
+                      
+                    }
                     Get.toNamed(PrimaryRoute.photo_creation);
                     controller.setStep(2);
                   },

@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/main.dart';
+import 'package:snapid/models/photo_creation/photo_creation_model.dart';
 import 'package:snapid/repositories/photo_creation_repository/photo_creation_repository.dart';
 import 'package:snapid/utlis/country_model.dart';
 import 'package:snapid/routes/routes.dart';
@@ -23,9 +25,11 @@ class PhotoController extends GetxController {
   var selectedCountry = Rxn<Country>();
 
   final isLoading = false.obs;
+  var photoCreationModelData = Rxn<PhotoCreationModel>();
+  var processedWatermarkedUrl = ''.obs;
+  TextEditingController widthController = TextEditingController();
+  TextEditingController heightController= TextEditingController();
 
-  // ✅ Add auth token property (you might want to get this from your auth service)
-  String? get authToken => _getAuthToken(); // Implement this method
 
   void selectCountry(Country country) {
     selectedCountry.value = country;
@@ -54,7 +58,9 @@ class PhotoController extends GetxController {
           colorText: AppColors.whiteColor,
         );
         return;
-      } else if (currentStep.value == 2 && selectedCountry.value != null) {
+      }
+
+      if (currentStep.value == 2 && selectedCountry.value != null) {
         // ✅ Validate that photos exist before proceeding
         if (capturedPhotos.isEmpty) {
           Get.snackbar(
@@ -68,7 +74,53 @@ class PhotoController extends GetxController {
         print("Creating photo session...");
         bool success = await createPhoto();
         if (!success) return; // stop if error
+        print(
+            "Reviewing photos... ${photoCreationModelData.value?.processedWatermarkedUrl}");
+
+        // ✅ Only increment when photo creation succeeds
+        currentStep.value++;
+        return;
       }
+
+      if (currentStep.value == 3) {
+        if (photoCreationModelData.value?.canDownloadImage == true) {
+          // ⛔ Stay on step 3, don't increment
+          isLoading.value = true;
+          await photoCreationRepository
+              .downloadImage(
+            id: photoCreationModelData.value!.id,
+          )
+              .then((response) {
+            response.fold((error) {
+              Get.snackbar(
+                'Error',
+                error,
+                backgroundColor: AppColors.red,
+                colorText: AppColors.whiteColor,
+              );
+              isLoading.value = false;
+            }, (photoCreationModel) {
+              isLoading.value = false;
+              photoCreationModelData.value = photoCreationModel;
+              _storeSessionData(photoCreationModel);
+              Get.toNamed(PrimaryRoute.photo_preview);
+              Get.snackbar(
+                'Success',
+                'Image download initiated successfully',
+                backgroundColor: AppColors.green,
+                colorText: AppColors.whiteColor,
+              );
+            });
+          });
+          return; // ⛔ do not increment
+        } else {
+          // ✅ if image not downloadable, allow moving forward
+          currentStep.value++;
+          return;
+        }
+      }
+
+      // ✅ default increment for other steps
       currentStep.value++;
     }
   }
@@ -145,7 +197,6 @@ class PhotoController extends GetxController {
     }
   }
 
-  /// ✅ Updated: Added auth token and better error handling
   Future<bool> createPhoto() async {
     try {
       isLoading.value = true;
@@ -171,13 +222,12 @@ class PhotoController extends GetxController {
         );
         return false;
       }
-
+        
       final response = await photoCreationRepository.createPhotoSession(
         countryCode: selectedCountry.value!.code,
         documentType: _mapDocumentType(selectedType.value),
         userSessionPhotos: capturedPhotos,
         platform: 'MOBILE_APP',
-    
       );
 
       return response.fold(
@@ -192,6 +242,7 @@ class PhotoController extends GetxController {
           return false;
         },
         (photoCreationModel) {
+          print("Photo session created: ${photoCreationModel.id}");
           Get.snackbar(
             'Success',
             'Photos uploaded successfully!',
@@ -199,8 +250,10 @@ class PhotoController extends GetxController {
             colorText: AppColors.whiteColor,
             duration: Duration(seconds: 3),
           );
-          // ✅ You might want to store the response data for later use
-          // _storeSessionData(photoCreationModel);
+          photoCreationModelData.value = photoCreationModel;
+          processedWatermarkedUrl.value =
+              photoCreationModel.processedWatermarkedUrl;
+          _storeSessionData(photoCreationModel);
           return true;
         },
       );
@@ -232,28 +285,9 @@ class PhotoController extends GetxController {
     }
   }
 
-  /// ✅ Implement this method based on your authentication system
-  String? _getAuthToken() {
-    final token = appStorage.read("token") ?? "";
-
-    // Option 1: Get from GetX storage or another controller
-    // return Get.find<AuthController>().token;
-
-    // Option 2: Get from SharedPreferences
-    // final prefs = await SharedPreferences.getInstance();
-    // return prefs.getString('auth_token');
-
-    // Option 3: Get from secure storage
-    // return await FlutterSecureStorage().read(key: 'auth_token');
-
-    // For now, return a placeholder - REPLACE THIS WITH YOUR ACTUAL TOKEN LOGIC
-    return token;
-  }
-
-  /// ✅ Optional: Store session data for later use
-  void _storeSessionData(dynamic photoCreationModel) {
-    // Store session ID, response data, etc. for future reference
-    // This depends on your PhotoCreationModel structure
+  void _storeSessionData(PhotoCreationModel model) {
+    // Save as JSON string
+    appStorage.write('photoSession', model.toJson());
   }
 
   Future<bool> _showContinueDialog(int currentCount,

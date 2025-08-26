@@ -6,15 +6,19 @@ import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
-
+import 'package:snapid/view/photo_creation/cached_image.dart';
 
 class HistoryCustomCard extends StatelessWidget {
   final String imageUrl;
   final String country;
+  final String documentType;
   final String date;
   final String status;
   final Color statusColor;
   final GestureTapDownCallback? onMoreTapDown;
+
+  /// Callback when delete is confirmed
+  final VoidCallback? onDelete;
 
   const HistoryCustomCard({
     super.key,
@@ -24,8 +28,9 @@ class HistoryCustomCard extends StatelessWidget {
     required this.status,
     required this.statusColor,
     this.onMoreTapDown,
+    this.onDelete, required this.documentType,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -33,7 +38,7 @@ class HistoryCustomCard extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           decoration: BoxDecoration(
             color: AppColors.cardColor,
             borderRadius: BorderRadius.circular(20),
@@ -50,14 +55,11 @@ class HistoryCustomCard extends StatelessWidget {
                     height: 130,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                      ),
+                      child: CustomCachedImage(imageUrl: imageUrl),
                     ),
                   ),
 
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
 
                   Expanded(
                     child: Column(
@@ -71,7 +73,7 @@ class HistoryCustomCard extends StatelessWidget {
                               style: CustomTextTheme.regular22
                                   .copyWith(color: AppColors.whiteColor),
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             Row(
                               children: [
                                 Text(
@@ -79,7 +81,7 @@ class HistoryCustomCard extends StatelessWidget {
                                   style: CustomTextTheme.regular12
                                       .copyWith(color: AppColors.whiteColor),
                                 ),
-                                SpaceW10(),
+                                const SpaceW10(),
                                 Text(
                                   date,
                                   style: CustomTextTheme.regular12
@@ -89,12 +91,12 @@ class HistoryCustomCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        SpaceH20(),
+                        const SpaceH20(),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 8),
                               decoration: BoxDecoration(
                                 color: statusColor,
@@ -106,7 +108,7 @@ class HistoryCustomCard extends StatelessWidget {
                                     .copyWith(color: AppColors.whiteColor),
                               ),
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Text(
                               "Expire Within 7 days",
                               style: CustomTextTheme.regular12
@@ -119,27 +121,28 @@ class HistoryCustomCard extends StatelessWidget {
                   ),
 
                   PopupMenuButton<String>(
-                    
                     color: const Color.fromARGB(194, 46, 46, 46),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                     onSelected: (value) {
-                      print('Selected: $value');
-                      // Add your action logic here
+                      if (value == 'delete') {
+                        _showDeleteDialog(context);
+                      } else if (value == 'redownload') {
+                        print("Re-download logic here");
+                      } else if (value == 'reuse_setting') {
+                        print("Reuse setting logic here");
+                      }
                     },
-                    popUpAnimationStyle: AnimationStyle(),
                     itemBuilder: (BuildContext context) =>
-                     
                         <PopupMenuEntry<String>>[
-                      _buildMenuItem(
-                          Icons.file_download_outlined, 'Re-Download', 'redownload'),
+                      _buildMenuItem(Icons.file_download_outlined, 'Re-Download',
+                          'redownload'),
                       _buildDivider(),
-                      _buildMenuItem(
-                          Icons.replay, 'Reuse Setting', 'reuse_setting'),
+                      _buildMenuItem(Icons.replay, 'Reuse Setting',
+                          'reuse_setting'),
                       _buildDivider(),
-                      _buildMenuItem(
-                          Icons.delete, 'Delete', 'delete'),
+                      _buildMenuItem(Icons.delete, 'Delete', 'delete'),
                     ],
                     child: Container(
                       padding: const EdgeInsets.all(8),
@@ -155,15 +158,15 @@ class HistoryCustomCard extends StatelessWidget {
                   )
                 ],
               ),
-              SpaceH20(),
+              const SpaceH20(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
                       Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 5, vertical: 5),
                         decoration: BoxDecoration(
                           color: const Color.fromARGB(20, 223, 222, 222),
                           borderRadius: BorderRadius.circular(10),
@@ -173,19 +176,19 @@ class HistoryCustomCard extends StatelessWidget {
                           width: 15,
                         ),
                       ),
-                      SpaceW10(),
+                      const SpaceW10(),
                       Text(
-                        "Passport",
+                        documentType,
                         style: CustomTextTheme.regular12
                             .copyWith(color: AppColors.whiteColor),
                       ),
                     ],
                   ),
-                  Text(
-                    "3.5 x 4.5 cm",
-                    style: CustomTextTheme.regular12
-                        .copyWith(color: AppColors.whiteColor),
-                  ),
+                  // Text(
+                  //   "3.5 x 4.5 cm",
+                  //   style: CustomTextTheme.regular12
+                  //       .copyWith(color: AppColors.whiteColor),
+                  // ),
                 ],
               )
             ],
@@ -215,6 +218,29 @@ class HistoryCustomCard extends StatelessWidget {
   PopupMenuDivider _buildDivider() {
     return const PopupMenuDivider(
       height: 1,
+    );
+  }
+
+  void _showDeleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Delete Item"),
+        content: const Text("Are you sure you want to delete this item?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context), // cancel
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // close dialog
+              onDelete?.call(); // notify parent
+            },
+            child: const Text("Delete"),
+          ),
+        ],
+      ),
     );
   }
 }

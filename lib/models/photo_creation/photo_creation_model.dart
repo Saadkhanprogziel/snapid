@@ -10,6 +10,7 @@ class PhotoCreationModel {
   final double? customHeight;
   final int photos;
   final String processedWatermarkedUrl;
+  final String? processedImageUrl; // Nullable now
   final bool canDownloadImage;
   final String platform;
   final String createdAt;
@@ -26,6 +27,7 @@ class PhotoCreationModel {
     this.customHeight,
     required this.photos,
     required this.processedWatermarkedUrl,
+    this.processedImageUrl,
     required this.canDownloadImage,
     required this.platform,
     required this.createdAt,
@@ -48,6 +50,7 @@ class PhotoCreationModel {
           : null,
       photos: json["photos"] ?? 0,
       processedWatermarkedUrl: json["processedWatermarkedUrl"] ?? "",
+      processedImageUrl: json["processedImageUrl"], // nullable
       canDownloadImage: json["canDownloadImage"] ?? false,
       platform: json["platform"] ?? "",
       createdAt: json["createdAt"] ?? "",
@@ -67,6 +70,7 @@ class PhotoCreationModel {
       "customHeight": customHeight,
       "photos": photos,
       "processedWatermarkedUrl": processedWatermarkedUrl,
+      "processedImageUrl": processedImageUrl,
       "canDownloadImage": canDownloadImage,
       "platform": platform,
       "createdAt": createdAt,

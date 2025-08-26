@@ -10,8 +10,10 @@ class DashboardController extends GetxController {
   var showGreeting = true.obs;
   var user = UserModel().obs; // store full user reactively
 
-  // Getter for convenience
+ 
   String get userName => user.value.firstName ?? 'User';
+  int get credits => user.value.credits ?? 0  ;
+
 
   @override
   void onInit() {
@@ -25,7 +27,7 @@ class DashboardController extends GetxController {
     final userData = LocalStorage.getUser();
     if (userData != null) {
       user.value = userData;
-      print('User loaded: ${userData.firstName}');
+      
     } else {
       user.value = UserModel(firstName: 'User');
       print('No user data found, using default name');

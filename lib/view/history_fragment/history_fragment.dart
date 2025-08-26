@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/history/history_controller.dart';
@@ -18,6 +19,8 @@ class HistoryFragment extends StatelessWidget {
   Widget build(BuildContext context) {
     final HistoryController controller = Get.put(HistoryController());
 
+  
+
     return Scaffold(
       body: Stack(
         children: [
@@ -33,7 +36,6 @@ class HistoryFragment extends StatelessWidget {
             child: Column(
               children: [
                 CustomHeader(
-                  // leftIcon: ,
                   title: "History",
                   leftIconPath: Assets.asistantIcon,
                   rightIconPath: Assets.bellIcon,
@@ -65,10 +67,19 @@ class HistoryFragment extends StatelessWidget {
                               child: Obx(
                                 () {
                                   return TabBarWidget(
-                                    tabs: ['All Orders', 'Active', 'Expired'],
+                                    tabs: ['All Orders', 'Credited', 'Processed'],
                                     selectedIndex: controller.selectedTab.value,
                                     onTabSelected: (index) {
                                       controller.onTabChanged(index);
+
+                                      // ✅ Fetch history based on tab
+                                      if (index == 0) {
+                                        // controller.fetchHistory(status: "ALL");
+                                      } else if (index == 1) {
+                                        controller.fetchHistory(status: "CREDITED");
+                                      } else {
+                                        controller.fetchHistory(status: "IMAGE_PROCESSED");
+                                      }
                                     },
                                   );
                                 },
@@ -84,41 +95,55 @@ class HistoryFragment extends StatelessWidget {
                 Expanded(
                   child: Obx(
                     () {
-                      // print(object)
-                      return controller.selectedTab.value == 0
-                          ? ListView(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              children: const [
-                                HistoryCustomCard(
-                                  imageUrl:
-                                      'https://www.w3schools.com/howto/img_avatar2.png',
-                                  country: 'United States',
-                                  date: 'May 17, 2025',
-                                  status: 'Processed',
-                                  statusColor: Color.fromARGB(113, 0, 229, 34),
-                                ),
-                                SizedBox(height: 20),
-                                HistoryCustomCard(
-                                  imageUrl:
-                                      'https://www.w3schools.com/howto/img_avatar.png',
-                                  country: 'Italy',
-                                  date: 'May 17, 2025',
-                                  status: 'Expire',
-                                  statusColor: Color.fromARGB(58, 255, 0, 0),
-                                ),
-                              ],
-                            )
-                          : EmptyDataWidget(
-                              imagePath: Assets.historIcon,
-                              title: "No Photo Orders Yet",
-                              subtitle:
-                                  "Looks like you haven’t started yet. Tap below to create your first photo — it's quick and easy!",
-                              buttonTitle: "Upload or Capture",
-                              onPressed: () {
-                                // handle action
+                      if (controller.isLoading.value) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      if (controller.errorMessage.isNotEmpty) {
+                        return Center(child: Text(controller.errorMessage.value));
+                      }
+
+                      if (controller.historyList.isEmpty) {
+                        return EmptyDataWidget(
+                          imagePath: Assets.historIcon,
+                          title: "No Photo Orders Yet",
+                          subtitle:
+                              "Looks like you haven’t started yet. Tap below to create your first photo — it's quick and easy!",
+                          buttonTitle: "Upload or Capture",
+                          onPressed: () {
+                            // handle action
+                          },
+                        );
+                      }
+
+                      // ✅ Render dynamic history list
+                      return ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        itemCount: controller.historyList.length,
+                        itemBuilder: (context, index) {
+                          final item = controller.historyList[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 20),
+                            child: HistoryCustomCard(
+                              imageUrl: item.processedImageUrl ??
+                                  item.processedWatermarkedUrl ??
+                                  'https://via.placeholder.com/150',
+                              country: item.countryName,
+                              documentType: item.documentType,
+                              date: formatDate(item.createdAt)  ,
+                              status: item.status ?? '',
+                              onDelete: () {
+                                controller.delete(item.id);
                               },
-                            );
+                              statusColor: item.status == "CREDITED"
+                                  ?
+                                   Colors.orange.withValues(alpha: 0.6)
+                                  :
+                                   Colors.green.withValues(alpha: 0.5)
+                            ),
+                          );
+                        },
+                      );
                     },
                   ),
                 ),
@@ -128,5 +153,15 @@ class HistoryFragment extends StatelessWidget {
         ],
       ),
     );
+  }
+  String formatDate(String? dateString, {String pattern = 'yyyy-MM-dd'}) {
+    if (dateString == null || dateString.isEmpty) return '';
+
+    try {
+      final dateTime = DateTime.parse(dateString);
+      return DateFormat(pattern).format(dateTime);
+    } catch (e) {
+      return dateString; // fallback in case parsing fails
+    }
   }
 }

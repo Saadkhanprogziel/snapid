@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 
@@ -16,6 +17,8 @@ class NetworkRepository {
     required String url,
     Map<String, dynamic>? data,
     Map<String, dynamic>? queryParameters,
+    FormData? formData,
+    Map<String, String>? headers,
   }) async {
     if (!await networkMonitor.checkConnection()) {
       throw NetworkResponse(
@@ -42,12 +45,16 @@ class NetworkRepository {
         }
       },
     );
+
     try {
       final response = await dioClient.dio.request(
         url,
-        data: data,
+        data: formData ?? data,
         queryParameters: queryParameters,
-        options: Options(method: method),
+        options: Options(
+          method: method,
+          headers: headers,
+        ),
       );
 
       networkResponse = _handleResponse(response);
@@ -107,7 +114,69 @@ class NetworkRepository {
         data: data,
       );
 
-  
+  // New method for multipart POST requests
+  Future<NetworkResponse> postMultipart({
+    required String url,
+    required FormData formData,
+    Map<String, String>? headers,
+  }) =>
+      request(
+        method: 'POST',
+        url: url,
+        formData: formData,
+        headers: headers,
+      );
+
+  // Helper method to create FormData with files
+  Future<FormData> createFormData({
+    Map<String, dynamic>? fields,
+    Map<String, File>? files,
+    Map<String, List<File>>? multipleFiles,
+  }) async {
+    final formData = FormData();
+
+    // Add text fields
+    if (fields != null) {
+      fields.forEach((key, value) {
+        formData.fields.add(MapEntry(key, value.toString()));
+      });
+    }
+
+    // Add single files
+    if (files != null) {
+      for (final entry in files.entries) {
+        formData.files.add(
+          MapEntry(
+            entry.key,
+            await MultipartFile.fromFile(
+              entry.value.path,
+              filename: entry.value.path.split('/').last,
+            ),
+          ),
+        );
+      }
+    }
+
+    // Add multiple files with same key
+    if (multipleFiles != null) {
+      for (final entry in multipleFiles.entries) {
+        for (final file in entry.value) {
+          formData.files.add(
+            MapEntry(
+              entry.key,
+              await MultipartFile.fromFile(
+                file.path,
+                filename: file.path.split('/').last,
+              ),
+            ),
+          );
+        }
+      }
+    }
+
+    return formData;
+  }
+
   Future<NetworkResponse> patch({
     required String url,
     Map<String, dynamic>? data,
@@ -128,20 +197,21 @@ class NetworkRepository {
         data: data,
       );
 
-  Future<NetworkResponse> delete({required String url}) => request(
+  Future<NetworkResponse> delete({required String url,Map<String, dynamic>? data}) => request(
         method: 'DELETE',
         url: url,
+        data: data
       );
 
   NetworkResponse _handleResponse(Response response) {
     final body = response.data;
     if (response.statusCode == 200 || response.statusCode == 201) {
       return NetworkResponse(
-         data: body,
-      success: body is Map && body["success"] == true,
-      message: body is Map && body.containsKey("message")
-          ? body["message"]
-          : "",
+        data: body,
+        success: body is Map && body["success"] == true,
+        message: body is Map && body.containsKey("message")
+            ? body["message"]
+            : "",
       );
     }
     throw NetworkResponse(success: false, data: body);

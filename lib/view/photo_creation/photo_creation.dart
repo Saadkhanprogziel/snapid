@@ -17,6 +17,8 @@ import 'package:snapid/utlis/custom_spaces.dart';
 import 'package:snapid/utlis/custom_text_field.dart';
 import 'package:snapid/utlis/screenBg.dart';
 import 'package:snapid/utlis/subscription_card.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:snapid/view/photo_creation/cached_image.dart';
 
 class PhotoCreationScreen extends StatelessWidget {
   const PhotoCreationScreen({super.key});
@@ -501,6 +503,7 @@ class PhotoCreationScreen extends StatelessWidget {
                           children: [
                             Expanded(
                               child: CustomTextField(
+                                controller: controller.widthController,
                                 hintText: 'Width',
                                 keyboardType: TextInputType.number,
                               ),
@@ -514,6 +517,7 @@ class PhotoCreationScreen extends StatelessWidget {
                             SizedBox(width: 16),
                             Expanded(
                               child: CustomTextField(
+                                controller: controller.heightController,
                                 hintText: 'Height',
                                 keyboardType: TextInputType.number,
                               ),
@@ -541,13 +545,25 @@ class PhotoCreationScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SpaceH40(),
-        Center(
-          child: Container(
-            width: 170,
-            height: 200,
-            child: Image.asset(Assets.demoResult),
-          ),
-        ),
+        controller.processedWatermarkedUrl.value.isEmpty
+            ? Center(
+                child: Container(
+                  width: 170,
+                  height: 200,
+                  child: Image.asset(Assets.demoResult),
+                ),
+              )
+            : Center(
+                child: Container(
+                  width: 170,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: CustomCachedImage(
+                      imageUrl: controller.processedWatermarkedUrl.value),
+                ),
+              ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 20),
           child: Text(
@@ -622,13 +638,21 @@ class PhotoCreationScreen extends StatelessWidget {
                         minHeight: 60,
                       ),
                       SpaceH20(),
-                      CustomElevatedButton(
-                        onPressed: () {
-                          controller.goToNextStep();
-                        },
-                        text: "Proceed To Download",
-                        minHeight: 60,
-                      ),
+                      controller.isLoading.value
+                          ? const Center(
+                              child: SizedBox(
+                                height: 40,
+                                width: 40,
+                                child: CircularProgressIndicator(),
+                              ),
+                            )
+                          : CustomElevatedButton(
+                              onPressed: () {
+                                controller.goToNextStep();
+                              },
+                              text: "Proceed To Download",
+                              minHeight: 60,
+                            ),
                     ],
                   ),
                 ),
@@ -644,13 +668,25 @@ class PhotoCreationScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SpaceH10(),
-        Center(
-          child: Container(
-            width: 350,
-            height: 250,
-            child: Image.asset(Assets.demoResult2),
-          ),
-        ),
+        controller.processedWatermarkedUrl.value.isEmpty
+            ? Center(
+                child: Container(
+                  width: 350,
+                  height: 250,
+                  child: Image.asset(Assets.demoResult2),
+                ),
+              )
+            : Center(
+                child: Container(
+                  width: 230,
+                  height: 300,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: CustomCachedImage(
+                      imageUrl: controller.processedWatermarkedUrl.value),
+                ),
+              ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 10),
           child: Text(

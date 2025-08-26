@@ -50,7 +50,13 @@ dependencies:
   get_storage: ^2.1.1
   dartz: ^0.10.1
   pretty_dio_logger: ^1.4.0
-  
+  cached_network_image: ^3.4.1
+  permission_handler: ^11.0.1
+  share_plus: ^7.2.1
+  intl: ^0.20.2
+  fluttertoast: ^8.2.12
+  gallery_saver_plus: ^3.2.9
+  # image_gallery_saver: ^2.0.3
   
 
 dev_dependencies:

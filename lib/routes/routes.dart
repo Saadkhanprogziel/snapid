@@ -17,8 +17,10 @@ class PrimaryRoute {
   static const String help_support = '/help_support';
   static const String editProfile = '/editProfile';
   static const String photo_creation = '/photoCreation';
+  static const String photo_preview = '/photoPreview';
   static const String selectedPhoto = '/selectedPhoto';
   static const String assistant = '/assistant';
   static const String popularCountires = '/popularCountries';
   static const String payment_method= '/payment_method';
+  static const String report_bug= '/report_bug';
 }

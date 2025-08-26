@@ -9,20 +9,20 @@ import 'package:snapid/utlis/country_model.dart';
 
 class EditProfileController extends GetxController {
   final editProfile = EditProfileModel();
-  AuthRespository authRespository = AuthRespository();
-  DashboardController dashboardController = Get.find<DashboardController>();  
+  final AuthRespository authRespository = AuthRespository();
+  final DashboardController dashboardController = Get.find<DashboardController>();
 
-  // Text controllers
+  // Text controllers (always initialized to avoid LateInitializationError)
   late TextEditingController firstNameController;
   late TextEditingController lastNameController;
   late TextEditingController emailController;
   late TextEditingController phoneController;
 
+  // Observables
   RxBool isPasswordObscured = true.obs;
   RxBool isConfrimPasswordObscured = true.obs;
   Rx<Country?> selectedCountryCode = Rx<Country?>(null);
   RxBool isLoading = false.obs;
-
 
   final List<String> genderOptions = ['Male', 'Female', 'Other'];
 
@@ -31,15 +31,21 @@ class EditProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
+    // Initialize controllers immediately (empty by default)
+    firstNameController = TextEditingController();
+    lastNameController = TextEditingController();
+    emailController = TextEditingController();
+    phoneController = TextEditingController();
+
+    // Load user data asynchronously
     loadCurrentUserData();
   }
 
   Future<void> loadCurrentUserData() async {
-    // Get user from local storage
     user = await LocalStorage.getUser();
 
-    // Debug
-    print("Loaded user: ${user?.firstName}, gender: ${user?.gender}");
+    
 
     // Populate editProfile safely
     editProfile.firstName = user?.firstName ?? "";
@@ -56,14 +62,14 @@ class EditProfileController extends GetxController {
     } else if (rawGender == "other") {
       editProfile.gender = "Other";
     } else {
-      editProfile.gender = null; // fallback if gender not set or doesn't match
+      editProfile.gender = null;
     }
 
-    // Init controllers
-    firstNameController = TextEditingController(text: editProfile.firstName);
-    lastNameController = TextEditingController(text: editProfile.lastName);
-    emailController = TextEditingController(text: editProfile.email);
-    phoneController = TextEditingController(text: editProfile.phone);
+    // Update controllers with loaded data
+    firstNameController.text = editProfile.firstName!;
+    lastNameController.text = editProfile.lastName!;
+    emailController.text = editProfile.email!;
+    phoneController.text = editProfile.phone!;
 
     // Set default country (or from user if available)
     selectedCountryCode.value = allCountries.firstWhere(
@@ -90,63 +96,60 @@ class EditProfileController extends GetxController {
     update();
   }
 
- void onSaveProfile() async {
-  try {
-    // Show loading dialog
-    Get.dialog(
-      const Center(child: CircularProgressIndicator()),
-      barrierDismissible: false,
-    );
+  Future<void> onSaveProfile() async {
+    try {
+      // Show loading dialog
+      Get.dialog(
+        const Center(child: CircularProgressIndicator()),
+        barrierDismissible: false,
+      );
 
-    final result = await authRespository.updateProfile(
-      firstName: firstNameController.text.trim(),
-      lastName: lastNameController.text.trim(),
-      email: emailController.text.trim(),
-      phone: phoneController.text.trim(),
-      gender: editProfile.gender, // if you are storing gender
-    );
+      final result = await authRespository.updateProfile(
+        firstName: firstNameController.text.trim(),
+        lastName: lastNameController.text.trim(),
+        email: emailController.text.trim(),
+        phone: phoneController.text.trim(),
+        gender: editProfile.gender,
+      );
 
-    // Close loading dialog
-    if (Get.isDialogOpen ?? false) Get.back();
+      // Close loading dialog
+      if (Get.isDialogOpen ?? false) Get.back();
 
-    result.fold(
-      (errorMessage) {
-        // Left = error
-        Get.snackbar(
-          'Error',
-          errorMessage,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
-      },
-      (success) {
-        // Right = success
-        dashboardController.refreshUser(); // Refresh user data in dashboard
-        Get.back(); // navigate back to previous screen
-        Get.snackbar(
-          'Success',
-          'Profile updated successfully!',
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
-        // Get.back(); // navigate back to previous screen
-      },
-    );
-  } catch (e) {
-    if (Get.isDialogOpen ?? false) Get.back();
+      result.fold(
+        (errorMessage) {
+          Get.snackbar(
+            'Error',
+            errorMessage,
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+        },
+        (success) {
+          dashboardController.refreshUser();
+          Get.back(); // navigate back to previous screen
+          Get.snackbar(
+            'Success',
+            'Profile updated successfully!',
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+          );
+        },
+      );
+    } catch (e) {
+      if (Get.isDialogOpen ?? false) Get.back();
 
-    Get.snackbar(
-      'Error',
-      'Something went wrong. Please try again.',
-      backgroundColor: Colors.red,
-      colorText: Colors.white,
-    );
+      Get.snackbar(
+        'Error',
+        'Something went wrong. Please try again.',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
-}
-
 
   @override
   void onClose() {
+    // Dispose controllers
     firstNameController.dispose();
     lastNameController.dispose();
     emailController.dispose();

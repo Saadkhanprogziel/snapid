@@ -1,13 +1,13 @@
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
-import 'package:dio/dio.dart';
 import 'package:snapid/keys_urls/urls.dart';
 import 'package:snapid/main.dart';
 import 'package:snapid/models/photo_creation/photo_creation_model.dart';
+import 'package:snapid/network/network_repository.dart';
 
 class PhotoCreationRepository {
-  final Dio _dio = Dio();
+  final NetworkRepository _networkRepository = NetworkRepository();
 
   Future<Either<String, PhotoCreationModel>> createPhotoSession({
     required String countryCode,
@@ -18,71 +18,78 @@ class PhotoCreationRepository {
     double? customHeight,
   }) async {
     try {
-      // Create FormData for multipart request
-      final formData = FormData();
+      print("Creating photo session with ${userSessionPhotos.length} photos");
+      print("Document Type: $documentType");
 
-      // Add text fields
-      formData.fields.addAll([
-        MapEntry('countryCode', countryCode),
-        MapEntry('documentType', "DRIVING_LICENSE"),
-        MapEntry('platform', platform),
-      ]);
-
+      // Prepare fields for FormData
+      final fields = <String, dynamic>{
+        'countryCode': countryCode,
+        'documentType': documentType,
+        'platform': platform,
+      };
 
       // Add custom dimensions if provided
       if (customWidth != null) {
-        formData.fields.add(MapEntry('customWidth', customWidth.toString()));
+        fields['customWidth'] = customWidth.toString();
       }
       if (customHeight != null) {
-        formData.fields.add(MapEntry('customHeight', customHeight.toString()));
+        fields['customHeight'] = customHeight.toString();
       }
 
-      // Add files to form data
-      for (File file in userSessionPhotos) {
-        formData.files.add(
-          MapEntry(
-            'userSessionPhotos',
-            await MultipartFile.fromFile(
-              file.path,
-              filename: file.path.split('/').last,
-            ),
-          ),
-        );
-      }
+      // Create FormData using the helper method
+      final formData = await _networkRepository.createFormData(
+        fields: fields,
+        multipleFiles: {
+          'userSessionPhotos': userSessionPhotos,
+        },
+      );
 
-      // Set base URL - replace with your actual API base URL
-      const String baseUrl = apiUrl;
-            final token = appStorage.read("token") ?? "";
-
-      // Configure headers if needed
-      _dio.options.headers = {
+      // Prepare headers
+      final token = appStorage.read("token") ?? "";
+      final headers = <String, String>{
         'Content-Type': 'multipart/form-data',
-        // Add any other headers like authorization if needed
         'Authorization': 'Bearer $token',
       };
 
-      // Make the API call
-      final response = await _dio.post(
-        '$baseUrl/session/start-session',
-        data: formData,
+      // Make the API call using NetworkRepository
+      final response = await _networkRepository.postMultipart(
+        url: '$apiUrl/session/start-session',
+        formData: formData,
+        headers: headers,
       );
 
-      if (response.statusCode == 200) {
-        final photoCreationModel = PhotoCreationModel.fromJson(response.data);
-        
+      if (response.success) {
+        final photoCreationModel =
+            PhotoCreationModel.fromJson(response.data['data']);
         return Right(photoCreationModel);
       } else {
-        return Left('Failed to create photo session: ${response.statusMessage}');
-      }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        print(e.response!.data);
-        return Left('API Error: ${e.response!.statusCode} - ${e.response!.data}');
-      } else {
-        return Left('Network Error: ${e.message}');
+        return Left(response.message);
       }
     } catch (e) {
       return Left('Error creating photo session: ${e.toString()}');
+    }
+  }
+
+  Future<Either<String, PhotoCreationModel>> downloadImage({
+    required String id,
+  }) async {
+    try {
+      // Call API endpoint (replace with actual download URL)
+      
+      final response = await _networkRepository.post(
+        url: '/session/download-photo',
+        data: {'sessionID': id},
+      );
+
+      if (response.success) {
+        final photoCreationModel =
+            PhotoCreationModel.fromJson(response.data['data']);
+        return Right(photoCreationModel);
+      } else {
+        return Left(response.message);
+      }
+    } catch (e) {
+      return Left('Error downloading image: ${e.toString()}');
     }
   }
 }
