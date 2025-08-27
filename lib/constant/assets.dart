@@ -1,6 +1,8 @@
 class Assets {
 //Images
   static const String logo = 'assets/images/logo.png';
+  // static const String logoVideo = 'assets/images/splash_animation.mp4';
+  static const String logoGif = 'assets/images/splash_animation.gif';
   static const String welcomeBg = 'assets/images/welcome_bg.png';
   static const String appBg = 'assets/images/app_bg.png';
   static const String onboard3 = 'assets/images/intro.png';

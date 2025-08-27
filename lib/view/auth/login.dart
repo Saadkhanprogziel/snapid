@@ -5,6 +5,8 @@ import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/constant/strings.dart';
 import 'package:snapid/controllers/auth/login/login_controller.dart';
+import 'package:snapid/controllers/biometric/biometric._controller.dart';
+
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
@@ -17,9 +19,12 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return GetBuilder<LoginController>(
       init: LoginController(),
-      builder: (controller) {
+      builder: (logincontroller) {
+
+        
         return Scaffold(
           body: Stack(
             children: [
@@ -79,7 +84,7 @@ class LoginScreen extends StatelessWidget {
                                 children: [
                                   // Email field
                                   CustomTextField(
-                                    controller: controller.emailController,
+                                    controller: logincontroller.emailController,
                                     hintText: Strings
                                         .enterEmail, // You may want to rename to "Enter email or phone"
                                     prefixIcon: Icons.email,
@@ -104,15 +109,15 @@ class LoginScreen extends StatelessWidget {
 
                                   // Password field with toggle
                                   CustomTextField(
-                                    controller: controller.passwordController,
+                                   controller: logincontroller.passwordController,
                                     hintText: Strings.yourPassword,
-                                    obscureText: controller.isPasswordObscured,
+                                    obscureText: logincontroller.isPasswordObscured,
                                     prefixIcon: Icons.lock,
-                                    suffixIcon: controller.isPasswordObscured
+                                    suffixIcon: logincontroller.isPasswordObscured
                                         ? Icons.visibility
                                         : Icons.visibility_off,
                                     onSuffixIconPressed: () {
-                                      controller.togglePasswordVisibility();
+                                      logincontroller.togglePasswordVisibility();
                                     },
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -146,7 +151,7 @@ class LoginScreen extends StatelessWidget {
 
                                   // Sign In Button
                                   // Sign In Button
-                                  controller.isLoading
+                                  logincontroller.isLoading
                                       ? const SizedBox(
                                           height: 60,
                                           child: Center(
@@ -159,7 +164,7 @@ class LoginScreen extends StatelessWidget {
                                           onPressed: () {
                                             if (_formKey.currentState!
                                                 .validate()) {
-                                              controller.onLogin();
+                                              logincontroller.onLogin();
                                             }
                                           },
                                           text: Strings.signIn,
@@ -169,26 +174,97 @@ class LoginScreen extends StatelessWidget {
                                   const SizedBox(height: 30),
 
                                   // Biometrics button
-                                  OutlinedButton.icon(
-                                    onPressed: () {},
-                                    icon: const Icon(
-                                      Icons.fingerprint,
-                                      color: Colors.white70,
-                                      size: 30,
-                                    ),
-                                    label: Text(
-                                      Strings.signInWithBiometrics,
-                                      style: CustomTextTheme.regular16.copyWith(
-                                          color: AppColors.whiteColor),
-                                    ),
-                                    style: OutlinedButton.styleFrom(
-                                      side: const BorderSide(
-                                          color: Colors.white24),
-                                      minimumSize: const Size.fromHeight(60),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                    ),
+                                  GetBuilder<BiometricController>(
+                                    init: BiometricController(),
+                                    builder: (biometricController) {
+                                      return OutlinedButton.icon(
+                                        onPressed: () async {
+                                          final isEnabled =
+                                              await biometricController
+                                                  .isBiometricEnabled();
+
+                                          if (!isEnabled) {
+                                            Get.snackbar(
+                                              'Biometric Disabled',
+                                              'Please enable biometric authentication in settings first.',
+                                              snackPosition: SnackPosition.TOP,
+                                               colorText: Colors.white,
+                                            );
+                                            // Navigate to biometric settings
+                                            Get.toNamed(
+                                                '/biometric-settings'); // Your biometric settings route
+                                            return;
+                                          }
+
+                                          if (!biometricController
+                                              .isBiometricAvailable.value) {
+                                            Get.snackbar(
+                                              'Not Available',
+                                              'Biometric authentication is not available on this device.',
+                                              snackPosition: SnackPosition.TOP,
+                                              colorText: Colors.white,
+                                            );
+                                            return;
+                                          }
+
+                                          final isAuthenticated =
+                                              await biometricController
+                                                  .authenticateUser();
+
+                                          if (isAuthenticated) {
+                                            // Call your existing login success logic
+                                            logincontroller
+                                                .onLogin(); // Or your success method
+                                            Get.snackbar(
+                                              'Success',
+                                              'Login successful with ${biometricController.biometricType.value}!',
+                                              snackPosition: SnackPosition.TOP,
+                                            );
+                                          }
+                                        },
+                                        icon:
+                                            biometricController.isLoading.value
+                                                ? const SizedBox(
+                                                    width: 24,
+                                                    height: 24,
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                      color: Colors.white70,
+                                                      strokeWidth: 2,
+                                                    ),
+                                                  )
+                                                : Icon(
+                                                    biometricController
+                                                                .biometricType
+                                                                .value ==
+                                                            'Face ID'
+                                                        ? Icons.face
+                                                        : Icons.fingerprint,
+                                                    color: Colors.white70,
+                                                    size: 30,
+                                                  ),
+                                        label: Text(
+                                          biometricController
+                                                  .isBiometricAvailable.value
+                                              ? 'Sign in with ${biometricController.biometricType.value}'
+                                              : Strings.signInWithBiometrics,
+                                          style: CustomTextTheme.regular16
+                                              .copyWith(
+                                            color: AppColors.whiteColor,
+                                          ),
+                                        ),
+                                        style: OutlinedButton.styleFrom(
+                                          side: const BorderSide(
+                                              color: Colors.white24),
+                                          minimumSize:
+                                              const Size.fromHeight(60),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   ),
                                   const SizedBox(height: 12),
 

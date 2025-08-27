@@ -7,6 +7,8 @@ import 'package:snapid/utlis/message_popup.dart';
 
 class OtpController extends GetxController {
   AuthRespository authRepository = AuthRespository();
+  var isLoading = false.obs;
+
   final List<FocusNode> focusNodes = List.generate(6, (_) => FocusNode());
   final List<TextEditingController> otp =
       List.generate(6, (_) => TextEditingController());
@@ -61,13 +63,15 @@ class OtpController extends GetxController {
       Get.snackbar("Error", "Please enter the complete OTP");
       return;
     }
-
+    isLoading.value = true;
     authRepository.verifyOtp(identifier: identifier, code: int.parse(code) ).then(
           (response) => response.fold(
             (error) {
               Get.snackbar("Error", error);
+              isLoading.value = false;
             },
             (success) async {
+              isLoading.value = false;
               if (isPasswordForgot) {
                 Get.toNamed('/reset-password', arguments: {'email': identifier});
               } else {

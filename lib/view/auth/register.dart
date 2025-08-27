@@ -119,7 +119,8 @@ class RegisterScreen extends StatelessWidget {
                                       if (value == null || value.isEmpty) {
                                         return 'Email is required';
                                       }
-                                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                      if (!RegExp(
+                                              r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
                                           .hasMatch(value)) {
                                         return 'Please enter a valid email';
                                       }
@@ -141,20 +142,25 @@ class RegisterScreen extends StatelessWidget {
                                       }
                                       return null;
                                     },
-                                    autovalidateMode: AutovalidateMode.onUserInteraction, // ✅ Individual validation
+                                    autovalidateMode: AutovalidateMode
+                                        .onUserInteraction, // ✅ Individual validation
                                     icon: const Icon(
                                       Icons.arrow_drop_down,
                                       color: Colors.white,
                                     ),
-                                    dropdownColor: const Color.fromARGB(216, 39, 43, 52),
-                                    style: CustomTextTheme.regular14.copyWith(color: Colors.white),
+                                    dropdownColor:
+                                        const Color.fromARGB(216, 39, 43, 52),
+                                    style: CustomTextTheme.regular14
+                                        .copyWith(color: Colors.white),
                                     decoration: InputDecoration(
                                       filled: true,
                                       fillColor: Colors.white10,
                                       hintText: Strings.selectGender,
-                                      hintStyle: const TextStyle(color: Colors.white70),
-                                      contentPadding: const EdgeInsets.symmetric(
-                                          horizontal: 10, vertical: 18),
+                                      hintStyle: const TextStyle(
+                                          color: Colors.white70),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              horizontal: 10, vertical: 18),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
                                         borderSide: BorderSide.none,
@@ -173,56 +179,78 @@ class RegisterScreen extends StatelessWidget {
 
                                   /// Phone number with searchable country code
                                   Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       // Country Code Dropdown (Searchable) - validates individually
                                       SizedBox(
                                         child: FormField<Country?>(
                                           validator: (value) {
-                                            if (controller.selectedCountryCode.value == null) {
+                                            if (controller.selectedCountryCode
+                                                    .value ==
+                                                null) {
                                               return 'Required';
                                             }
                                             return null;
                                           },
-                                          autovalidateMode: AutovalidateMode.onUserInteraction, // ✅ Individual validation
+                                          autovalidateMode: AutovalidateMode
+                                              .onUserInteraction, // ✅ Individual validation
                                           builder: (formFieldState) {
-                                            final countryCode = controller.selectedCountryCode.value;
+                                            final countryCode = controller
+                                                .selectedCountryCode.value;
                                             return Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Container(
                                                   height: 65,
                                                   child: OutlinedButton(
-                                                    onPressed: () => _showCountryCodePicker(controller),
-                                                    style: OutlinedButton.styleFrom(
-                                                      backgroundColor: Colors.white10,
+                                                    onPressed: () =>
+                                                        _showCountryCodePicker(
+                                                            controller),
+                                                    style: OutlinedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          Colors.white10,
                                                       side: BorderSide(
-                                                        color: formFieldState.hasError 
-                                                            ? Colors.red 
-                                                            : Colors.transparent,
+                                                        color: formFieldState
+                                                                .hasError
+                                                            ? Colors.red
+                                                            : Colors
+                                                                .transparent,
                                                       ),
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(12),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(12),
                                                       ),
-                                                      padding: const EdgeInsets.symmetric(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
                                                         vertical: 0,
                                                         horizontal: 8,
                                                       ),
                                                     ),
                                                     child: Row(
-                                                      mainAxisSize: MainAxisSize.min,
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
                                                       children: [
-                                                        if (countryCode != null) ...[
+                                                        if (countryCode !=
+                                                            null) ...[
                                                           SvgPicture.asset(
                                                             countryCode.flag,
                                                             width: 16,
                                                             height: 16,
                                                           ),
-                                                          const SizedBox(width: 4),
+                                                          const SizedBox(
+                                                              width: 4),
                                                           Text(
-                                                            countryCode.dialCode,
-                                                            style: const TextStyle(
-                                                              color: Colors.white,
+                                                            countryCode
+                                                                .dialCode,
+                                                            style:
+                                                                const TextStyle(
+                                                              color:
+                                                                  Colors.white,
                                                               fontSize: 14,
                                                             ),
                                                           ),
@@ -230,11 +258,13 @@ class RegisterScreen extends StatelessWidget {
                                                           const Text(
                                                             "+00",
                                                             style: TextStyle(
-                                                              color: Colors.white70,
+                                                              color: Colors
+                                                                  .white70,
                                                               fontSize: 14,
                                                             ),
                                                           ),
-                                                        const SizedBox(width: 4),
+                                                        const SizedBox(
+                                                            width: 4),
                                                         const Icon(
                                                           Icons.arrow_drop_down,
                                                           color: Colors.white,
@@ -246,7 +276,9 @@ class RegisterScreen extends StatelessWidget {
                                                 ),
                                                 if (formFieldState.hasError)
                                                   Padding(
-                                                    padding: const EdgeInsets.only(left: 12, top: 6),
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 12, top: 6),
                                                     child: Text(
                                                       formFieldState.errorText!,
                                                       style: const TextStyle(
@@ -272,7 +304,8 @@ class RegisterScreen extends StatelessWidget {
                                           hintText: Strings.phoneNumber,
                                           prefixIcon: Icons.phone,
                                           keyboardType: TextInputType.phone,
-                                          validator: (value) => value == null || value.isEmpty
+                                          validator: (value) => value == null ||
+                                                  value.isEmpty
                                               ? 'Phone number is required'
                                               : (value.length < 10
                                                   ? 'Phone number must be at least 10 digits'
@@ -305,7 +338,8 @@ class RegisterScreen extends StatelessWidget {
                                       if (value.length < 8) {
                                         return 'Password must be at least 8 characters';
                                       }
-                                      if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$')
+                                      if (!RegExp(
+                                              r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$')
                                           .hasMatch(value)) {
                                         return 'Must contain uppercase, lowercase and number';
                                       }
@@ -317,23 +351,28 @@ class RegisterScreen extends StatelessWidget {
                                   /// Confirm Password - validates individually
                                   CustomTextField(
                                     onChanged: (value) {
-                                      controller.register.confirmPassword = value;
+                                      controller.register.confirmPassword =
+                                          value;
                                       controller.update();
                                     },
                                     hintText: Strings.confirmPassword,
                                     prefixIcon: Icons.lock,
-                                    obscureText: controller.isConfrimPasswordObscured,
-                                    suffixIcon: controller.isConfrimPasswordObscured
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
+                                    obscureText:
+                                        controller.isConfrimPasswordObscured,
+                                    suffixIcon:
+                                        controller.isConfrimPasswordObscured
+                                            ? Icons.visibility
+                                            : Icons.visibility_off,
                                     onSuffixIconPressed: () {
-                                      controller.toggleConfrimPasswordVisibility();
+                                      controller
+                                          .toggleConfrimPasswordVisibility();
                                     },
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please confirm your password';
                                       }
-                                      if (value != controller.register.password) {
+                                      if (value !=
+                                          controller.register.password) {
                                         return 'Passwords do not match';
                                       }
                                       return null;
@@ -348,7 +387,8 @@ class RegisterScreen extends StatelessWidget {
                                         () => Checkbox(
                                           value: controller.agreeToTerms.value,
                                           onChanged: (value) {
-                                            controller.agreeToTerms.value = value ?? false;
+                                            controller.agreeToTerms.value =
+                                                value ?? false;
                                           },
                                           activeColor: AppColors.primaryColor,
                                         ),
@@ -356,7 +396,8 @@ class RegisterScreen extends StatelessWidget {
                                       Expanded(
                                         child: Text(
                                           Strings.agreeTerms,
-                                          style: CustomTextTheme.regular12.copyWith(
+                                          style: CustomTextTheme.regular12
+                                              .copyWith(
                                             color: AppColors.whiteColor,
                                           ),
                                         ),
@@ -365,27 +406,35 @@ class RegisterScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 10),
 
-                                  /// Register Button
-                                  CustomElevatedButton(
-                                    minHeight: 60,
-                                    onPressed: () async {
-                                      if (_formKey.currentState!.validate()) {
-                                        controller.onRegister();
-                                      }
-                                    },
-                                    text: Strings.register,
-                                  ),
+                                  Obx(() {
+                                    return controller.isLoading.value
+                                        ? const CircularProgressIndicator(
+                                            color: Colors.white)
+                                        : CustomElevatedButton(
+                                            minHeight: 60,
+                                            onPressed: () async {
+                                              if (_formKey.currentState!
+                                                  .validate()) {
+                                                controller.onRegister();
+                                              }
+                                            },
+                                            text: Strings.register,
+                                          );
+                                  }),
+
                                   const SizedBox(height: 10),
 
                                   /// Already have account
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 16),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           Strings.alreadyHaveAccount,
-                                          style: CustomTextTheme.regular14.copyWith(
+                                          style: CustomTextTheme.regular14
+                                              .copyWith(
                                             color: AppColors.whiteColor,
                                             fontWeight: FontWeight.w400,
                                           ),
@@ -396,7 +445,8 @@ class RegisterScreen extends StatelessWidget {
                                           },
                                           child: Text(
                                             Strings.signIn,
-                                            style: CustomTextTheme.regular14.copyWith(
+                                            style: CustomTextTheme.regular14
+                                                .copyWith(
                                               color: AppColors.primaryColor,
                                               fontWeight: FontWeight.w400,
                                             ),
@@ -460,7 +510,8 @@ class RegisterScreen extends StatelessWidget {
                     prefixIcon: Icon(Icons.search, color: AppColors.whiteColor),
                     labelText: 'Search country or dial code',
                     labelStyle: TextStyle(color: AppColors.whiteColor),
-                    hintStyle: CustomTextTheme.regular14.copyWith(color: AppColors.whiteColor),
+                    hintStyle: CustomTextTheme.regular14
+                        .copyWith(color: AppColors.whiteColor),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.grey.shade800),
                       borderRadius: BorderRadius.circular(12),
@@ -473,7 +524,9 @@ class RegisterScreen extends StatelessWidget {
                   onChanged: (value) {
                     filteredCountries.value = allCountries
                         .where((c) =>
-                            c.name.toLowerCase().contains(value.toLowerCase()) ||
+                            c.name
+                                .toLowerCase()
+                                .contains(value.toLowerCase()) ||
                             c.dialCode.contains(value))
                         .toList();
                     controller.update();

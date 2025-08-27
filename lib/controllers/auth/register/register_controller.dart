@@ -42,6 +42,7 @@ class RegisterController extends GetxController {
   }
 
   void onRegister() {
+    isLoading.value = true;
     authRepository.register(user: register).then(
           (response) => response.fold(
             (error) {

@@ -60,7 +60,7 @@ class EditProfile extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              /// Profile header
+                              /// Profile header with image picker
                               Center(
                                 child: Column(
                                   children: [
@@ -69,31 +69,119 @@ class EditProfile extends StatelessWidget {
                                         ClipRRect(
                                           borderRadius:
                                               BorderRadius.circular(10),
-                                          child: Image.network(
-                                            'https://www.w3schools.com/howto/img_avatar.png',
-                                            width: 120,
-                                            height: 120,
-                                            fit: BoxFit.cover,
-                                          ),
+                                          child: Obx(() {
+                                            if (controller.selectedProfileImage
+                                                    .value !=
+                                                null) {
+                                              return Image.file(
+                                                controller.selectedProfileImage
+                                                    .value!,
+                                                width: 120,
+                                                height: 120,
+                                                fit: BoxFit.cover,
+                                              );
+                                            } else if (controller
+                                                .profileImageUrl
+                                                .value
+                                                .isNotEmpty) {
+                                              return Image.network(
+                                                controller
+                                                    .profileImageUrl.value,
+                                                width: 120,
+                                                height: 120,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error,
+                                                    stackTrace) {
+                                                  return Container(
+                                                    width: 120,
+                                                    height: 120,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey[300],
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                    ),
+                                                    child: Image.network(
+                                                      'https://www.w3schools.com/howto/img_avatar.png',
+                                                      width: 120,
+                                                      height: 120,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  );
+                                                },
+                                                loadingBuilder: (context, child,
+                                                    loadingProgress) {
+                                                  if (loadingProgress == null)
+                                                    return child;
+                                                  return Container(
+                                                    width: 120,
+                                                    height: 120,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey[300],
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            } else {
+                                              return Image.network(
+                                                'https://www.w3schools.com/howto/img_avatar.png',
+                                                width: 120,
+                                                height: 120,
+                                                fit: BoxFit.cover,
+                                              );
+                                            }
+                                          }),
                                         ),
                                         Positioned(
                                           bottom: 0,
                                           right: 0,
                                           child: GestureDetector(
-                                            onTap: () {
-                                              // TODO: upload image
-                                            },
-                                            child: const CircleAvatar(
-                                              backgroundColor: Colors.white,
-                                              radius: 16,
-                                              child: Icon(
-                                                Icons.upload,
-                                                color: Colors.black,
-                                                size: 16,
+                                            onTap: () => controller
+                                                .showImageSourceActionSheet(),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                shape: BoxShape.circle,
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(0.2),
+                                                    blurRadius: 4,
+                                                    offset: const Offset(0, 2),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: const CircleAvatar(
+                                                backgroundColor: Colors.white,
+                                                radius: 18,
+                                                child: Icon(
+                                                  Icons.camera_alt,
+                                                  color: Colors.black,
+                                                  size: 18,
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
+                                        // Loading overlay when uploading
+                                        Obx(() {
+                                          if (controller.isLoading.value) {
+                                            return Positioned.fill(
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black
+                                                      .withOpacity(0.5),
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                          return const SizedBox.shrink();
+                                        }),
                                       ],
                                     ),
                                     const SpaceH20(),
@@ -131,9 +219,8 @@ class EditProfile extends StatelessWidget {
                                         CustomTextField(
                                           controller:
                                               controller.firstNameController,
-                                          onChanged: (value) =>
-                                              controller.editProfile.firstName =
-                                                  value,
+                                          onChanged: (value) => controller
+                                              .editProfile.firstName = value,
                                           label: 'First Name',
                                           hintText: 'First Name',
                                           prefixIcon: Icons.person,
@@ -154,9 +241,8 @@ class EditProfile extends StatelessWidget {
                                         CustomTextField(
                                           controller:
                                               controller.lastNameController,
-                                          onChanged: (value) =>
-                                              controller.editProfile.lastName =
-                                                  value,
+                                          onChanged: (value) => controller
+                                              .editProfile.lastName = value,
                                           label: 'Last Name',
                                           hintText: 'Last Name',
                                           prefixIcon: Icons.person,
@@ -172,10 +258,10 @@ class EditProfile extends StatelessWidget {
 
                                         /// Email
                                         CustomTextField(
-                                          controller: controller.emailController,
-                                          onChanged: (value) =>
-                                              controller.editProfile.email =
-                                                  value,
+                                          controller:
+                                              controller.emailController,
+                                          onChanged: (value) => controller
+                                              .editProfile.email = value,
                                           label: 'Email',
                                           hintText: 'johndoe@example.com',
                                           prefixIcon: Icons.email,
@@ -232,8 +318,9 @@ class EditProfile extends StatelessWidget {
                                                 Icons.arrow_drop_down,
                                                 color: Colors.white,
                                               ),
-                                              dropdownColor: const Color.fromARGB(
-                                                  216, 39, 43, 52),
+                                              dropdownColor:
+                                                  const Color.fromARGB(
+                                                      216, 39, 43, 52),
                                               style: CustomTextTheme.regular14
                                                   .copyWith(
                                                       color: Colors.white),
@@ -248,6 +335,8 @@ class EditProfile extends StatelessWidget {
                                                       BorderRadius.circular(12),
                                                   borderSide: BorderSide.none,
                                                 ),
+                                                errorStyle: const TextStyle(
+                                                    color: Colors.red),
                                               ),
                                               items: controller.genderOptions
                                                   .map(
@@ -263,7 +352,7 @@ class EditProfile extends StatelessWidget {
                                         ),
                                         const SizedBox(height: 16),
 
-                                        /// Phone + Country Code
+                                        /// Phone Number
                                         Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -282,73 +371,7 @@ class EditProfile extends StatelessWidget {
                                             ),
                                             Row(
                                               children: [
-                                                // Country Code
-                                                // SizedBox(
-                                                //   height: 65,
-                                                //   child: OutlinedButton(
-                                                //     onPressed: () =>
-                                                //         _showCountryCodePicker(
-                                                //             controller),
-                                                //     style: OutlinedButton
-                                                //         .styleFrom(
-                                                //       backgroundColor:
-                                                //           Colors.white10,
-                                                //       shape:
-                                                //           RoundedRectangleBorder(
-                                                //         borderRadius:
-                                                //             BorderRadius
-                                                //                 .circular(12),
-                                                //       ),
-                                                //     ),
-                                                //     child: Row(
-                                                //       mainAxisSize:
-                                                //           MainAxisSize.min,
-                                                //       children: [
-                                                //         if (controller
-                                                //                 .selectedCountryCode
-                                                //                 .value !=
-                                                //             null) ...[
-                                                //           SvgPicture.asset(
-                                                //             controller
-                                                //                 .selectedCountryCode
-                                                //                 .value!
-                                                //                 .flag,
-                                                //             width: 16,
-                                                //             height: 16,
-                                                //           ),
-                                                //           const SizedBox(
-                                                //               width: 4),
-                                                //           Text(
-                                                //             controller
-                                                //                 .selectedCountryCode
-                                                //                 .value!
-                                                //                 .dialCode,
-                                                //             style:
-                                                //                 const TextStyle(
-                                                //               color:
-                                                //                   Colors.white,
-                                                //               fontSize: 14,
-                                                //             ),
-                                                //           ),
-                                                //         ] else
-                                                //           const Text(
-                                                //             "+00",
-                                                //             style: TextStyle(
-                                                //               color: Colors
-                                                //                   .white70,
-                                                //               fontSize: 14,
-                                                //             ),
-                                                //           ),
-                                                //         const Icon(
-                                                //           Icons.arrow_drop_down,
-                                                //           color: Colors.white,
-                                                //           size: 18,
-                                                //         ),
-                                                //       ],
-                                                //     ),
-                                                //   ),
-                                                // ),
-                                               SpaceH10(),
+                                                const SpaceW10(),
                                                 Expanded(
                                                   child: CustomTextField(
                                                     controller: controller
@@ -360,20 +383,22 @@ class EditProfile extends StatelessWidget {
                                                     prefixIcon: Icons.phone,
                                                     keyboardType:
                                                         TextInputType.phone,
-                                                    validator: (value) =>
-                                                        value == null ||
-                                                                value.isEmpty
-                                                            ? 'Phone number is required'
-                                                            : (value.length < 10
-                                                                ? 'Phone number must be at least 10 digits'
-                                                                : null),
+                                                    validator: (value) => value ==
+                                                                null ||
+                                                            value.isEmpty
+                                                        ? 'Phone number is required'
+                                                        : (value.length < 10
+                                                            ? 'Phone number must be at least 10 digits'
+                                                            : null),
                                                   ),
                                                 ),
                                               ],
                                             ),
-                                                SpaceH20(),
+                                            const SpaceH20(),
                                           ],
                                         ),
+
+                                        const SizedBox(height: 100),
                                       ],
                                     ),
                                   ),
@@ -381,29 +406,38 @@ class EditProfile extends StatelessWidget {
                               ),
 
                               /// Action Buttons
-                              Row(
-                                children: [
-                                  SpaceW12(),
-                                  Expanded(
-                                    child: CustomOutlineButton(
-                                      minHeight: 60,
-                                      onPressed: () => Get.back(),
-                                      label: "Cancel",
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 20),
+                                child: Row(
+                                  children: [
+                                    const SpaceW12(),
+                                    Expanded(
+                                      child: CustomOutlineButton(
+                                        minHeight: 60,
+                                        onPressed: () => Get.back(),
+                                        label: "Cancel",
+                                      ),
                                     ),
-                                  ),
-                                  SpaceW12(),
-                                  Expanded(
-                                    child: CustomElevatedButton(
-                                      minHeight: 60,
-                                      onPressed: () {
-                                        if (_formKey.currentState!.validate()) {
-                                          controller.onSaveProfile();
-                                        }
-                                      },
-                                      text: "Save",
+                                    const SpaceW12(),
+                                    Expanded(
+                                      child: Obx(() => CustomElevatedButton(
+                                            minHeight: 60,
+                                            onPressed: () {
+                                              if (controller.isLoading.value) {
+                                                return;
+                                              }
+                                              if (_formKey.currentState!
+                                                  .validate()) {
+                                                controller.onSaveProfile();
+                                              }
+                                            },
+                                            text: controller.isLoading.value
+                                                ? "Saving..."
+                                                : "Save",
+                                          )),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ],
                           ),
@@ -420,7 +454,6 @@ class EditProfile extends StatelessWidget {
     );
   }
 
-  /// Country picker
   void _showCountryCodePicker(EditProfileController controller) {
     showModalBottomSheet(
       context: Get.context!,

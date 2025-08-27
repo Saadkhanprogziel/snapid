@@ -1,7 +1,12 @@
 import 'dart:ui';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:gallery_saver_plus/gallery_saver.dart';
+import 'package:get/get.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/theme/text_theme.dart';
@@ -28,7 +33,8 @@ class HistoryCustomCard extends StatelessWidget {
     required this.status,
     required this.statusColor,
     this.onMoreTapDown,
-    this.onDelete, required this.documentType,
+    this.onDelete,
+    required this.documentType,
   });
 
   @override
@@ -109,6 +115,7 @@ class HistoryCustomCard extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 8),
+                            if (status != "CREDITED")
                             Text(
                               "Expire Within 7 days",
                               style: CustomTextTheme.regular12
@@ -129,18 +136,13 @@ class HistoryCustomCard extends StatelessWidget {
                       if (value == 'delete') {
                         _showDeleteDialog(context);
                       } else if (value == 'redownload') {
-                        print("Re-download logic here");
-                      } else if (value == 'reuse_setting') {
-                        print("Reuse setting logic here");
+                        saveImageToGallery(imageUrl);
                       }
                     },
                     itemBuilder: (BuildContext context) =>
                         <PopupMenuEntry<String>>[
-                      _buildMenuItem(Icons.file_download_outlined, 'Re-Download',
-                          'redownload'),
-                      _buildDivider(),
-                      _buildMenuItem(Icons.replay, 'Reuse Setting',
-                          'reuse_setting'),
+                      _buildMenuItem(Icons.file_download_outlined,
+                          'Re-Download', 'redownload'),
                       _buildDivider(),
                       _buildMenuItem(Icons.delete, 'Delete', 'delete'),
                     ],
@@ -221,23 +223,62 @@ class HistoryCustomCard extends StatelessWidget {
     );
   }
 
+  Future<void> saveImageToGallery(String url) async {
+    try {
+      final status = await Permission.photos.request();
+
+      if (status.isGranted) {
+        // ✅ Create custom filename with date
+        final now = DateTime.now();
+        final formattedDate =
+            "${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}";
+        final fileName = "snapid_processed_image_$formattedDate.jpg";
+
+        // ✅ Download to temp dir first
+        final tempDir = await getTemporaryDirectory();
+        final filePath = "${tempDir.path}/$fileName";
+        await Dio().download(url, filePath);
+
+        // ✅ Save with custom name
+        final success =
+            await GallerySaver.saveImage(filePath, albumName: "SnapID");
+
+        if (success ?? false) {
+          Get.snackbar("Success", "Image saved as $fileName",
+              backgroundColor: Colors.green, colorText: Colors.white);
+        } else {
+          Get.snackbar("Failed", "Could not save image",
+              backgroundColor: Colors.red, colorText: Colors.white);
+        }
+      } else {
+        Get.snackbar("Permission Denied",
+            "Please allow photo/gallery access to save images",
+            backgroundColor: Colors.red, colorText: Colors.white);
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Error saving image: $e",
+          backgroundColor: Colors.red, colorText: Colors.white);
+    }
+  }
+
   void _showDeleteDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Delete Item"),
-        content: const Text("Are you sure you want to delete this item?"),
+        backgroundColor: AppColors.solidCardColor,
+        title: Text("Delete Item",style: CustomTextTheme.regular16.copyWith(color: AppColors.whiteColor)),
+        content:  Text("Are you sure you want to delete this item?", style: CustomTextTheme.regular14.copyWith(color: AppColors.whiteColor),),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context), // cancel
-            child: const Text("Cancel"),
+            child:  Text("Cancel",style: CustomTextTheme.regular16.copyWith(color: AppColors.whiteColor)),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context); // close dialog
+            Get.back(); // close dialog
               onDelete?.call(); // notify parent
             },
-            child: const Text("Delete"),
+            child:  Text("Delete",style: CustomTextTheme.regular16.copyWith(color: AppColors.red)),
           ),
         ],
       ),

@@ -19,8 +19,6 @@ class HistoryFragment extends StatelessWidget {
   Widget build(BuildContext context) {
     final HistoryController controller = Get.put(HistoryController());
 
-  
-
     return Scaffold(
       body: Stack(
         children: [
@@ -67,19 +65,14 @@ class HistoryFragment extends StatelessWidget {
                               child: Obx(
                                 () {
                                   return TabBarWidget(
-                                    tabs: ['All Orders', 'Credited', 'Processed'],
+                                    tabs: [
+                                      'All Orders',
+                                      'Credited',
+                                      'Processed'
+                                    ],
                                     selectedIndex: controller.selectedTab.value,
                                     onTabSelected: (index) {
                                       controller.onTabChanged(index);
-
-                                      // ✅ Fetch history based on tab
-                                      if (index == 0) {
-                                        // controller.fetchHistory(status: "ALL");
-                                      } else if (index == 1) {
-                                        controller.fetchHistory(status: "CREDITED");
-                                      } else {
-                                        controller.fetchHistory(status: "IMAGE_PROCESSED");
-                                      }
                                     },
                                   );
                                 },
@@ -100,7 +93,39 @@ class HistoryFragment extends StatelessWidget {
                       }
 
                       if (controller.errorMessage.isNotEmpty) {
-                        return Center(child: Text(controller.errorMessage.value));
+                        return RefreshIndicator(
+                          onRefresh: () => controller.refreshHistory(),
+                          child: ListView(
+                            children: [
+                              SizedBox(
+                                height: MediaQuery.of(context).size.height * 0.6,
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        controller.errorMessage.value,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 12),
+                                      const Text(
+                                        "Pull down to refresh",
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
                       }
 
                       if (controller.historyList.isEmpty) {
@@ -108,41 +133,58 @@ class HistoryFragment extends StatelessWidget {
                           imagePath: Assets.historIcon,
                           title: "No Photo Orders Yet",
                           subtitle:
-                              "Looks like you haven’t started yet. Tap below to create your first photo — it's quick and easy!",
+                              "Looks like you haven't started yet. Tap below to create your first photo — it's quick and easy!",
                           buttonTitle: "Upload or Capture",
                           onPressed: () {
-                            // handle action
+                            Get.toNamed(PrimaryRoute.photo_creation);
                           },
                         );
                       }
 
-                      // ✅ Render dynamic history list
-                      return ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        itemCount: controller.historyList.length,
-                        itemBuilder: (context, index) {
-                          final item = controller.historyList[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 20),
-                            child: HistoryCustomCard(
-                              imageUrl: item.processedImageUrl ??
-                                  item.processedWatermarkedUrl ??
-                                  'https://via.placeholder.com/150',
-                              country: item.countryName,
-                              documentType: item.documentType,
-                              date: formatDate(item.createdAt)  ,
-                              status: item.status ?? '',
-                              onDelete: () {
-                                controller.delete(item.id);
-                              },
-                              statusColor: item.status == "CREDITED"
-                                  ?
-                                   Colors.orange.withValues(alpha: 0.6)
-                                  :
-                                   Colors.green.withValues(alpha: 0.5)
-                            ),
-                          );
-                        },
+                      return RefreshIndicator(
+                        onRefresh: () => controller.refreshHistory(),
+                        child: ListView.builder(
+                          controller: controller.scrollController,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          itemCount: controller.historyList.length +
+                              (controller.hasMoreData.value ? 1 : 0),
+                          itemBuilder: (context, index) {
+                            // Show loading indicator at the bottom when loading more data
+                            if (index == controller.historyList.length) {
+                              return Obx(() {
+                                if (controller.isLoadingMore.value) {
+                                  return const Padding(
+                                    padding: EdgeInsets.all(20),
+                                    child: Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              });
+                            }
+
+                            final item = controller.historyList[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 20),
+                              child: HistoryCustomCard(
+                                imageUrl: item.processedImageUrl ??
+                                    item.processedWatermarkedUrl ??
+                                    'https://via.placeholder.com/150',
+                                country: item.countryName,
+                                documentType: item.documentType,
+                                date: formatDate(item.createdAt),
+                                status: item.status,
+                                onDelete: () {
+                                  controller.delete(item.id);
+                                },
+                                statusColor: item.status == "CREDITED"
+                                    ? Colors.green.withValues(alpha: 0.5)
+                                    : Colors.orange.withValues(alpha: 0.6),
+                              ),
+                            );
+                          },
+                        ),
                       );
                     },
                   ),
@@ -154,6 +196,7 @@ class HistoryFragment extends StatelessWidget {
       ),
     );
   }
+
   String formatDate(String? dateString, {String pattern = 'yyyy-MM-dd'}) {
     if (dateString == null || dateString.isEmpty) return '';
 

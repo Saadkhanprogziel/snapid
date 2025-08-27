@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -75,10 +76,14 @@ class ProfileFragment extends StatelessWidget {
                                       height: 120,
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(10),
-                                        child: Image.network(
-                                          'https://www.w3schools.com/howto/img_avatar2.png',
-                                          fit: BoxFit.cover,
-                                        ),
+                                        child: Obx(() {
+                                          return CachedNetworkImage(
+                                            imageUrl: dashboardController.user
+                                                    .value.profilePicture ??
+                                                'https://www.w3schools.com/howto/img_avatar2.png',
+                                            fit: BoxFit.cover,
+                                          );
+                                        }),
                                       ),
                                     ),
                                     Positioned(
@@ -132,7 +137,7 @@ class ProfileFragment extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                   child: Text(
-                                    'Credits Remaining: 03',
+                                    'Credits Remaining: ${dashboardController.user.value.credits ?? 0}',
                                     style: TextStyle(
                                         color: Colors.white, fontSize: 14),
                                   ),

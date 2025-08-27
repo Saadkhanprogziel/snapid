@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
@@ -49,11 +50,12 @@ class DashboardFragment extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      width: 55,
-                      height: 55,
+                      width: 65,
+                      height: 65,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: Image.network(
+                          controller.user.value.profilePicture ??
                           'https://www.w3schools.com/howto/img_avatar2.png',
                           fit: BoxFit.cover,
                         ),
@@ -66,8 +68,16 @@ class DashboardFragment extends StatelessWidget {
                           
                           Flexible(
                             child: GestureDetector(
-                              onTap:controller.credits == 0 ? null:  (){
-                                print("Tap Test");
+                              onTap:controller.credits != 0 ? null:  (){
+                                Fluttertoast.showToast(
+                                  msg: "We're working on it! Credits purchase coming soon.",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.BOTTOM,
+                                  backgroundColor: AppColors.solidCardColor,
+                                  textColor: Colors.white,
+                                  
+                                  fontSize: 14.0
+                                );
                               },
                               child: Container(
                                 padding: EdgeInsets.symmetric(

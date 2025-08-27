@@ -24,19 +24,21 @@ class PhotoCreationRepository {
       // Prepare fields for FormData
       final fields = <String, dynamic>{
         'countryCode': countryCode,
-        'documentType': documentType,
         'platform': platform,
       };
 
-      // Add custom dimensions if provided
-      if (customWidth != null) {
-        fields['customWidth'] = customWidth.toString();
-      }
-      if (customHeight != null) {
-        fields['customHeight'] = customHeight.toString();
+      // Only send documentType if it's not MANUAL_INPUT
+      if (documentType != 'MANUAL_INPUT') {
+        fields['documentType'] = documentType;
       }
 
-      // Create FormData using the helper method
+      if (customWidth != null && customWidth > 0) {
+        fields['customWidth'] = customWidth;
+      }
+      if (customHeight != null && customHeight > 0) {
+        fields['customHeight'] = customHeight;
+      }
+
       final formData = await _networkRepository.createFormData(
         fields: fields,
         multipleFiles: {
@@ -75,7 +77,6 @@ class PhotoCreationRepository {
   }) async {
     try {
       // Call API endpoint (replace with actual download URL)
-      
       final response = await _networkRepository.post(
         url: '/session/download-photo',
         data: {'sessionID': id},

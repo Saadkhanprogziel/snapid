@@ -72,19 +72,19 @@ class PhotoController extends GetxController {
           return;
         }
         print("Creating photo session...");
-        bool success = await createPhoto();
+        bool success = await createSession();
         if (!success) return; // stop if error
         print(
             "Reviewing photos... ${photoCreationModelData.value?.processedWatermarkedUrl}");
 
-        // ✅ Only increment when photo creation succeeds
+
         currentStep.value++;
         return;
       }
 
       if (currentStep.value == 3) {
         if (photoCreationModelData.value?.canDownloadImage == true) {
-          // ⛔ Stay on step 3, don't increment
+
           isLoading.value = true;
           await photoCreationRepository
               .downloadImage(
@@ -104,12 +104,7 @@ class PhotoController extends GetxController {
               photoCreationModelData.value = photoCreationModel;
               _storeSessionData(photoCreationModel);
               Get.toNamed(PrimaryRoute.photo_preview);
-              Get.snackbar(
-                'Success',
-                'Image download initiated successfully',
-                backgroundColor: AppColors.green,
-                colorText: AppColors.whiteColor,
-              );
+             
             });
           });
           return; // ⛔ do not increment
@@ -197,7 +192,7 @@ class PhotoController extends GetxController {
     }
   }
 
-  Future<bool> createPhoto() async {
+  Future<bool> createSession() async {
     try {
       isLoading.value = true;
 
@@ -228,7 +223,9 @@ class PhotoController extends GetxController {
         documentType: _mapDocumentType(selectedType.value),
         userSessionPhotos: capturedPhotos,
         platform: 'MOBILE_APP',
-      );
+        customHeight: double.tryParse(heightController.text) ?? 0.0,
+        customWidth: double.tryParse(widthController.text) ?? 0.0,);        
+        
 
       return response.fold(
         (error) {
@@ -281,7 +278,7 @@ class PhotoController extends GetxController {
       case DocumentType.drivingLicense:
         return "DRIVING_LICENSE";
       case DocumentType.manually:
-        return "MANUALLY";
+        return "MANUAL_INPUT";
     }
   }
 

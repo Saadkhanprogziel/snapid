@@ -56,6 +56,9 @@ dependencies:
   intl: ^0.20.2
   fluttertoast: ^8.2.12
   gallery_saver_plus: ^3.2.9
+  video_player: ^2.8.2
+  local_auth: ^2.1.6
+
   # image_gallery_saver: ^2.0.3
   
 

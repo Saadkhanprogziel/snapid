@@ -18,6 +18,7 @@ class AppColors {
   static const Color cardColor             = Color.fromARGB(25, 223, 222,222);
   static const Color cardColorsolid        = Color.fromARGB(100, 223, 222,222);
   static const Color backBtnColor          = Color.fromARGB(100, 96, 66, 255);
+  static const Color solidCardColor        = Color.fromARGB(255, 48, 48, 48);
   
 
 

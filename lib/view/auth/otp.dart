@@ -84,7 +84,9 @@ class OtpScreen extends StatelessWidget {
                     children: List.generate(6, (index) => buildOtpBox(index)),
                   ),
                   const SizedBox(height: 30),
-                  ElevatedButton(
+                  Obx(() => controller.isLoading.value
+                      ? const CircularProgressIndicator()
+                      :  ElevatedButton(
                     onPressed: ()  {
                       controller.verifyOtp();
                     },
@@ -104,6 +106,9 @@ class OtpScreen extends StatelessWidget {
                           .copyWith(color: AppColors.whiteColor),
                     ),
                   ),
+                  
+                  ),
+                 
                   const SizedBox(height: 20),
                   TextButton.icon(
                     onPressed: () {

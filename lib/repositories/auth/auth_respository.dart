@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dartz/dartz.dart';
+import 'package:get/get.dart';
 import 'package:snapid/main.dart';
 import 'package:snapid/models/register/register.dart';
 import 'package:snapid/models/user/user_model.dart';
 import 'package:snapid/network/network_repository.dart';
+import 'package:snapid/routes/routes.dart';
 
 class AuthRespository {
   final networkRepository = NetworkRepository();
@@ -35,16 +38,22 @@ class AuthRespository {
     });
 
     if (!response.failed) {
+      print("nahi hai");
       final data = UserModel.fromJson(response.data["data"]["user"]);
       appStorage.write("user", jsonEncode(data.toJson()));
       await getUserDetails();
 
-
-      // appStorage.write("accessToken", response.data["data"]["accessToken"]);
-      // appStorage.write("refreshToken", response.data["data"]["refreshToken"]);
-
       return right(data);
     }
+    if (response.message == "Please Verify your account.") {
+      final dataString = response.data["data"];
+     Get.toNamed(PrimaryRoute.verification, arguments: {
+        "email": dataString['userMail'],
+        "phone": "${dataString['userPhone']}",
+      });
+      return left(response.message);
+    }
+
     return left(response.message);
   }
 
@@ -59,7 +68,6 @@ class AuthRespository {
     return left(response.message);
   }
 
-     /// ✅ Fixed and completed updateProfile
   Future<Either<String, bool>> updateProfile({
     required String firstName,
     required String lastName,
@@ -67,27 +75,48 @@ class AuthRespository {
     required String phone,
     String? gender,
     String? password,
+    File? profileImage,
   }) async {
-    final response = await networkRepository.post(
-      url: "/auth/update-user-profile",
-      data: {
-        "firstName": firstName,
-        "lastName": lastName,
-        "email": email,
-        "phone": phone,
-        if (gender != null) "gender": gender,
+    try {
+      // Prepare fields
+      final fields = {
+        'firstName': firstName,
+        'lastName': lastName,
+        'email': email,
+        'phone': phone,
+        if (gender != null && gender.isNotEmpty) 'gender': gender,
+        if (password != null && password.isNotEmpty) 'password': password,
+      };
 
-      },
-    );
+      final files = <String, File>{};
+      if (profileImage != null && profileImage.existsSync()) {
+        files['profilePicLocalPath'] = profileImage;
+      }
 
-    if (!response.failed) {
-      // Refresh local user info
-      await getUserDetails();
-      return right(true);
+      // Use existing helper in NetworkRepository
+      final formData = await networkRepository.createFormData(
+        fields: fields,
+        files: files.isNotEmpty ? files : null,
+      );
+
+      // Call multipart post
+      final response = await networkRepository.postMultipart(
+        url: "/auth/update-user-profile",
+        formData: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      );
+
+      if (!response.failed) {
+        await getUserDetails();
+        return right(true);
+      }
+      return left(response.message);
+    } catch (e) {
+      return left("Failed to update profile: ${e.toString()}");
     }
-    return left(response.message);
   }
-
 
   Future<Either<String, bool>> resetPassword({
     required String email,
@@ -149,7 +178,6 @@ class AuthRespository {
   Future<Either<String, bool>> logout() async {
     final response = await networkRepository.post(url: "/auth/logout-user");
     if (!response.failed) {
-      
       return right(true);
     }
     return left(response.message);

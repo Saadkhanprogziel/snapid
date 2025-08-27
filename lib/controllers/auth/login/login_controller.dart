@@ -21,10 +21,6 @@ class LoginController extends GetxController {
     final emailOrPhone = emailController.text.trim();
     final password = passwordController.text.trim();
 
-    // if (emailOrPhone.isEmpty || password.isEmpty) {
-    //   Get.snackbar("Error", "Please enter email/phone and password");
-    //   return;
-    // }
 
     isLoading = true;
     update();
@@ -34,8 +30,11 @@ class LoginController extends GetxController {
           password: password,
         )
         .then((response) => response.fold((error) {
+
+              print(error);
               isLoading = false;
-              Get.snackbar("Error", error);
+              Get.snackbar("Error", error,
+                  backgroundColor: Colors.red, colorText: Colors.white);
               update();
             }, (success) {
               isLoading = false;

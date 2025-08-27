@@ -9,28 +9,33 @@ class SplashView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder(
-        init: SplashController(),
-        builder: (controller) {
-          return Scaffold(
-              backgroundColor: AppColors.bgColor,
-              body: Container(
-                width: double.infinity,
-                height: double.infinity,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(Assets.appBg),
-                    fit: BoxFit.cover,
-                  ),
+    return GetBuilder<SplashController>(
+      init: SplashController(),
+      builder: (controller) {
+        return Scaffold(
+          backgroundColor: AppColors.bgColor,
+          body: Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(Assets.appBg),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: Center(
+              child: SizedBox(
+                width: 250,
+                height: 250,
+                child: Image.asset(
+                  Assets.logoGif, // Change this to your GIF asset path
+                  fit: BoxFit.contain,
                 ),
-                child: Center(
-                  child: SizedBox(
-                    width: 200,
-                    height: 200,
-                    child: Image.asset(Assets.logo, fit: BoxFit.contain),
-                  ),
-                ),
-              ));
-        });
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }
