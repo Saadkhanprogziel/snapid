@@ -118,23 +118,7 @@ class AuthRespository {
     }
   }
 
-  Future<Either<String, bool>> resetPassword({
-    required String email,
-    required String newPassword,
-    required String confirmPassword,
-  }) async {
-    final response =
-        await networkRepository.post(url: "/auth/reset-password", data: {
-      "email": email,
-      "new_password": newPassword,
-      "confirm_password": confirmPassword,
-    });
-    if (!response.failed) {
-      return right(true);
-    }
-    return left(response.message);
-  }
-
+  // 
   Future<Either<String, bool>> verifyOtp({
     required String identifier,
     required int code,
@@ -162,6 +146,43 @@ class AuthRespository {
     return left(response.message);
   }
 
+
+Future<Either<String, bool>> deleteProfile(
+  {required String reason}
+){
+    return networkRepository.delete(url: "/auth/delete-profile",data: {
+      "reason": reason
+    }).then((response) async {
+      if (!response.failed) {
+      await removeUserData();
+        return right(true);
+      }
+      return left(response.message);
+    });
+}
+
+Future<Either<String, bool>> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required String confirmPassword,
+  }) async {
+    final response = await networkRepository.post(
+        url: "/auth/change-password",
+        data: {
+          "currentPassword": currentPassword,
+          "newPassword": newPassword,
+          "confirmNewPassword": confirmPassword,
+
+        });
+    if (!response.failed) {
+      return right(true);
+    }
+    return left(response.message);
+  }
+
+
+
+
   Future<Either<String, bool>> reSendOtp(
     String identifier,
   ) async {
@@ -178,6 +199,7 @@ class AuthRespository {
   Future<Either<String, bool>> logout() async {
     final response = await networkRepository.post(url: "/auth/logout-user");
     if (!response.failed) {
+      await removeUserData();
       return right(true);
     }
     return left(response.message);
@@ -192,5 +214,21 @@ class AuthRespository {
       return right(data);
     }
     return left(response.message);
+  }
+
+
+Future<void> removeUserData() async {
+  bool biometric = appStorage.read("biometric_enabled") ?? false;
+    try {
+      await appStorage.remove('user');
+      await appStorage.remove('token');
+      await appStorage.remove('refreshToken');
+      if (biometric) {
+      await appStorage.remove('biometric_enabled');
+        
+      }
+    } catch (e) {
+      print("Error removing user data: $e");
+    }
   }
 }

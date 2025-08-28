@@ -16,6 +16,10 @@ class LocalStorage {
     final name = appStorage.read('name');
     return name != null ? '$name' : '';
   }
+  bool canDownload() {
+    int credits = appStorage.read('credits') ?? 0;
+    return credits > 0 ? true : false;
+  }
 
   String getEmail() {
     final email = appStorage.read('email');

@@ -6,7 +6,7 @@ import 'package:snapid/constant/colors.dart';
 import 'package:snapid/constant/strings.dart';
 import 'package:snapid/controllers/auth/login/login_controller.dart';
 import 'package:snapid/controllers/biometric/biometric._controller.dart';
-
+import 'package:snapid/main.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
@@ -19,12 +19,9 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return GetBuilder<LoginController>(
       init: LoginController(),
       builder: (logincontroller) {
-
-        
         return Scaffold(
           body: Stack(
             children: [
@@ -85,8 +82,7 @@ class LoginScreen extends StatelessWidget {
                                   // Email field
                                   CustomTextField(
                                     controller: logincontroller.emailController,
-                                    hintText: Strings
-                                        .enterEmail, // You may want to rename to "Enter email or phone"
+                                    hintText: Strings.enterEmail,
                                     prefixIcon: Icons.email,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -94,11 +90,11 @@ class LoginScreen extends StatelessWidget {
                                       }
 
                                       if (GetUtils.isEmail(value)) {
-                                        return null; // valid email
+                                        return null;
                                       }
 
                                       if (GetUtils.isPhoneNumber(value)) {
-                                        return null; // valid phone
+                                        return null;
                                       }
 
                                       return 'Enter a valid email or phone number';
@@ -109,15 +105,19 @@ class LoginScreen extends StatelessWidget {
 
                                   // Password field with toggle
                                   CustomTextField(
-                                   controller: logincontroller.passwordController,
+                                    controller:
+                                        logincontroller.passwordController,
                                     hintText: Strings.yourPassword,
-                                    obscureText: logincontroller.isPasswordObscured,
+                                    obscureText:
+                                        logincontroller.isPasswordObscured,
                                     prefixIcon: Icons.lock,
-                                    suffixIcon: logincontroller.isPasswordObscured
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
+                                    suffixIcon:
+                                        logincontroller.isPasswordObscured
+                                            ? Icons.visibility
+                                            : Icons.visibility_off,
                                     onSuffixIconPressed: () {
-                                      logincontroller.togglePasswordVisibility();
+                                      logincontroller
+                                          .togglePasswordVisibility();
                                     },
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -150,7 +150,6 @@ class LoginScreen extends StatelessWidget {
                                   const SizedBox(height: 10),
 
                                   // Sign In Button
-                                  // Sign In Button
                                   logincontroller.isLoading
                                       ? const SizedBox(
                                           height: 60,
@@ -173,54 +172,20 @@ class LoginScreen extends StatelessWidget {
 
                                   const SizedBox(height: 30),
 
-                                  // Biometrics button
                                   GetBuilder<BiometricController>(
                                     init: BiometricController(),
                                     builder: (biometricController) {
+                                     var isBiometricEnabled =  appStorage
+                                          .read('biometric_enabled') ?? false;
+                                      if (!isBiometricEnabled) {
+                                     
+                                        return const SizedBox.shrink();
+                                      }
                                       return OutlinedButton.icon(
                                         onPressed: () async {
-                                          final isEnabled =
-                                              await biometricController
-                                                  .isBiometricEnabled();
-
-                                          if (!isEnabled) {
-                                            Get.snackbar(
-                                              'Biometric Disabled',
-                                              'Please enable biometric authentication in settings first.',
-                                              snackPosition: SnackPosition.TOP,
-                                               colorText: Colors.white,
-                                            );
-                                            // Navigate to biometric settings
-                                            Get.toNamed(
-                                                '/biometric-settings'); // Your biometric settings route
-                                            return;
-                                          }
-
-                                          if (!biometricController
-                                              .isBiometricAvailable.value) {
-                                            Get.snackbar(
-                                              'Not Available',
-                                              'Biometric authentication is not available on this device.',
-                                              snackPosition: SnackPosition.TOP,
-                                              colorText: Colors.white,
-                                            );
-                                            return;
-                                          }
-
-                                          final isAuthenticated =
-                                              await biometricController
-                                                  .authenticateUser();
-
-                                          if (isAuthenticated) {
-                                            // Call your existing login success logic
-                                            logincontroller
-                                                .onLogin(); // Or your success method
-                                            Get.snackbar(
-                                              'Success',
-                                              'Login successful with ${biometricController.biometricType.value}!',
-                                              snackPosition: SnackPosition.TOP,
-                                            );
-                                          }
+                                          // Use the new biometric button method
+                                          await logincontroller
+                                              .onBiometricButtonPressed();
                                         },
                                         icon:
                                             biometricController.isLoading.value
@@ -246,7 +211,7 @@ class LoginScreen extends StatelessWidget {
                                         label: Text(
                                           biometricController
                                                   .isBiometricAvailable.value
-                                              ? 'Sign in with ${biometricController.biometricType.value}'
+                                              ? 'Sign in with Biometric'
                                               : Strings.signInWithBiometrics,
                                           style: CustomTextTheme.regular16
                                               .copyWith(

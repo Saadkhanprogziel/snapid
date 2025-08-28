@@ -134,6 +134,18 @@
       "languageVersion": "2.17"
     },
     {
+      "name": "device_info_plus",
+      "rootUri": "file:///C:/Users/CC/AppData/Local/Pub/Cache/hosted/pub.dev/device_info_plus-11.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "device_info_plus_platform_interface",
+      "rootUri": "file:///C:/Users/CC/AppData/Local/Pub/Cache/hosted/pub.dev/device_info_plus_platform_interface-7.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
+    },
+    {
       "name": "dio",
       "rootUri": "file:///C:/Users/CC/AppData/Local/Pub/Cache/hosted/pub.dev/dio-5.8.0+1",
       "packageUri": "lib/",
@@ -782,6 +794,12 @@
       "languageVersion": "3.5"
     },
     {
+      "name": "win32_registry",
+      "rootUri": "file:///C:/Users/CC/AppData/Local/Pub/Cache/hosted/pub.dev/win32_registry-1.1.5",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
       "name": "xdg_directories",
       "rootUri": "file:///C:/Users/CC/AppData/Local/Pub/Cache/hosted/pub.dev/xdg_directories-1.1.0",
       "packageUri": "lib/",
@@ -800,7 +818,7 @@
       "languageVersion": "3.6"
     }
   ],
-  "generated": "2025-08-27T12:23:26.257703Z",
+  "generated": "2025-08-28T06:46:53.855071Z",
   "generator": "pub",
   "generatorVersion": "3.6.2",
   "flutterRoot": "file:///C:/src/flutter3.24",

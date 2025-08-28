@@ -168,6 +168,8 @@ class HistoryFragment extends StatelessWidget {
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 20),
                               child: HistoryCustomCard(
+                                controller: controller,
+                                sessionId: item.id,
                                 imageUrl: item.processedImageUrl ??
                                     item.processedWatermarkedUrl ??
                                     'https://via.placeholder.com/150',

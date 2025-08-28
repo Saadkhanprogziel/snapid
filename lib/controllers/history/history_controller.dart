@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:snapid/models/photo_creation/photo_creation_model.dart';
+import 'package:snapid/repositories/auth/auth_respository.dart';
 import 'package:snapid/repositories/history/history_repository.dart';
 
 class HistoryController extends GetxController {
   final HistoryRepository _historyRepository = HistoryRepository();
+  final AuthRespository authRespository = AuthRespository();
 
   var selectedTab = 0.obs;
 
@@ -14,14 +16,14 @@ class HistoryController extends GetxController {
   var isLoadingMore = false.obs;
   var errorMessage = "".obs;
   var historyList = <PhotoCreationModel>[].obs;
-  
+
   // Pagination variables
   var currentPage = 1.obs;
   var hasMoreData = true.obs;
   var pageSize = 10;
   var currentStatus = "ALL";
+  var canDownload = false.obs;
 
-  // ScrollController for detecting scroll events
   final ScrollController scrollController = ScrollController();
 
   @override
@@ -31,6 +33,8 @@ class HistoryController extends GetxController {
     // 👇 Fetch default history when controller is created
     fetchHistory(status: "ALL");
   }
+
+
 
   @override
   void onClose() {
@@ -89,7 +93,7 @@ class HistoryController extends GetxController {
       } else {
         isLoadingMore.value = true;
       }
-      
+
       errorMessage.value = "";
       currentStatus = status;
 

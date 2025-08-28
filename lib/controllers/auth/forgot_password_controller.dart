@@ -32,7 +32,7 @@ class ForgotPasswordController extends GetxController {
       (success) {
         Get.back();
         Get.snackbar('Success', 'Password reset link sent to your email' 
-            ,backgroundColor: Colors.green, colorText: Colors.white );
+            , colorText: Colors.white );
       },
     );
   }

@@ -249,7 +249,7 @@ class EditProfileController extends GetxController {
           Get.snackbar(
             'Success',
             'Profile updated successfully!',
-            backgroundColor: Colors.green,
+            
             colorText: Colors.white,
             snackPosition: SnackPosition.TOP,
           );

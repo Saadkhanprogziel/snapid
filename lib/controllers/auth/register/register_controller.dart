@@ -51,7 +51,7 @@ class RegisterController extends GetxController {
             },
             (success) {
               isLoading.value = false;
-              Get.snackbar("Success", "Registration successful", colorText: Colors.green);
+              Get.snackbar("Success", "Registration successful", colorText: Colors.white);
               Get.toNamed(
                 PrimaryRoute.verification,
                 arguments: {

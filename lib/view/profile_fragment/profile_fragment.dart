@@ -42,22 +42,23 @@ class ProfileFragment extends StatelessWidget {
           Column(
             children: [
               SafeArea(
-                  child: CustomHeader(
-                title: "Profile",
-                rightIconPath: Assets.bellIcon,
-                onRightIconTap: () {
-                  Get.toNamed(PrimaryRoute.notification);
-                },
-              )),
-              // SpaceH40(),
+                child: CustomHeader(
+                  title: "Profile",
+                  rightIconPath: Assets.bellIcon,
+                  onRightIconTap: () {
+                    Get.toNamed(PrimaryRoute.notification);
+                  },
+                ),
+              ),
               Expanded(
                 child: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: AppColors.cardColor, // Light translucent color
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(60),
-                        topRight: Radius.circular(60)),
+                    color: AppColors.cardColor,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(60),
+                      topRight: Radius.circular(60),
+                    ),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -91,10 +92,9 @@ class ProfileFragment extends StatelessWidget {
                                       right: 0,
                                       child: GestureDetector(
                                         onTap: () {
-                                          print("object");
                                           Get.toNamed(PrimaryRoute.editProfile);
                                         },
-                                        child: CircleAvatar(
+                                        child: const CircleAvatar(
                                           backgroundColor: Colors.white,
                                           radius: 16,
                                           child: Icon(
@@ -114,34 +114,36 @@ class ProfileFragment extends StatelessWidget {
                                               ""
                                           ? "${dashboardController.user.value.firstName} ${dashboardController.user.value.lastName}"
                                           : "John Doe",
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     )),
                                 Obx(() => Text(
-                                      dashboardController.user.value.email ??
-                                          "",
-                                      style: TextStyle(
+                                      dashboardController.user.value.email ?? "",
+                                      style: const TextStyle(
                                         color: Colors.grey,
                                         fontSize: 14,
                                       ),
                                     )),
                                 SpaceH10(),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 20),
-                                  decoration: BoxDecoration(
-                                    color: Color.fromARGB(61, 82, 79, 112),
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: Text(
-                                    'Credits Remaining: ${dashboardController.user.value.credits ?? 0}',
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 14),
-                                  ),
-                                ),
+                                Obx(() => Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 20),
+                                      decoration: BoxDecoration(
+                                        color:
+                                            const Color.fromARGB(61, 82, 79, 112),
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      child: Text(
+                                        'Credits Remaining: ${dashboardController.user.value.credits ?? 0}',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    )),
                               ],
                             ),
                           ),
@@ -157,108 +159,108 @@ class ProfileFragment extends StatelessWidget {
                           SpaceH10(),
                           Expanded(
                             child: SingleChildScrollView(
-                              physics: AlwaysScrollableScrollPhysics(),
-                              child: Obx(() {
-                                return Column(
-                                  children: [
-                                    SettingItem(
-                                      svgPath: Assets.history,
-                                      title: 'My Orders',
-                                      subtitle:
-                                          'View History And Manage Downloads',
-                                      onTap: () {
-                                        Get.toNamed(PrimaryRoute.history);
-                                      },
-                                    ),
-                                    SpaceH14(),
-                                    SettingItem(
-                                      svgPath: Assets.measurement,
-                                      title: 'Measurement Unit',
-                                      subtitle: 'Set Your Preferred Unit.',
-                                      onTap: () {
-                                        Get.dialog(CustomDialogPop(
-                                          title: 'Select Measurement Unit',
-                                          message:
-                                              'Select how you want photo sizes to be displayed throughout the app.',
-                                          isIcon: false,
-                                          iconData: Icons.check,
-                                          iconColor: AppColors.whiteColor,
-                                          isActionPopUp: true,
-                                          isRadio: true,
-                                          radioOptions: controller.radioOptions,
-                                          selectedOption:
-                                              controller.selectedOption,
-                                          onCancel: () {
-                                            Get.back();
-                                          },
-                                          onPressed: () {},
-                                        ));
-                                      },
-                                    ),
-                                    SpaceH14(),
-                                    SettingItem(
-                                      icon: Icons.lock_outline,
-                                      title: 'Security Setting',
-                                      subtitle: 'Update Account Security',
-                                      onTap: () {
-                                        Get.toNamed(
-                                            PrimaryRoute.securitySetting);
-                                      },
-                                    ),
-                                    SpaceH14(),
-                                    SettingItem(
-                                      svgPath: Assets.notification,
-                                      title: 'Notification',
-                                      subtitle:
-                                          'Receive updates via push/email.',
-                                      hasToggle: true,
-                                      toggleValue:
-                                          controller.isNotificationOn.value,
-                                      onToggle: (val) {
-                                        controller.setNotification(val);
-                                      },
-                                    ),
-                                    SpaceH14(),
-                                    SettingItem(
-                                      icon: Icons.question_mark,
-                                      title: 'Help & Support',
-                                      subtitle: 'Chat Or Contact Us Directly.',
-                                      // showArrow: true,
-                                      onTap: () {
-                                        Get.toNamed(PrimaryRoute.help_support);
-                                      },
-                                    ),
-                                    SpaceH14(),
-                                    SettingItem(
-                                      svgPath: Assets.logout,
-
-                                      title: 'Log Out',
-                                      // subtitle: 'Return To Login',
-                                      showArrow: false,
-                                      onTap: () {
-                                        Get.dialog(BackdropFilter(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              child: Column(
+                                children: [
+                                  SettingItem(
+                                    svgPath: Assets.history,
+                                    title: 'My Orders',
+                                    subtitle:
+                                        'View History And Manage Downloads',
+                                    onTap: () {
+                                      Get.toNamed(PrimaryRoute.history);
+                                    },
+                                  ),
+                                  SpaceH14(),
+                                  SettingItem(
+                                    svgPath: Assets.measurement,
+                                    title: 'Measurement Unit',
+                                    subtitle: 'Set Your Preferred Unit.',
+                                    onTap: () {
+                                      Get.dialog(CustomDialogPop(
+                                        title: 'Select Measurement Unit',
+                                        message:
+                                            'Select how you want photo sizes to be displayed throughout the app.',
+                                        isIcon: false,
+                                        iconData: Icons.check,
+                                        iconColor: AppColors.whiteColor,
+                                        isActionPopUp: true,
+                                        isRadio: true,
+                                        radioOptions: controller.radioOptions,
+                                        selectedOption:
+                                            controller.selectedOption,
+                                        onCancel: () {
+                                          Get.back();
+                                        },
+                                        onPressed: () {},
+                                      ));
+                                    },
+                                  ),
+                                  SpaceH14(),
+                                  SettingItem(
+                                    icon: Icons.lock_outline,
+                                    title: 'Security Setting',
+                                    subtitle: 'Update Account Security',
+                                    onTap: () {
+                                      Get.toNamed(
+                                          PrimaryRoute.securitySetting);
+                                    },
+                                  ),
+                                  /*
+                                  SpaceH14(),
+                                  Obx(() => SettingItem(
+                                        svgPath: Assets.notification,
+                                        title: 'Notification',
+                                        subtitle:
+                                            'Receive updates via push/email.',
+                                        hasToggle: true,
+                                        toggleValue:
+                                            controller.isNotificationOn.value,
+                                        onToggle: (val) {
+                                          controller.setNotification(val);
+                                        },
+                                      )),
+                                  */
+                                  SpaceH14(),
+                                  SettingItem(
+                                    icon: Icons.question_mark,
+                                    title: 'Help & Support',
+                                    subtitle: 'Chat Or Contact Us Directly.',
+                                    onTap: () {
+                                      Get.toNamed(PrimaryRoute.help_support);
+                                    },
+                                  ),
+                                  SpaceH14(),
+                                  SettingItem(
+                                    svgPath: Assets.logout,
+                                    title: 'Log Out',
+                                    showArrow: false,
+                                    onTap: () {
+                                      Get.dialog(
+                                        BackdropFilter(
                                           filter: ImageFilter.blur(
                                               sigmaX: 15, sigmaY: 15),
                                           child: CustomDialogPop(
-                                              solidBtnLabel: "Logout",
-                                              title: "Log Out ?",
-                                              message:
-                                                  "Are you sure you want to log out of your Snapid account?",
-                                              svgPath: Assets.logout,
-                                              isActionPopUp: true,
-                                              backgroundColor:
-                                                  AppColors.cardColor,
-                                              onCancel: () => Get.back(),
-                                              onPressed: () {
-                                                controller.logout();
-                                              }),
-                                        ));
-                                      },
-                                    ),
-                                    SpaceH90()
-                                  ],
-                                );
-                              }),
+                                            solidBtnLabel: "Logout",
+                                            title: "Log Out ?",
+                                            message:
+                                                "Are you sure you want to log out of your Snapid account?",
+                                            svgPath: Assets.logout,
+                                            isActionPopUp: true,
+                                            backgroundColor:
+                                                AppColors.cardColor,
+                                            onCancel: () => Get.back(),
+                                            onPressed: () {
+                                              controller.logout();
+                                            },
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  SpaceH90()
+                                ],
+                              ),
                             ),
                           ),
                         ],

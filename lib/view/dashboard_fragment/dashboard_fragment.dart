@@ -8,7 +8,7 @@ import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/constant/strings.dart';
 import 'package:snapid/controllers/dashboard/dashboard_controller.dart';
-import 'package:snapid/controllers/photoController/photo_controller.dart';
+import 'package:snapid/controllers/photoSession/photo_controller.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_card.dart';
@@ -20,8 +20,8 @@ class DashboardFragment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DashboardController controller = Get.put(DashboardController());
     final PhotoController photoController = Get.find<PhotoController>();
+    final DashboardController controller = Get.find<DashboardController>(); // 👈 don’t re-put
 
     return Scaffold(
       body: Stack(

@@ -24,10 +24,8 @@ class ProfileController extends GetxController {
           Get.snackbar("Error", error);
           Get.back();
         }, (success) {
-          print("success");
-          appStorage.remove('user');
-          appStorage.remove('token');
-          appStorage.remove('refreshToken');
+         
+        
           Get.offAllNamed(PrimaryRoute.login);
         }));
   }

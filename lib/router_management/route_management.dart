@@ -6,7 +6,7 @@ import 'package:snapid/view/auth/forgot_password.dart';
 import 'package:snapid/view/auth/login.dart';
 import 'package:snapid/view/auth/otp.dart';
 import 'package:snapid/view/auth/register.dart';
-import 'package:snapid/view/auth/reset_password.dart';
+import 'package:snapid/view/auth/change_password.dart';
 import 'package:snapid/view/auth/verify.dart';
 import 'package:snapid/view/biometric/biometric.dart';
 import 'package:snapid/view/delete_account/delete_account.dart';
@@ -18,8 +18,8 @@ import 'package:snapid/view/onboarding/onboarding.dart';
 import 'package:snapid/view/onboarding/onboardingLastPage.dart';
 
 import 'package:snapid/view/payment_method/payment_method.dart';
-import 'package:snapid/view/photo_creation/photo_creation.dart';
-import 'package:snapid/view/photo_creation/photo_preview.dart';
+import 'package:snapid/view/photo_session/photo_session.dart';
+import 'package:snapid/view/photo_session/photo_preview.dart';
 import 'package:snapid/view/photo_select/seletedPhotos.dart';
 import 'package:snapid/view/popular_countries.dart/popular_countries.dart';
 import 'package:snapid/view/profile_fragment/edit_profile.dart';
@@ -73,7 +73,7 @@ class Pages {
           transition: Transition.fadeIn),
       GetPage(
           name: PrimaryRoute.resetPassword,
-          page: () => ResetPassowrd(),
+          page: () => ChangePassword(),
           binding: ControllerBindings(),
           transition: Transition.fadeIn),
       GetPage(
@@ -83,7 +83,7 @@ class Pages {
           transition: Transition.fadeIn),
       GetPage(
           name: PrimaryRoute.photo_creation,
-          page: () => PhotoCreationScreen(),
+          page: () => PhotoSessionScreen(),
           binding: ControllerBindings(),
           transition: Transition.cupertino),
       GetPage(

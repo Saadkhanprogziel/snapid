@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:dio/dio.dart';
@@ -9,18 +10,23 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
+import 'package:snapid/controllers/history/history_controller.dart';
+import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
-import 'package:snapid/view/photo_creation/cached_image.dart';
+import 'package:snapid/view/photo_session/cached_image.dart';
+import 'package:snapid/controllers/photoSession/photo_controller.dart';
 
 class HistoryCustomCard extends StatelessWidget {
   final String imageUrl;
+  final String sessionId;
   final String country;
   final String documentType;
   final String date;
   final String status;
   final Color statusColor;
   final GestureTapDownCallback? onMoreTapDown;
+  final HistoryController controller;
 
   /// Callback when delete is confirmed
   final VoidCallback? onDelete;
@@ -35,6 +41,7 @@ class HistoryCustomCard extends StatelessWidget {
     this.onMoreTapDown,
     this.onDelete,
     required this.documentType,
+    required this.controller, required this.sessionId,
   });
 
   @override
@@ -116,11 +123,11 @@ class HistoryCustomCard extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             if (status != "CREDITED")
-                            Text(
-                              "Expire Within 7 days",
-                              style: CustomTextTheme.regular12
-                                  .copyWith(color: AppColors.whiteColor),
-                            ),
+                              Text(
+                                "Expire Within 7 days",
+                                style: CustomTextTheme.regular12
+                                    .copyWith(color: AppColors.whiteColor),
+                              ),
                           ],
                         ),
                       ],
@@ -136,13 +143,13 @@ class HistoryCustomCard extends StatelessWidget {
                       if (value == 'delete') {
                         _showDeleteDialog(context);
                       } else if (value == 'redownload') {
-                        saveImageToGallery(imageUrl);
+                        _handleDownload(controller);
                       }
                     },
                     itemBuilder: (BuildContext context) =>
                         <PopupMenuEntry<String>>[
-                      _buildMenuItem(Icons.file_download_outlined,
-                          'Re-Download', 'redownload'),
+                      _buildMenuItem(Icons.file_download_outlined, 'Download',
+                          'redownload'),
                       _buildDivider(),
                       _buildMenuItem(Icons.delete, 'Delete', 'delete'),
                     ],
@@ -186,11 +193,6 @@ class HistoryCustomCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  // Text(
-                  //   "3.5 x 4.5 cm",
-                  //   style: CustomTextTheme.regular12
-                  //       .copyWith(color: AppColors.whiteColor),
-                  // ),
                 ],
               )
             ],
@@ -223,41 +225,152 @@ class HistoryCustomCard extends StatelessWidget {
     );
   }
 
+  void _handleDownload(HistoryController controller) async {
+    if (status != "CREDITED") {
+      _navigateToPaymentScreen();
+    } else {
+      saveImageToGallery(imageUrl);
+    }
+  }
+
+  void _navigateToPaymentScreen() async {
+    final PhotoController photoController = Get.find<PhotoController>();
+
+    await photoController.getUserDetails();
+
+    photoController.processedWatermarkedUrl.value = imageUrl;
+    photoController.sessionId.value = sessionId;
+
+    photoController.setStep(4);
+
+    Get.toNamed(
+      PrimaryRoute.photo_creation,
+      arguments: {'fromHistory': true},
+    );
+  }
+
   Future<void> saveImageToGallery(String url) async {
     try {
-      final status = await Permission.photos.request();
+      PermissionStatus status = PermissionStatus.denied;
 
-      if (status.isGranted) {
-        // ✅ Create custom filename with date
-        final now = DateTime.now();
-        final formattedDate =
-            "${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}";
-        final fileName = "snapid_processed_image_$formattedDate.jpg";
-
-        // ✅ Download to temp dir first
-        final tempDir = await getTemporaryDirectory();
-        final filePath = "${tempDir.path}/$fileName";
-        await Dio().download(url, filePath);
-
-        // ✅ Save with custom name
-        final success =
-            await GallerySaver.saveImage(filePath, albumName: "SnapID");
-
-        if (success ?? false) {
-          Get.snackbar("Success", "Image saved as $fileName",
-              backgroundColor: Colors.green, colorText: Colors.white);
-        } else {
-          Get.snackbar("Failed", "Could not save image",
-              backgroundColor: Colors.red, colorText: Colors.white);
+      if (Platform.isAndroid) {
+        status = await Permission.storage.request();
+        if (status.isDenied || status.isPermanentlyDenied) {
+          status = await Permission.manageExternalStorage.request();
         }
       } else {
-        Get.snackbar("Permission Denied",
-            "Please allow photo/gallery access to save images",
-            backgroundColor: Colors.red, colorText: Colors.white);
+        status = await Permission.photos.request();
+      }
+
+      if (status.isGranted || status.isLimited) {
+        Get.snackbar(
+          "Downloading",
+          "Please wait while the image is being downloaded...",
+          duration: Duration(seconds: 2),
+          colorText: Colors.white,
+        );
+
+        try {
+          final now = DateTime.now();
+          final formattedDate =
+              "${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}";
+          final fileName = "snapid_processed_image_$formattedDate.jpg";
+
+          final tempDir = await getTemporaryDirectory();
+          final filePath = "${tempDir.path}/$fileName";
+
+          await Dio().download(url, filePath);
+
+          final file = File(filePath);
+          if (!await file.exists()) {
+            throw Exception("Downloaded file not found");
+          }
+
+          final success =
+              await GallerySaver.saveImage(filePath, albumName: "SnapID");
+
+          if (success == true) {
+            Get.snackbar(
+              "Success",
+              "Image Downloaded successfully!",
+              colorText: Colors.white,
+              backgroundColor: const Color.fromARGB(97, 76, 175, 79),
+              duration: const Duration(seconds: 3),
+            );
+          } else {
+            Get.snackbar(
+              "Failed",
+              "Could not save image to gallery",
+              backgroundColor: Colors.red,
+              colorText: Colors.white,
+              snackPosition: SnackPosition.BOTTOM,
+            );
+          }
+        } catch (e) {
+          Get.snackbar(
+            "Error",
+            "Failed to save image: ${e.toString()}",
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
+      } else if (status.isDenied) {
+        Get.snackbar(
+          "Permission Denied",
+          "Storage permission is required to save images",
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+          duration: const Duration(seconds: 4),
+        );
+      } else if (status.isPermanentlyDenied) {
+        Get.dialog(
+          AlertDialog(
+            backgroundColor: AppColors.solidCardColor,
+            title: Text(
+              "Permission Required",
+              style: CustomTextTheme.regular16
+                  .copyWith(color: AppColors.whiteColor),
+            ),
+            content: Text(
+              "Storage permission is permanently denied. Please enable it from app settings to save images.",
+              style: CustomTextTheme.regular14
+                  .copyWith(color: AppColors.whiteColor),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Get.back(),
+                child: Text(
+                  "Cancel",
+                  style: CustomTextTheme.regular16
+                      .copyWith(color: AppColors.whiteColor),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Get.back();
+                  openAppSettings();
+                },
+                child: Text(
+                  "Settings",
+                  style:
+                      CustomTextTheme.regular16.copyWith(color: AppColors.red),
+                ),
+              ),
+            ],
+          ),
+        );
       }
     } catch (e) {
-      Get.snackbar("Error", "Error saving image: $e",
-          backgroundColor: Colors.red, colorText: Colors.white);
+      print("Error in saveImageToGallery: $e");
+      Get.snackbar(
+        "Error",
+        "An unexpected error occurred: ${e.toString()}",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 
@@ -266,19 +379,31 @@ class HistoryCustomCard extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.solidCardColor,
-        title: Text("Delete Item",style: CustomTextTheme.regular16.copyWith(color: AppColors.whiteColor)),
-        content:  Text("Are you sure you want to delete this item?", style: CustomTextTheme.regular14.copyWith(color: AppColors.whiteColor),),
+        title: Text(
+          "Delete Item",
+          style:
+              CustomTextTheme.regular16.copyWith(color: AppColors.whiteColor),
+        ),
+        content: Text(
+          "Are you sure you want to delete this item?",
+          style:
+              CustomTextTheme.regular14.copyWith(color: AppColors.whiteColor),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context), // cancel
-            child:  Text("Cancel",style: CustomTextTheme.regular16.copyWith(color: AppColors.whiteColor)),
+            child: Text("Cancel",
+                style: CustomTextTheme.regular16
+                    .copyWith(color: AppColors.whiteColor)),
           ),
           TextButton(
             onPressed: () {
-            Get.back(); // close dialog
+              Get.back(); // close dialog
               onDelete?.call(); // notify parent
             },
-            child:  Text("Delete",style: CustomTextTheme.regular16.copyWith(color: AppColors.red)),
+            child: Text("Delete",
+                style:
+                    CustomTextTheme.regular16.copyWith(color: AppColors.red)),
           ),
         ],
       ),

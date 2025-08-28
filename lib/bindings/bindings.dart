@@ -1,14 +1,14 @@
-
 import 'package:get/get.dart';
 import 'package:snapid/controllers/auth/forgot_password_controller.dart';
+import 'package:snapid/controllers/biometric/biometric._controller.dart';
 import 'package:snapid/controllers/dashboard/dashboard_controller.dart';
 import 'package:snapid/controllers/history/history_controller.dart';
 import 'package:snapid/controllers/home/home_controller.dart';
 import 'package:snapid/controllers/notification/notification_controller.dart';
 
-
 import 'package:snapid/controllers/onboarding/onbording_controller.dart';
-import 'package:snapid/controllers/photoController/photo_controller.dart';
+import 'package:snapid/controllers/photoSession/photo_controller.dart';
+import 'package:snapid/controllers/security_settting/security_setting_controller.dart';
 import 'package:snapid/controllers/splash/splash.dart';
 
 class ControllerBindings extends Bindings {
@@ -21,13 +21,9 @@ class ControllerBindings extends Bindings {
     Get.lazyPut(() => PhotoController());
     Get.lazyPut(() => HomeController());
     Get.lazyPut(() => ForgotPasswordController());
-    // Get.lazyPut(() => DashboardController());
+    Get.lazyPut(() => SecuritySettingController());
+    Get.lazyPut<DashboardController>(() => DashboardController());
 
-    // Get.lazyPut(() => UserRegisterController());
-    // Get.lazyPut(() => RegisterProfileController());
-    // Get.lazyPut(() => LoginController());
-    // Get.lazyPut(() => ForgotPasswordController());
-    // Get.lazyPut(() => DashboardController());
-   
+    Get.lazyPut<BiometricController>(() => BiometricController(), fenix: true);
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
-import 'package:snapid/controllers/photoController/photo_controller.dart';
+import 'package:snapid/controllers/photoSession/photo_controller.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
 import 'package:snapid/utlis/custom_header.dart';

@@ -14,25 +14,33 @@ class SplashController extends GetxController {
   }
 
   void _startSplashTimer() {
-    // Set duration based on your GIF length (adjust as needed)
     Future.delayed(const Duration(seconds: 5), () {
       _navigateToNextScreen();
     });
   }
 
   void _navigateToNextScreen() async {
+    bool biometricEnabled = appStorage.read("biometric_enabled") ?? false;
     final token = appStorage.read("token") ?? "";
-    print(token);
 
     if (token.isNotEmpty) {
-      await authRespository
-          .getUserDetails()
-          .then((response) => response.fold((error) {
+      if (biometricEnabled) {
+        // Navigate to login where biometric auth will be handled
+        Get.offAllNamed(PrimaryRoute.login, arguments: {"biometric": true});
+      } else {
+        // Normal flow → fetch user details and go home
+        await authRespository.getUserDetails().then((response) => response.fold(
+              (error) {
                 Get.snackbar("Error", error);
                 update();
-              }, (success) {
+              },
+              (success) {
+                
                 Get.offAllNamed(PrimaryRoute.home, arguments: {'index': 0});
-              }));
+              },
+            ));
+        // Get.offAllNamed(PrimaryRoute.login,);
+      }
     } else {
       final onBoarded = appStorage.read("onBoarded") ?? false;
       if (onBoarded) {

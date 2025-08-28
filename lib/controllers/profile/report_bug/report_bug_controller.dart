@@ -113,7 +113,7 @@ class ReportBugController extends GetxController {
           "Success",
           "Report submitted successfully",
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green,
+         
           colorText: Colors.white,
         );
       } else {

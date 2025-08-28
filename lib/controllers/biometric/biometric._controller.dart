@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:local_auth_android/local_auth_android.dart';
@@ -17,38 +18,81 @@ class BiometricController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _initializeBiometric();
+    // Delay initialization to ensure platform is ready
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeBiometric();
+    });
   }
 
   Future<void> _initializeBiometric() async {
-    await _checkBiometricAvailability();
-    await _loadBiometricSetting();
+    try {
+      // Add a small delay to ensure platform channels are ready
+      await Future.delayed(const Duration(milliseconds: 100));
+      
+      await _checkBiometricAvailability();
+      await _loadBiometricSetting();
+    } catch (e) {
+      print('Error initializing biometric: $e');
+      // Retry once after a longer delay
+      await Future.delayed(const Duration(seconds: 1));
+      try {
+        await _checkBiometricAvailability();
+        await _loadBiometricSetting();
+      } catch (retryError) {
+        print('Retry failed: $retryError');
+      }
+    }
   }
 
   Future<void> _checkBiometricAvailability() async {
     try {
-      final bool isAvailable = await _localAuthentication.canCheckBiometrics;
+      print('=== Biometric Availability Check ===');
+      
+      // Check if device supports biometrics
       final bool isDeviceSupported = await _localAuthentication.isDeviceSupported();
-      isBiometricAvailable.value = isAvailable && isDeviceSupported;
+      print('Device supported: $isDeviceSupported');
+      
+      // Check if biometrics can be checked
+      final bool canCheckBiometrics = await _localAuthentication.canCheckBiometrics;
+      print('Can check biometrics: $canCheckBiometrics');
+      
+      // Get available biometrics
+      final List<BiometricType> availableBiometrics = await _localAuthentication.getAvailableBiometrics();
+      print('Available biometrics: $availableBiometrics');
+      
+      // Overall availability
+      isBiometricAvailable.value = isDeviceSupported && canCheckBiometrics && availableBiometrics.isNotEmpty;
+      print('Final availability: ${isBiometricAvailable.value}');
 
       if (isBiometricAvailable.value) {
-        final biometrics = await _localAuthentication.getAvailableBiometrics();
-        print("Biometrics available: $biometrics");
+        print("Biometrics available: $availableBiometrics");
 
-        if (biometrics.contains(BiometricType.face)) {
+        if (availableBiometrics.contains(BiometricType.face)) {
           biometricType.value = 'Face ID';
-        } else if (biometrics.contains(BiometricType.fingerprint)) {
+        } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
           biometricType.value = 'Fingerprint';
-        } else if (biometrics.contains(BiometricType.iris)) {
+        } else if (availableBiometrics.contains(BiometricType.iris)) {
           biometricType.value = 'Iris';
-        } else if (biometrics.contains(BiometricType.strong)) {
+        } else if (availableBiometrics.contains(BiometricType.strong)) {
           biometricType.value = GetPlatform.isAndroid
               ? 'Fingerprint / Face'
               : 'Face ID / Touch ID';
-        } else if (biometrics.contains(BiometricType.weak)) {
+        } else if (availableBiometrics.contains(BiometricType.weak)) {
           biometricType.value = 'Weak Biometric';
         } else {
           biometricType.value = 'Biometric';
+        }
+        print('Biometric type set to: ${biometricType.value}');
+      } else {
+        print('=== Why biometric is not available ===');
+        if (!isDeviceSupported) {
+          print('- Device does not support biometrics');
+        }
+        if (!canCheckBiometrics) {
+          print('- Cannot check biometrics (may need screen lock setup)');
+        }
+        if (availableBiometrics.isEmpty) {
+          print('- No biometrics are enrolled on this device');
         }
       }
     } catch (e) {
@@ -77,6 +121,7 @@ class BiometricController extends GetxController {
           'Success',
           '${biometricType.value} authentication enabled successfully!',
           snackPosition: SnackPosition.TOP,
+          colorText: const Color(0xFFFFFFFF),
         );
       } else {
         print('Please enroll and try again with ${biometricType.value}.');
@@ -84,6 +129,7 @@ class BiometricController extends GetxController {
           'Authentication Failed',
           'Please enroll and try again with ${biometricType.value}.',
           snackPosition: SnackPosition.TOP,
+          colorText: const Color(0xFFFFFFFF),
         );
       }
     } else if (!value) {
@@ -93,12 +139,14 @@ class BiometricController extends GetxController {
         'Disabled',
         '${biometricType.value} authentication has been disabled.',
         snackPosition: SnackPosition.TOP,
+        colorText: const Color(0xFFFFFFFF),
       );
     } else {
       Get.snackbar(
         'Not Available',
         'Biometric authentication is not available on this device.',
         snackPosition: SnackPosition.TOP,
+        colorText: const Color(0xFFFFFFFF),
       );
     }
   }
@@ -123,6 +171,7 @@ class BiometricController extends GetxController {
           'Not Enrolled',
           'Please set up ${biometricType.value} in device settings first.',
           snackPosition: SnackPosition.TOP,
+          colorText: const Color(0xFFFFFFFF),
         );
         return false;
       }

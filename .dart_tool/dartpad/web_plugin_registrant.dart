@@ -8,6 +8,7 @@
 
 import 'package:camera_web/camera_web.dart';
 import 'package:connectivity_plus/src/connectivity_plus_web.dart';
+import 'package:device_info_plus/src/device_info_plus_web.dart';
 import 'package:fluttertoast/fluttertoast_web.dart';
 import 'package:image_picker_for_web/image_picker_for_web.dart';
 import 'package:permission_handler_html/permission_handler_html.dart';
@@ -20,6 +21,7 @@ void registerPlugins([final Registrar? pluginRegistrar]) {
   final Registrar registrar = pluginRegistrar ?? webPluginRegistrar;
   CameraPlugin.registerWith(registrar);
   ConnectivityPlusWebPlugin.registerWith(registrar);
+  DeviceInfoPlusWebPlugin.registerWith(registrar);
   FluttertoastWebPlugin.registerWith(registrar);
   ImagePickerPlugin.registerWith(registrar);
   WebPermissionHandler.registerWith(registrar);

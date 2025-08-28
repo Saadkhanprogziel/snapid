@@ -22,7 +22,6 @@ class DashboardController extends GetxController {
     loadUser(); // initial load
   }
 
-  // Load user from local storage
   void loadUser() {
     final userData = LocalStorage.getUser();
     if (userData != null) {
@@ -34,12 +33,11 @@ class DashboardController extends GetxController {
     }
   }
 
-  // Call this after updating user in LocalStorage
   void refreshUser() {
     loadUser();
   }
-
-  void _onScroll() {
+ void _onScroll() {
+    if (!scrollController.hasClients) return; // ✅ guard
     if (scrollController.offset > 40 && showGreeting.value) {
       showGreeting.value = false;
     } else if (scrollController.offset <= 10 && !showGreeting.value) {
@@ -49,7 +47,8 @@ class DashboardController extends GetxController {
 
   @override
   void onClose() {
-    scrollController.dispose();
+    scrollController.removeListener(_onScroll); // ✅ no dispose()
     super.onClose();
   }
+
 }
