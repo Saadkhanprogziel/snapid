@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart' as dio;
 import 'package:get/get.dart';
-import 'package:snapid/routes/routes.dart';
 import '../../../main.dart';
 class NetworkInterceptor extends dio.Interceptor {
   @override

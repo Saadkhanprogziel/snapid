@@ -10,7 +10,6 @@ import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/dashboard/dashboard_controller.dart';
 
 import 'package:snapid/controllers/profile/profile_controller.dart';
-import 'package:snapid/main.dart';
 import 'package:snapid/routes/routes.dart';
 
 import 'package:snapid/theme/text_theme.dart';

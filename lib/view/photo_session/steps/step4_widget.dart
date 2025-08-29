@@ -60,7 +60,7 @@ class Step4Widget extends StatelessWidget {
                     minHeight: 60,
                     onPressed: () {
                       print(controller.sessionId.value);
-                      // controller.downloadImageById(controller.sessionId.value);
+                      controller.downloadImageById(controller.sessionId.value);
                     },
                     text: "Proceed to Download",
                   ),

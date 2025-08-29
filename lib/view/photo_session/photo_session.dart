@@ -48,6 +48,7 @@ class PhotoSessionScreen extends StatelessWidget {
               Get.back();
             },
             onPressed: () {
+          
               Get.offAllNamed(PrimaryRoute.home);
             },
             solidBtnLabel: "Exit Anyway",

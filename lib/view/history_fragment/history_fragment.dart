@@ -17,7 +17,7 @@ class HistoryFragment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final HistoryController controller = Get.put(HistoryController());
+    final HistoryController controller = Get.find<HistoryController>();
 
     return Scaffold(
       body: Stack(
@@ -168,21 +168,13 @@ class HistoryFragment extends StatelessWidget {
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 20),
                               child: HistoryCustomCard(
+                                photoCreationModel: item,
                                 controller: controller,
-                                sessionId: item.id,
-                                imageUrl: item.processedImageUrl ??
-                                    item.processedWatermarkedUrl ??
-                                    'https://via.placeholder.com/150',
-                                country: item.countryName,
-                                documentType: item.documentType,
-                                date: formatDate(item.createdAt),
-                                status: item.status,
+                                
                                 onDelete: () {
                                   controller.delete(item.id);
                                 },
-                                statusColor: item.status == "CREDITED"
-                                    ? Colors.green.withValues(alpha: 0.5)
-                                    : Colors.orange.withValues(alpha: 0.6),
+                               
                               ),
                             );
                           },

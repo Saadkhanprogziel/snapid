@@ -16,12 +16,12 @@ class ControllerBindings extends Bindings {
   void dependencies() {
     Get.lazyPut(() => SplashController());
     Get.lazyPut(() => OnBoardingController());
-    Get.lazyPut(() => HistoryController());
     Get.lazyPut(() => NotificationController());
     Get.lazyPut(() => PhotoController());
     Get.lazyPut(() => HomeController());
     Get.lazyPut(() => ForgotPasswordController());
     Get.lazyPut(() => SecuritySettingController());
+    Get.lazyPut(() => HistoryController(), fenix: true);
     Get.lazyPut<DashboardController>(() => DashboardController());
 
     Get.lazyPut<BiometricController>(() => BiometricController(), fenix: true);

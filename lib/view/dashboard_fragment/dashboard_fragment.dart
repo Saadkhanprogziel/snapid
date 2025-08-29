@@ -15,13 +15,52 @@ import 'package:snapid/utlis/custom_card.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
 import 'package:snapid/utlis/custom_outline_button.dart';
 
-class DashboardFragment extends StatelessWidget {
+class DashboardFragment extends StatefulWidget {
   const DashboardFragment({super.key});
+
+  @override
+  State<DashboardFragment> createState() => _DashboardFragmentState();
+}
+
+class _DashboardFragmentState extends State<DashboardFragment> {
+  final ScrollController _scrollController = ScrollController();
+  bool _isCollapsed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_scrollListener);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollListener() {
+
+    const double expandedHeight = 200;
+    const double toolbarHeight = 100;
+    const double collapseThreshold =
+        expandedHeight - toolbarHeight - 20; // 80 with buffer
+
+    bool shouldCollapse = _scrollController.hasClients &&
+        _scrollController.offset > collapseThreshold;
+
+    if (shouldCollapse != _isCollapsed) {
+      setState(() {
+        _isCollapsed = shouldCollapse;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final PhotoController photoController = Get.find<PhotoController>();
-    final DashboardController controller = Get.find<DashboardController>(); // 👈 don’t re-put
+    final DashboardController controller =
+        Get.find<DashboardController>(); // 👈 don't re-put
 
     return Scaffold(
       body: Stack(
@@ -35,7 +74,7 @@ class DashboardFragment extends StatelessWidget {
             ),
           ),
           CustomScrollView(
-            controller: controller.scrollController,
+            controller: _scrollController,
             physics: AlwaysScrollableScrollPhysics(),
             slivers: [
               SliverAppBar(
@@ -56,7 +95,7 @@ class DashboardFragment extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                         child: Image.network(
                           controller.user.value.profilePicture ??
-                          'https://www.w3schools.com/howto/img_avatar2.png',
+                              'https://www.w3schools.com/howto/img_avatar2.png',
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -65,20 +104,21 @@ class DashboardFragment extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          
                           Flexible(
                             child: GestureDetector(
-                              onTap:controller.credits != 0 ? null:  (){
-                                Fluttertoast.showToast(
-                                  msg: "We're working on it! Credits purchase coming soon.",
-                                  toastLength: Toast.LENGTH_SHORT,
-                                  gravity: ToastGravity.BOTTOM,
-                                  backgroundColor: AppColors.solidCardColor,
-                                  textColor: Colors.white,
-                                  
-                                  fontSize: 14.0
-                                );
-                              },
+                              onTap: controller.credits != 0
+                                  ? null
+                                  : () {
+                                      Fluttertoast.showToast(
+                                          msg:
+                                              "We're working on it! Credits purchase coming soon.",
+                                          toastLength: Toast.LENGTH_SHORT,
+                                          gravity: ToastGravity.BOTTOM,
+                                          backgroundColor:
+                                              AppColors.solidCardColor,
+                                          textColor: Colors.white,
+                                          fontSize: 14.0);
+                                    },
                               child: Container(
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 10, vertical: 12),
@@ -86,8 +126,10 @@ class DashboardFragment extends StatelessWidget {
                                   color: Colors.white24.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: Text(controller.credits == 0 ? "Purchase Credits":
-                                  "${Strings.creditsRemaining}  ${controller.credits}",
+                                child: Text(
+                                  controller.credits == 0
+                                      ? "Purchase Credits"
+                                      : "${Strings.creditsRemaining}  ${controller.credits}",
                                   style: CustomTextTheme.regular14.copyWith(
                                     color: AppColors.whiteColor,
                                   ),
@@ -120,48 +162,58 @@ class DashboardFragment extends StatelessWidget {
                   ],
                 ),
 
-                // 🔹 Flexible space with background switching
-                flexibleSpace: LayoutBuilder(
-                  builder: (context, constraints) {
-                    // check if collapsed
-                    final collapsed =
-                        constraints.biggest.height <= kToolbarHeight + 20;
-
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: collapsed
-                            ? Colors.black.withOpacity(
-                                0.6) // 👈 collapsed background color
-                            : null,
-                        image: collapsed
-                            ? null
-                            : DecorationImage(
-                                image: AssetImage(Assets.headerbg),
-                                fit: BoxFit.cover,
-                              ),
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(30),
-                          bottomRight: Radius.circular(30),
-                        ),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (!collapsed) // 👈 show greeting only when expanded
-                            Padding(
-                              padding: const EdgeInsets.all(20),
-                              child: Obx(
-                                () => AnimatedGreeting(
-                                  userName: controller.user.value.firstName ?? "",
-                                  visible: controller.showGreeting.value,
-                                ),
+                flexibleSpace: Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage(Assets.headerbg),
+                      fit: BoxFit.cover,
+                    ),
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(30),
+                      bottomRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AnimatedSlide(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        offset:
+                            _isCollapsed ? const Offset(0, 0.3) : Offset.zero,
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 300),
+                          opacity: _isCollapsed ? 0 : 1,
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Obx(
+                              () => Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Hello, ${controller.user.value.firstName ?? 'User'}",
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    Strings.welcomeBack,
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                        ],
+                          ),
+                        ),
                       ),
-                    );
-                  },
+                    ],
+                  ),
                 ),
               ),
               // Content Gap
@@ -383,83 +435,12 @@ class DashboardFragment extends StatelessWidget {
               // Bottom spacing
               SliverPadding(
                 padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).padding.bottom + 80),
+                    bottom: MediaQuery.of(context).padding.bottom + 30),
               ),
             ],
           ),
         ],
       ),
     );
-  }
-}
-
-class AnimatedGreeting extends StatefulWidget {
-  final bool visible;
-  final String userName;
-  const AnimatedGreeting({required this.visible, required this.userName, super.key});
-
-  @override
-  State<AnimatedGreeting> createState() => _AnimatedGreetingState();
-}
-
-class _AnimatedGreetingState extends State<AnimatedGreeting>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _animation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 300));
-    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
-
-    if (widget.visible) {
-      _controller.forward();
-    }
-  }
-
-  @override
-  void didUpdateWidget(covariant AnimatedGreeting oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.visible != oldWidget.visible) {
-      widget.visible ? _controller.forward() : _controller.reverse();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizeTransition(
-      sizeFactor: _animation,
-      axisAlignment: -1.0,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 0),
-          Text(
-            "Hello, ${widget.userName.isEmpty ? 'User' : widget.userName}!",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            Strings.welcomeBack,
-            textAlign: TextAlign.left,
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 }

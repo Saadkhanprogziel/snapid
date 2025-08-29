@@ -1,7 +1,4 @@
 import 'package:get/get.dart';
-import 'package:snapid/keys_urls/local_storage.dart';
-import 'package:snapid/main.dart';
-import 'package:snapid/models/user/user_model.dart';
 import 'package:snapid/repositories/auth/auth_respository.dart';
 import 'package:snapid/routes/routes.dart';
 

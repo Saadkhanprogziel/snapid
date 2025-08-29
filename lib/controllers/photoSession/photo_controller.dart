@@ -26,6 +26,7 @@ class PhotoController extends GetxController {
   var selectedType = DocumentType.visa.obs;
   var selectedCountry = Rxn<Country>();
   final canDownload = false.obs;
+  
 
   final isLoading = false.obs;
   var photoCreationModelData = Rxn<PhotoCreationModel>();
@@ -45,11 +46,27 @@ class PhotoController extends GetxController {
           (success) {
             if (success.credits != 0) {
               canDownload.value = true;
-              print("controller.canDownload.value ${canDownload.value}sss");
+             
             }
           },
         ));
   }
+
+  // Add this method to your PhotoController class
+
+void initializeFromNavigation({bool fromHistory =false }) {
+
+  if (!fromHistory) {
+    
+    currentStep.value = 1;
+    // Optionally clear other data when starting fresh
+    clearAllPhotos();
+    selectedCountry.value = null;
+    photoCreationModelData.value = null;
+    processedWatermarkedUrl.value = '';
+    sessionId.value = '';
+  }
+}
 
   void selectCountry(Country country) {
     selectedCountry.value = country;

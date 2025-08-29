@@ -109,7 +109,7 @@ class SelectedPhotosScreen extends StatelessWidget {
                       return;
                       
                     }
-                    Get.toNamed(PrimaryRoute.photo_creation);
+                    Get.toNamed(PrimaryRoute.photo_creation,arguments: {"fromSelection": true});
                     controller.setStep(2);
                   },
                   text: "Continue",

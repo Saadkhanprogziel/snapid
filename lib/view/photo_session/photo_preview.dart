@@ -120,13 +120,13 @@ class PhotoPreview extends StatelessWidget {
                                 SpaceH20(),
                                 infoRow(
                                   "Country:",
-                                  "${controller.selectedCountry.value?.name ?? 'Select Country'}",
+                                  "${controller.photoCreationModelData.value?.countryName ?? ''}",
                                   flagPath:
-                                      controller.selectedCountry.value!.flag,
+                                      controller.selectedCountry.value?.flag ?? '',
                                 ),
                                 const Divider(color: Colors.white12),
                                 infoRow("Document:",
-                                    controller.selectedType.value.name),
+                                    controller.photoCreationModelData.value?.documentType ?? ''),
                                 const Divider(color: Colors.white12),
                                 infoRow("Size:", "50x50 Cm"),
                               ],

@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gallery_saver_plus/gallery_saver.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/history/history_controller.dart';
+import 'package:snapid/models/photo_creation/photo_creation_model.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
@@ -18,13 +20,8 @@ import 'package:snapid/view/photo_session/cached_image.dart';
 import 'package:snapid/controllers/photoSession/photo_controller.dart';
 
 class HistoryCustomCard extends StatelessWidget {
-  final String imageUrl;
-  final String sessionId;
-  final String country;
-  final String documentType;
-  final String date;
-  final String status;
-  final Color statusColor;
+  final PhotoCreationModel photoCreationModel;
+
   final GestureTapDownCallback? onMoreTapDown;
   final HistoryController controller;
 
@@ -33,15 +30,11 @@ class HistoryCustomCard extends StatelessWidget {
 
   const HistoryCustomCard({
     super.key,
-    required this.imageUrl,
-    required this.country,
-    required this.date,
-    required this.status,
-    required this.statusColor,
+   
     this.onMoreTapDown,
     this.onDelete,
-    required this.documentType,
-    required this.controller, required this.sessionId,
+
+    required this.controller, required this.photoCreationModel,
   });
 
   @override
@@ -68,7 +61,8 @@ class HistoryCustomCard extends StatelessWidget {
                     height: 130,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
-                      child: CustomCachedImage(imageUrl: imageUrl),
+                      child: CustomCachedImage(imageUrl: photoCreationModel.processedImageUrl ??
+                          photoCreationModel.processedWatermarkedUrl),
                     ),
                   ),
 
@@ -82,7 +76,7 @@ class HistoryCustomCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              country,
+                              photoCreationModel.countryName,
                               style: CustomTextTheme.regular22
                                   .copyWith(color: AppColors.whiteColor),
                             ),
@@ -96,7 +90,7 @@ class HistoryCustomCard extends StatelessWidget {
                                 ),
                                 const SpaceW10(),
                                 Text(
-                                  date,
+                                  formatDate(photoCreationModel.createdAt , pattern: 'dd MMM, yyyy'),
                                   style: CustomTextTheme.regular12
                                       .copyWith(color: AppColors.whiteColor),
                                 ),
@@ -112,17 +106,19 @@ class HistoryCustomCard extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 8),
                               decoration: BoxDecoration(
-                                color: statusColor,
+                                color: photoCreationModel.status == "CREDITED"
+                                    ? Colors.green.withValues(alpha: 0.5)
+                                    : Colors.orange.withValues(alpha: 0.6),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
-                                status,
+                                photoCreationModel.status,
                                 style: CustomTextTheme.regular14
                                     .copyWith(color: AppColors.whiteColor),
                               ),
                             ),
                             const SizedBox(height: 8),
-                            if (status != "CREDITED")
+                            if (photoCreationModel.status != "CREDITED")
                               Text(
                                 "Expire Within 7 days",
                                 style: CustomTextTheme.regular12
@@ -187,7 +183,7 @@ class HistoryCustomCard extends StatelessWidget {
                       ),
                       const SpaceW10(),
                       Text(
-                        documentType,
+                        photoCreationModel.documentType,
                         style: CustomTextTheme.regular12
                             .copyWith(color: AppColors.whiteColor),
                       ),
@@ -200,6 +196,17 @@ class HistoryCustomCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String formatDate(String? dateString, {String pattern = 'yyyy-MM-dd'}) {
+    if (dateString == null || dateString.isEmpty) return '';
+
+    try {
+      final dateTime = DateTime.parse(dateString);
+      return DateFormat(pattern).format(dateTime);
+    } catch (e) {
+      return dateString; // fallback in case parsing fails
+    }
   }
 
   PopupMenuItem<String> _buildMenuItem(
@@ -226,10 +233,11 @@ class HistoryCustomCard extends StatelessWidget {
   }
 
   void _handleDownload(HistoryController controller) async {
-    if (status != "CREDITED") {
+    if (photoCreationModel.status != "CREDITED") {
       _navigateToPaymentScreen();
     } else {
-      saveImageToGallery(imageUrl);
+      saveImageToGallery(photoCreationModel.processedImageUrl ??
+          photoCreationModel.processedWatermarkedUrl);
     }
   }
 
@@ -238,8 +246,12 @@ class HistoryCustomCard extends StatelessWidget {
 
     await photoController.getUserDetails();
 
-    photoController.processedWatermarkedUrl.value = imageUrl;
-    photoController.sessionId.value = sessionId;
+
+
+    photoController.processedWatermarkedUrl.value = photoCreationModel.processedWatermarkedUrl;
+    photoController.photoCreationModelData.value = photoCreationModel;
+
+    photoController.sessionId.value = photoCreationModel.id;
 
     photoController.setStep(4);
 

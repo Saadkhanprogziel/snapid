@@ -119,7 +119,7 @@ class ReportBugController extends GetxController {
       } else {
         Get.snackbar(
           "Error",
-          response.message ?? "Something went wrong",
+          response.message,
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red,
           colorText: Colors.white,

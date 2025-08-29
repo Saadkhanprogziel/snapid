@@ -88,31 +88,31 @@ class LoginController extends GetxController {
     }
   }
 
-  void _showBiometricDisabledDialog() {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Biometric Authentication'),
-        content: const Text(
-          'Biometric authentication is disabled. Would you like to enable it in settings or continue with email/password?'
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Get.back(); // Close dialog
-            },
-            child: const Text('Use Email/Password'),
-          ),
-          TextButton(
-            onPressed: () {
-              Get.back(); // Close dialog
-              Get.toNamed('/biometric-settings');
-            },
-            child: const Text('Enable Biometric'),
-          ),
-        ],
-      ),
-    );
-  }
+  // void _showBiometricDisabledDialog() {
+  //   Get.dialog(
+  //     AlertDialog(
+  //       title: const Text('Biometric Authentication'),
+  //       content: const Text(
+  //         'Biometric authentication is disabled. Would you like to enable it in settings or continue with email/password?'
+  //       ),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () {
+  //             Get.back(); // Close dialog
+  //           },
+  //           child: const Text('Use Email/Password'),
+  //         ),
+  //         TextButton(
+  //           onPressed: () {
+  //             Get.back(); // Close dialog
+  //             Get.toNamed('/biometric-settings');
+  //           },
+  //           child: const Text('Enable Biometric'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   void togglePasswordVisibility() {
     isPasswordObscured = !isPasswordObscured;

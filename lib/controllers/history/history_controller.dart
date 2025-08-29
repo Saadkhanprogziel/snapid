@@ -24,35 +24,51 @@ class HistoryController extends GetxController {
   var currentStatus = "ALL";
   var canDownload = false.obs;
 
-  final ScrollController scrollController = ScrollController();
+  // Make ScrollController nullable and lazy initialize
+  ScrollController? _scrollController;
+  ScrollController get scrollController {
+    if (_scrollController == null || _scrollController!.hasClients == false) {
+      _scrollController?.dispose(); // Dispose old one if exists
+      _scrollController = ScrollController();
+      _setupScrollListener();
+    }
+    return _scrollController!;
+  }
 
   @override
   void onInit() {
     super.onInit();
-    _setupScrollListener();
+    // Don't setup scroll listener here, it will be done when scrollController is first accessed
     // 👇 Fetch default history when controller is created
     fetchHistory(status: "ALL");
   }
 
-
-
   @override
   void onClose() {
-    scrollController.dispose();
+    _scrollController?.removeListener(_scrollListener);
+    _scrollController?.dispose();
+    _scrollController = null;
     super.onClose();
   }
 
+  // Extract scroll listener to a separate method to avoid memory leaks
+  void _scrollListener() {
+    if (_scrollController == null || !_scrollController!.hasClients) return;
+    
+    // Check if user has scrolled to near the bottom (80% of scroll)
+    if (_scrollController!.position.pixels >=
+            _scrollController!.position.maxScrollExtent * 0.8 &&
+        !isLoadingMore.value &&
+        hasMoreData.value &&
+        !isLoading.value) {
+      loadMoreData();
+    }
+  }
+
   void _setupScrollListener() {
-    scrollController.addListener(() {
-      // Check if user has scrolled to near the bottom (80% of scroll)
-      if (scrollController.position.pixels >=
-              scrollController.position.maxScrollExtent * 0.8 &&
-          !isLoadingMore.value &&
-          hasMoreData.value &&
-          !isLoading.value) {
-        loadMoreData();
-      }
-    });
+    if (_scrollController != null) {
+      _scrollController!.addListener(_scrollListener);
+    }
   }
 
   void onTabChanged(int index) {

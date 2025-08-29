@@ -1,11 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:get/get.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:snapid/keys_urls/urls.dart';
-import 'package:snapid/main.dart';
 import 'package:snapid/network/dio/interceptors/network_interceptor.dart';
-import 'package:snapid/routes/routes.dart';
 
 import '../network_response.dart';
 import 'interceptors/retry_interceptor.dart';

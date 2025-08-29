@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/home/home_controller.dart';
+import 'package:snapid/controllers/photoSession/photo_controller.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/view/assistant_fragment/assistant.dart';
 import 'package:snapid/view/dashboard_fragment/dashboard_fragment.dart';
@@ -82,6 +83,10 @@ class HomeScreen extends StatelessWidget {
               child: InkWell(
                 onTap: () {
                   Get.toNamed(PrimaryRoute.photo_creation);
+                  PhotoController photoController = Get.put(PhotoController());
+                  photoController.initializeFromNavigation(); 
+                  // photoController.currentStep.value = 1;
+
                 },
                 child: const SizedBox(
                   width: 70,
