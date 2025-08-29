@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -7,7 +6,6 @@ import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/auth/opt/otp_controller.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
-import 'package:snapid/utlis/message_popup.dart';
 
 class OtpScreen extends StatelessWidget {
   final OtpController controller = Get.put(OtpController());

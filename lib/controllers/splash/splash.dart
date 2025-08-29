@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:snapid/main.dart';
 import 'package:snapid/repositories/auth/auth_respository.dart';
