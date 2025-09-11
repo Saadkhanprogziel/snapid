@@ -49,11 +49,11 @@ class MyApp extends StatelessWidget {
             ),
           ),
           defaultScale: true,
-          // breakpoints: const [
-          //   ResponsiveBreakpoint.autoScaleDown(450, name: MOBILE),
-          //   ResponsiveBreakpoint.autoScaleDown(800, name: TABLET),
-          //   ResponsiveBreakpoint.autoScaleDown(1920, name: DESKTOP),
-          // ],
+          breakpoints: const [
+            ResponsiveBreakpoint.autoScaleDown(600, name: MOBILE),
+            ResponsiveBreakpoint.autoScaleDown(800, name: TABLET),
+            ResponsiveBreakpoint.autoScaleDown(1400, name: DESKTOP),
+          ],
         );
       },
       initialRoute: PrimaryRoute.splash,

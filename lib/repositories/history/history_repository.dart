@@ -17,8 +17,8 @@ class HistoryRepository {
       );
 
       if (response.success) {
-        // 👇 Extract "sessions" from inside "data"
-        print("Panzer $response");
+        
+ 
 
         final List<dynamic> sessions = response.data['data']['sessions'];
 

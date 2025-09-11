@@ -8,6 +8,7 @@ class CustomTextField extends StatelessWidget {
   final String hintText;
   final String label;
   final bool obscureText;
+  final bool enabled;
   final IconData? prefixIcon;
   final IconData? suffixIcon;
   final VoidCallback? onSuffixIconPressed;
@@ -20,6 +21,7 @@ class CustomTextField extends StatelessWidget {
     this.controller,
     required this.hintText,
     this.obscureText = false,
+    this.enabled = true,
     this.prefixIcon,
     this.suffixIcon,
     this.onSuffixIconPressed,
@@ -31,34 +33,41 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Pick color depending on enabled state
+    final Color textColor = enabled ? Colors.white : Colors.grey;
+    final Color hintColor = enabled ? Colors.white70 : Colors.grey.shade500;
+    final Color iconColor = enabled ? Colors.white70 : Colors.grey.shade600;
+    final Color fillColor =
+        enabled ? AppColors.cardColor : Colors.grey.shade800;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (label.isNotEmpty) ...[
           Text(
             label,
-            style: CustomTextTheme.regular16.copyWith(color: Colors.white),
+            style: CustomTextTheme.regular16.copyWith(color: textColor),
           ),
           SpaceH10(),
         ],
         TextFormField(
+          enabled: enabled,
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: textColor),
           onChanged: onChanged,
           validator: validator,
-          autovalidateMode:
-              AutovalidateMode.onUserInteraction, // ✅ validates only on field interaction
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           decoration: InputDecoration(
             counterText: '',
             hintText: hintText,
-            hintStyle: const TextStyle(color: Colors.white70),
+            hintStyle: TextStyle(color: hintColor),
             filled: true,
-            fillColor: AppColors.cardColor,
+            fillColor: fillColor,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
-              vertical: 22, // ✅ increased height
+              vertical: 22,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -79,15 +88,15 @@ class CustomTextField extends StatelessWidget {
             helperText: null,
             errorStyle: const TextStyle(
               color: Colors.red,
-              height: 0.8, // ✅ keeps error text close to field
+              height: 0.8,
             ),
             prefixIcon: prefixIcon != null
-                ? Icon(prefixIcon, color: Colors.white70)
+                ? Icon(prefixIcon, color: iconColor)
                 : null,
             suffixIcon: suffixIcon != null
                 ? IconButton(
-                    icon: Icon(suffixIcon, color: Colors.white54),
-                    onPressed: onSuffixIconPressed,
+                    icon: Icon(suffixIcon, color: iconColor),
+                    onPressed: enabled ? onSuffixIconPressed : null,
                   )
                 : null,
           ),

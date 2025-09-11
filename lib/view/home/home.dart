@@ -10,22 +10,62 @@ import 'package:snapid/view/dashboard_fragment/dashboard_fragment.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:snapid/view/history_fragment/history_fragment.dart';
 import 'package:snapid/view/profile_fragment/profile_fragment.dart';
-// import 'dashboard_screen.dart';
+
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
 
   final HomeController controller = Get.put(HomeController());
 
- final List<Widget> _screens = [
-  DashboardFragment(), 
-  HistoryFragment(),  
-  AssistantFragment(),
-  ProfileFragment(),    
-];
-
+  final List<Widget> _screens = [
+    DashboardFragment(),
+    HistoryFragment(),
+    AssistantFragment(),
+    ProfileFragment(),
+  ];
 
   @override
   Widget build(BuildContext context) {
+    final double deviceWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = deviceWidth <= 600;
+
+    if (!isMobile) {
+      return Scaffold(
+        body: Row(
+          children: [
+            Container(
+              width: 80,
+              color: Colors.black,
+              child: Obx(
+                () => NavigationRail(
+                  backgroundColor: Colors.black,
+                  selectedIndex: controller.selectedIndex.value,
+                  onDestinationSelected: (index) {
+                    if (index == 2) {
+                      Get.toNamed(PrimaryRoute.assistant);
+                    } else {
+                      controller.setIndex(index);
+                    }
+                  },
+                  labelType: NavigationRailLabelType.all,
+                  minWidth: 72,
+                  destinations: [
+                    buildNavDestination('assets/icons/home.svg', 'Home'),
+                    buildNavDestination('assets/icons/clock.svg', 'History'),
+                    buildNavDestination(
+                        'assets/icons/assistant.svg', 'Assistant'),
+                    buildNavDestination('assets/icons/profile.svg', 'Profile'),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              child: Obx(() => _screens[controller.selectedIndex.value]),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       extendBody: true,
       body: Obx(() => _screens[controller.selectedIndex.value]),
@@ -84,9 +124,7 @@ class HomeScreen extends StatelessWidget {
                 onTap: () {
                   Get.toNamed(PrimaryRoute.photo_creation);
                   PhotoController photoController = Get.put(PhotoController());
-                  photoController.initializeFromNavigation(); 
-                  // photoController.currentStep.value = 1;
-
+                  photoController.initializeFromNavigation();
                 },
                 child: const SizedBox(
                   width: 70,
@@ -140,5 +178,23 @@ class HomeScreen extends StatelessWidget {
         ),
       );
     });
+  }
+
+  NavigationRailDestination buildNavDestination(String svgPath, String label) {
+    return NavigationRailDestination(
+      icon: SvgPicture.asset(
+        svgPath,
+        height: 24,
+        width: 24,
+        color: Colors.white70,
+      ),
+      selectedIcon: SvgPicture.asset(
+        svgPath,
+        height: 24,
+        width: 24,
+        color: const Color(0xFF7861FF),
+      ),
+      label: Text(label),
+    );
   }
 }

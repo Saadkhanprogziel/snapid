@@ -83,7 +83,7 @@ class _ProcessingLoadingScreenState extends State<ProcessingLoadingScreen> {
             // Simple sparkle icons (static)
               Image.asset(
             "assets/images/preprocessing.gif",
-            height: 60,
+            height: 100,
           ),
             
             SizedBox(height: 60),

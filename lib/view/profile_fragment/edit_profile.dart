@@ -256,29 +256,16 @@ class EditProfile extends StatelessWidget {
                                         ),
                                         const SizedBox(height: 16),
 
-                                        /// Email
+                                        /// Email (Read-only)
                                         CustomTextField(
                                           controller:
                                               controller.emailController,
-                                          onChanged: (value) => controller
-                                              .editProfile.email = value,
                                           label: 'Email',
                                           hintText: 'johndoe@example.com',
                                           prefixIcon: Icons.email,
                                           keyboardType:
                                               TextInputType.emailAddress,
-                                          validator: (value) {
-                                            if (value == null ||
-                                                value.isEmpty) {
-                                              return 'Email is required';
-                                            }
-                                            if (!RegExp(
-                                                    r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                                .hasMatch(value)) {
-                                              return 'Please enter a valid email';
-                                            }
-                                            return null;
-                                          },
+                                          enabled: false,  // Make field uneditable
                                         ),
                                         const SizedBox(height: 16),
 
@@ -352,7 +339,7 @@ class EditProfile extends StatelessWidget {
                                         ),
                                         const SizedBox(height: 16),
 
-                                        /// Phone Number
+                                        /// Phone Number (Read-only)
                                         Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -376,20 +363,11 @@ class EditProfile extends StatelessWidget {
                                                   child: CustomTextField(
                                                     controller: controller
                                                         .phoneController,
-                                                    onChanged: (value) =>
-                                                        controller.editProfile
-                                                            .phone = value,
                                                     hintText: 'Phone Number',
                                                     prefixIcon: Icons.phone,
                                                     keyboardType:
                                                         TextInputType.phone,
-                                                    validator: (value) => value ==
-                                                                null ||
-                                                            value.isEmpty
-                                                        ? 'Phone number is required'
-                                                        : (value.length < 10
-                                                            ? 'Phone number must be at least 10 digits'
-                                                            : null),
+                                                    enabled: false,  // Make field uneditable
                                                   ),
                                                 ),
                                               ],

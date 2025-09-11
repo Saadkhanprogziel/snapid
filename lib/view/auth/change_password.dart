@@ -8,7 +8,6 @@ import 'package:snapid/utlis/custom_elevated_button.dart';
 import 'package:snapid/utlis/custom_header.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
 import 'package:snapid/utlis/custom_text_field.dart';
-import 'package:snapid/utlis/message_popup.dart';
 
 class ChangePassword extends StatelessWidget {
   ChangePassword({super.key});
