@@ -15,6 +15,7 @@ class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
 
   final HomeController controller = Get.put(HomeController());
+  final RxBool isExpanded = false.obs;
 
   final List<Widget> _screens = [
     DashboardFragment(),
@@ -26,38 +27,73 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double deviceWidth = MediaQuery.of(context).size.width;
-    final bool isMobile = deviceWidth <= 600;
+    final bool isMobile = deviceWidth <= 800;
 
     if (!isMobile) {
       return Scaffold(
         body: Row(
           children: [
-            Container(
-              width: 80,
-              color: Colors.black,
-              child: Obx(
-                () => NavigationRail(
-                  backgroundColor: Colors.black,
-                  selectedIndex: controller.selectedIndex.value,
-                  onDestinationSelected: (index) {
-                    if (index == 2) {
-                      Get.toNamed(PrimaryRoute.assistant);
-                    } else {
-                      controller.setIndex(index);
-                    }
-                  },
-                  labelType: NavigationRailLabelType.all,
-                  minWidth: 72,
-                  destinations: [
-                    buildNavDestination('assets/icons/home.svg', 'Home'),
-                    buildNavDestination('assets/icons/clock.svg', 'History'),
-                    buildNavDestination(
-                        'assets/icons/assistant.svg', 'Assistant'),
-                    buildNavDestination('assets/icons/profile.svg', 'Profile'),
-                  ],
-                ),
-              ),
-            ),
+            Obx(() => AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeInOut,
+                  width: isExpanded.value ? 250 : 80,
+                  color: Colors.black,
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 60,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Row(
+                          mainAxisAlignment: isExpanded.value
+                              ? MainAxisAlignment.spaceBetween
+                              : MainAxisAlignment.center,
+                          children: [
+                            if (isExpanded.value)
+                              const Text(
+                                'SnapID',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            IconButton(
+                              onPressed: () => isExpanded.toggle(),
+                              icon: Container(
+                                padding: EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: AppColors.primaryColor),
+                                child: Icon(
+                                  isExpanded.value
+                                      ? Icons.arrow_back_ios_rounded
+                                      : Icons.arrow_forward_ios_rounded,
+                                  color: Colors.white,
+                                  size: 14,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          children: [
+                            buildExpandableNavItem('assets/icons/home.svg',
+                                'Home', 0, isExpanded.value),
+                            buildExpandableNavItem('assets/icons/clock.svg',
+                                'History', 1, isExpanded.value),
+                            buildExpandableNavItem('assets/icons/assistant.svg',
+                                'Assistant', 2, isExpanded.value),
+                            buildExpandableNavItem('assets/icons/profile.svg',
+                                'Profile', 3, isExpanded.value),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
             Expanded(
               child: Obx(() => _screens[controller.selectedIndex.value]),
             ),
@@ -142,6 +178,71 @@ class HomeScreen extends StatelessWidget {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
+  }
+
+  Widget buildExpandableNavItem(
+      String svgPath, String label, int index, bool expanded) {
+    return Obx(() {
+      final isSelected = controller.selectedIndex.value == index;
+
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        child: Material(
+          color: isSelected
+              ? const Color.fromARGB(75, 121, 97, 255)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(18),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: () {
+              if (index == 2) {
+                Get.toNamed(PrimaryRoute.assistant);
+              } else {
+                controller.setIndex(index);
+              }
+            },
+            child: Container(
+              height: 56,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  SvgPicture.asset(
+                    svgPath,
+                    height: 24,
+                    width: 24,
+                    colorFilter: ColorFilter.mode(
+                      isSelected ? const Color(0xFF7861FF) : Colors.white70,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  if (expanded) ...[
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: AnimatedOpacity(
+                        duration: const Duration(milliseconds: 300),
+                        opacity: expanded ? 1.0 : 0.0,
+                        child: Text(
+                          label,
+                          style: TextStyle(
+                            color: isSelected
+                                ? const Color(0xFF7861FF)
+                                : Colors.white70,
+                            fontSize: 16,
+                            fontWeight: isSelected
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    });
   }
 
   Widget buildNavBarItem(String svgPath, String label, int index) {

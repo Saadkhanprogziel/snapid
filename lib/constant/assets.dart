@@ -6,6 +6,7 @@ class Assets {
   static const String welcomeBg = 'assets/images/welcome_bg.png';
   static const String appBg = 'assets/images/app_bg.png';
   static const String onboard3 = 'assets/images/intro.png';
+  static const String onboardItems = 'assets/images/onboardItems.png';
   static const String boardBg = 'assets/images/board_bg.png';
   static const String board1 = 'assets/images/board1.png';
   static const String board2 = 'assets/images/board2.png';

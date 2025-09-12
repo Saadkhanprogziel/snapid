@@ -43,6 +43,8 @@ class Strings {
   static const String helloUser = "Hello, John! 👋";
   static const String welcomeBack =
       "Welcome back! Let's get your next\nphoto ready in just a few steps.";
+  static const String welcomeBackDesktop =
+      "Welcome back! Let's get your next photo ready in just a few steps.";
 
   static const String uploadOrTakePhoto = "Upload or Take a Photo";
   static const String uploadPhoto = "Upload Photo";

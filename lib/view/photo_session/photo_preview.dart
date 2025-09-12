@@ -18,8 +18,15 @@ import 'package:snapid/utlis/custom_spaces.dart';
 import 'package:snapid/utlis/screenBg.dart';
 import 'package:snapid/view/photo_session/cached_image.dart';
 
-class PhotoPreview extends StatelessWidget {
+class PhotoPreview extends StatefulWidget {
   const PhotoPreview({super.key});
+
+  @override
+  State<PhotoPreview> createState() => _PhotoPreviewState();
+}
+
+class _PhotoPreviewState extends State<PhotoPreview> {
+  bool _isSaving = false;
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +35,7 @@ class PhotoPreview extends StatelessWidget {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return; // Back navigation already happened — do nothing
-
+        if (didPop) return;
         Get.toNamed(PrimaryRoute.home);
       },
       child: Scaffold(
@@ -61,18 +67,24 @@ class PhotoPreview extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          CustomElevatedButton(
-                            onPressed: () async {
-                              final url = controller.photoCreationModelData
-                                      .value!.processedImageUrl ??
-                                  "";
-                              if (url.isNotEmpty) {
-                                await saveImageToGallery(url);
-                              }
-                            },
-                            text: "Download Photo",
-                            minHeight: 60,
-                          ),
+                          _isSaving
+                              ? const Center(child: CircularProgressIndicator(color: AppColors.primaryColor,))
+                              : CustomElevatedButton(
+                                  onPressed: () {
+                                    if (_isSaving) return;
+                                    final url = controller.photoCreationModelData
+                                            .value!.processedImageUrl ??
+                                        "";
+                                    if (url.isNotEmpty) {
+                                      setState(() => _isSaving = true);
+                                      saveImageToGallery(url).whenComplete(() {
+                                        setState(() => _isSaving = false);
+                                      });
+                                    }
+                                  },
+                                  text: "Download Photo",
+                                  minHeight: 60,
+                                ),
                           SpaceH20(),
                           CustomOutlineButton(
                             onPressed: () async {
@@ -156,7 +168,7 @@ class PhotoPreview extends StatelessWidget {
 
   Future<void> saveImageToGallery(String url) async {
     try {
-      // Try multiple permissions to ensure compatibility across Android versions
+    
       PermissionStatus status;
       
       if (Platform.isAndroid) {

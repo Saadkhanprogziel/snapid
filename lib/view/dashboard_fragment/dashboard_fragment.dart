@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -9,11 +10,12 @@ import 'package:snapid/constant/colors.dart';
 import 'package:snapid/constant/strings.dart';
 import 'package:snapid/controllers/dashboard/dashboard_controller.dart';
 import 'package:snapid/controllers/photoSession/photo_controller.dart';
+import 'package:snapid/utlis/custom_bullets.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_card.dart';
-import 'package:snapid/utlis/custom_elevated_button.dart';
-import 'package:snapid/utlis/custom_outline_button.dart';
+import 'package:snapid/utlis/custom_spaces.dart';
+import 'package:snapid/utlis/image_with_icon.dart';
 
 class DashboardFragment extends StatefulWidget {
   const DashboardFragment({super.key});
@@ -44,8 +46,8 @@ class _DashboardFragmentState extends State<DashboardFragment> {
     const double toolbarHeight = 100;
     const double collapseThreshold = expandedHeight - toolbarHeight - 20;
 
-    bool shouldCollapse =
-        _scrollController.hasClients && _scrollController.offset > collapseThreshold;
+    bool shouldCollapse = _scrollController.hasClients &&
+        _scrollController.offset > collapseThreshold;
 
     if (shouldCollapse != _isCollapsed) {
       setState(() {
@@ -61,8 +63,17 @@ class _DashboardFragmentState extends State<DashboardFragment> {
 
     return LayoutBuilder(builder: (context, constraints) {
       final double deviceWidth = MediaQuery.of(context).size.width;
-        bool isMobile = deviceWidth <= 600;
-        print("$deviceWidth $isMobile");
+      bool isMobile = deviceWidth <= 800;
+      bool isDesktop = deviceWidth < 1200;
+      print("$deviceWidth $isMobile");
+      final List<String> guidelineImages = [
+        'assets/images/correct_image_1.jpg',
+        'assets/images/correct_image_1.jpg',
+        'assets/images/correct_image_1.jpg',
+        'assets/images/correct_image_1.jpg',
+        'assets/images/correct_image_1.jpg',
+        'assets/images/correct_image_1.jpg',
+      ];
 
       return Scaffold(
         body: Stack(
@@ -82,31 +93,54 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                 !isMobile
                     ? SliverToBoxAdapter(
                         child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                          decoration: BoxDecoration(
+                            color: AppColors.cardColor,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 30, horizontal: 20),
+                          margin: EdgeInsets.symmetric(
+                              vertical: 30, horizontal: 20),
                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Obx(
-                                () => Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Hello, ${controller.user.value.firstName ?? 'User'}",
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
+                              Flexible(
+                                child: Obx(
+                                  () => Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Hello, ${controller.user.value.firstName ?? 'User'}",
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      Strings.welcomeBack,
-                                      style: const TextStyle(
-                                        color: Colors.white70,
-                                        fontSize: 10,
+                                      Text(
+                                        Strings.welcomeBackDesktop,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
+                              SpaceW20(),
+                              GestureDetector(
+                                onTap: () {},
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 14),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.cardColor,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: SvgPicture.asset(Assets.bellIcon),
+                                ),
+                              )
                             ],
                           ),
                         ),
@@ -128,7 +162,7 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                                 borderRadius: BorderRadius.circular(8),
                                 child: Image.network(
                                   controller.user.value.profilePicture ??
-                                      'https://www.w3schools.com/howto/img_avatar2.png',
+                                      'https:://www.w3schools.com/howto/img_avatar2.png',
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -145,7 +179,8 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                                               Fluttertoast.showToast(
                                                   msg:
                                                       "We're working on it! Credits purchase coming soon.",
-                                                  toastLength: Toast.LENGTH_SHORT,
+                                                  toastLength:
+                                                      Toast.LENGTH_SHORT,
                                                   gravity: ToastGravity.BOTTOM,
                                                   backgroundColor:
                                                       AppColors.solidCardColor,
@@ -156,14 +191,17 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 10, vertical: 12),
                                         decoration: BoxDecoration(
-                                          color: Colors.white24.withOpacity(0.1),
-                                          borderRadius: BorderRadius.circular(8),
+                                          color:
+                                              Colors.white24.withOpacity(0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                         ),
                                         child: Text(
                                           controller.credits == 0
                                               ? "Purchase Credits"
                                               : "${Strings.creditsRemaining}  ${controller.credits}",
-                                          style: CustomTextTheme.regular14.copyWith(
+                                          style: CustomTextTheme.regular14
+                                              .copyWith(
                                             color: AppColors.whiteColor,
                                           ),
                                           overflow: TextOverflow.ellipsis,
@@ -212,7 +250,9 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                               AnimatedSlide(
                                 duration: const Duration(milliseconds: 300),
                                 curve: Curves.easeInOut,
-                                offset: _isCollapsed ? const Offset(0, 0.3) : Offset.zero,
+                                offset: _isCollapsed
+                                    ? const Offset(0, 0.3)
+                                    : Offset.zero,
                                 child: AnimatedOpacity(
                                   duration: const Duration(milliseconds: 300),
                                   opacity: _isCollapsed ? 0 : 1,
@@ -220,7 +260,8 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                                     padding: const EdgeInsets.all(20),
                                     child: Obx(
                                       () => Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             "Hello, ${controller.user.value.firstName ?? 'User'}",
@@ -247,117 +288,307 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                           ),
                         ),
                       ),
+                if(isMobile) 
                 SliverToBoxAdapter(
                   child: SizedBox(height: 40),
                 ),
                 SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(25),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: AppColors.cardColor,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Column(
-                              children: [
-                                Text(
-                                  Strings.uploadOrTakePhoto,
-                                  style: CustomTextTheme.regular18.copyWith(
-                                    color: AppColors.whiteColor,
-                                  ),
-                                ),
-                                SizedBox(height: 20),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Image.asset(Assets.sample1),
-                                          SizedBox(height: 12),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 3),
-                                            child: SizedBox(
-                                              height: 50,
-                                              width: double.infinity,
-                                              child: CustomOutlineButton(
-                                                onPressed: () {
-                                                  Get.toNamed(PrimaryRoute.selectedPhoto);
-                                                },
-                                                label: Strings.uploadPhoto,
-                                                icon: Icons.file_upload_outlined,
-                                                iconColor: AppColors.whiteColor,
-                                                textColor: AppColors.whiteColor,
-                                                borderColor: Colors.white24,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final double cardHeight = 420;
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 25),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: SizedBox(
+                                height: cardHeight,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20.0),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(25),
+                                    child: BackdropFilter(
+                                      filter: ImageFilter.blur(
+                                          sigmaX: 12, sigmaY: 12),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(24),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.cardColor,
+                                          borderRadius: BorderRadius.circular(25),
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "For best results, choose a well lit photo showing your full face and both ears.",
+                                              textAlign: TextAlign.center,
+                                              style: CustomTextTheme.regular16
+                                                  .copyWith(
+                                                color: AppColors.whiteColor,
+                                                height: 1.3,
                                               ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    SizedBox(width: 2),
-                                    Expanded(
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Image.asset(Assets.sample2),
-                                          SizedBox(height: 12),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 3),
-                                            child: SizedBox(
-                                              height: 50,
-                                              width: double.infinity,
-                                              child: CustomElevatedButton(
-                                                onPressed: () async {
-                                                  photoController.capturePhotosSimple();
-                                                },
-                                                text: Strings.takePhoto,
-                                              ),
+                                            const SizedBox(height: 20),
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Container(
+                                                    height: 120,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.transparent,
+                                                      border: Border.all(
+                                                        color: Colors.white
+                                                            .withOpacity(0.3),
+                                                        width: 1.5,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              16),
+                                                    ),
+                                                    child: Material(
+                                                      color: Colors.transparent,
+                                                      child: InkWell(
+                                                        onTap: () async {
+                                                          photoController
+                                                              .capturePhotosSimple();
+                                                        },
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                16),
+                                                        child: Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Icon(
+                                                              Icons
+                                                                  .camera_alt_outlined,
+                                                              color: AppColors
+                                                                  .whiteColor,
+                                                              size: 28,
+                                                            ),
+                                                            const SizedBox(
+                                                                height: 8),
+                                                            Text(
+                                                              "Take a Photo",
+                                                              style:
+                                                                  CustomTextTheme
+                                                                      .regular16
+                                                                      .copyWith(
+                                                                color: AppColors
+                                                                    .whiteColor,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 16),
+                                                Expanded(
+                                                  child: Container(
+                                                    height: 120,
+                                                    decoration: BoxDecoration(
+                                                      gradient:
+                                                          const LinearGradient(
+                                                        begin: Alignment.topLeft,
+                                                        end:
+                                                            Alignment.bottomRight,
+                                                        colors: [
+                                                          Color(0xFF6366F1),
+                                                          Color(0xFF8B5CF6),
+                                                        ],
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              16),
+                                                    ),
+                                                    child: Material(
+                                                      color: Colors.transparent,
+                                                      child: InkWell(
+                                                        onTap: () {
+                                                          Get.toNamed(PrimaryRoute
+                                                              .selectedPhoto);
+                                                        },
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                16),
+                                                        child: Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Icon(
+                                                              Icons
+                                                                  .cloud_upload_outlined,
+                                                              color: Colors.white,
+                                                              size: 28,
+                                                            ),
+                                                            const SizedBox(
+                                                                height: 8),
+                                                            Text(
+                                                              "Upload Photo",
+                                                              style:
+                                                                  CustomTextTheme
+                                                                      .regular16
+                                                                      .copyWith(
+                                                                color:
+                                                                    Colors.white,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 10),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    GestureDetector(
-                                      child: SvgPicture.asset(
-                                        Assets.hintIcon,
-                                        height: 14,
-                                        width: 14,
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {},
-                                      child: Text(
-                                        Strings.photoGuidelines,
-                                        style: CustomTextTheme.regular14.copyWith(
-                                          color: AppColors.whiteColor,
+                                            // const SizedBox(height: 30),
+                                            BulletList(
+                                              fontWeight: FontWeight.w400,
+                                              items: [
+                                                "Use a neutral expression",
+                                                "Avoid glasses, hats, and shadows",
+                                                "Background doesn't matter (we'll remove it)",
+                                              ],
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                GestureDetector(
+                                                  child: SvgPicture.asset(
+                                                    Assets.hintIcon,
+                                                    height: 14,
+                                                    width: 14,
+                                                  ),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () {},
+                                                  style: TextButton.styleFrom(
+                                                    padding: EdgeInsets.symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 4),
+                                                  ),
+                                                  child: Text(
+                                                    Strings.photoGuidelines,
+                                                    style: CustomTextTheme
+                                                        .regular14
+                                                        .copyWith(
+                                                      color: AppColors.whiteColor,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
+                            if(kIsWeb && !isDesktop)
+                            Expanded(
+                              child: SizedBox(
+                                height: cardHeight,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(25),
+                                  child: BackdropFilter(
+                                    filter:
+                                        ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(25),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.cardColor,
+                                        borderRadius: BorderRadius.circular(25),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Center(
+                                            child: Text(
+                                              "Photo Guidelines",
+                                              textAlign: TextAlign.center,
+                                              style: CustomTextTheme.regular16
+                                                  .copyWith(
+                                                color: AppColors.whiteColor,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(height: 20),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              ImageWithIcon(
+                                                imagePath:
+                                                    'assets/images/correct_image_1.jpg',
+                                                icon: Icons.check_circle,
+                                                iconColor: Colors.green,
+                                              ),
+                                              const SizedBox(width: 12),
+                                              ImageWithIcon(
+                                                imagePath:
+                                                    'assets/images/correct_image_1.jpg',
+                                                icon: Icons.check_circle,
+                                                iconColor: Colors.green,
+                                              ),
+                                              const SizedBox(width: 12),
+                                              ImageWithIcon(
+                                                imagePath:
+                                                    'assets/images/correct_image_1.jpg',
+                                                icon: Icons.check_circle,
+                                                iconColor: Colors.green,
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 20),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              ImageWithIcon(
+                                                imagePath:
+                                                    'assets/images/correct_image_1.jpg',
+                                                icon: Icons.close,
+                                                iconColor: Colors.redAccent,
+                                              ),
+                                              const SizedBox(width: 12),
+                                              ImageWithIcon(
+                                                imagePath:
+                                                    'assets/images/correct_image_1.jpg',
+                                                icon: Icons.close,
+                                                iconColor: Colors.redAccent,
+                                              ),
+                                              const SizedBox(width: 12),
+                                              ImageWithIcon(
+                                                imagePath:
+                                                    'assets/images/correct_image_1.jpg',
+                                                icon: Icons.close,
+                                                iconColor: Colors.redAccent,
+                                              ),
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                 ),
                 SliverToBoxAdapter(
