@@ -8,6 +8,7 @@ import 'package:snapid/controllers/notification/notification_controller.dart';
 
 import 'package:snapid/controllers/onboarding/onbording_controller.dart';
 import 'package:snapid/controllers/photoSession/photo_controller.dart';
+import 'package:snapid/controllers/profile/profile_controller.dart';
 import 'package:snapid/controllers/security_settting/security_setting_controller.dart';
 import 'package:snapid/controllers/splash/splash.dart';
 
@@ -21,6 +22,7 @@ class ControllerBindings extends Bindings {
     Get.lazyPut(() => HomeController());
     Get.lazyPut(() => ForgotPasswordController());
     Get.lazyPut(() => SecuritySettingController());
+    Get.lazyPut(() => ProfileController());
     Get.lazyPut(() => HistoryController(), fenix: true);
     Get.lazyPut<DashboardController>(() => DashboardController());
 

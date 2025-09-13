@@ -13,7 +13,7 @@ class ImageWithIcon extends StatelessWidget {
     required this.imagePath,
     required this.icon,
     required this.iconColor,
-    this.imageWidth = 150,
+    this.imageWidth = 130,
     this.borderRadius = 16,
     this.iconSize = 28,
   }) : super(key: key);

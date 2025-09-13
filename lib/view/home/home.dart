@@ -1,10 +1,18 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/home/home_controller.dart';
 import 'package:snapid/controllers/photoSession/photo_controller.dart';
+import 'package:snapid/controllers/profile/profile_controller.dart';
 import 'package:snapid/routes/routes.dart';
+import 'package:snapid/theme/text_theme.dart';
+import 'package:snapid/utlis/custom_dialog_pop.dart';
+import 'package:snapid/utlis/custom_elevated_button.dart';
+import 'package:snapid/utlis/custom_spaces.dart';
 import 'package:snapid/view/assistant_fragment/assistant.dart';
 import 'package:snapid/view/dashboard_fragment/dashboard_fragment.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -31,71 +39,221 @@ class HomeScreen extends StatelessWidget {
 
     if (!isMobile) {
       return Scaffold(
-        body: Row(
+        body: Stack(
+          clipBehavior: Clip.none,
           children: [
-            Obx(() => AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeInOut,
-                  width: isExpanded.value ? 250 : 80,
-                  color: Colors.black,
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 60,
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Row(
-                          mainAxisAlignment: isExpanded.value
-                              ? MainAxisAlignment.spaceBetween
-                              : MainAxisAlignment.center,
+            Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(Assets.appBg),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            Row(
+              children: [
+                Obx(
+                  () => ClipRRect(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        width: isExpanded.value ? 250 : 80,
+                        color: AppColors.cardColor,
+                        child: Column(
                           children: [
-                            if (isExpanded.value)
-                              const Text(
-                                'SnapID',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            const SizedBox(height: 30),
+                            Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child: Row(
+                                mainAxisAlignment: isExpanded.value
+                                    ? MainAxisAlignment.start
+                                    : MainAxisAlignment.center,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Image.network(
+                                      controller.user.value.profilePicture ??
+                                          'https://www.w3schools.com/howto/img_avatar2.png',
+                                      height: 50,
+                                      width: 50,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Container(
+                                          height: 50,
+                                          width: 50,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[300],
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
+                                          child: Icon(
+                                            Icons.person,
+                                            color: Colors.grey[600],
+                                            size: 24,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  SpaceW10(),
+                                  if (isExpanded.value)
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            controller.user.value.firstName ??
+                                                'User',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            controller.user.value.email ??
+                                                'user@example.com',
+                                            style: TextStyle(
+                                              color: Colors.white70,
+                                              fontSize: 12,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                ],
                               ),
-                            IconButton(
-                              onPressed: () => isExpanded.toggle(),
-                              icon: Container(
-                                padding: EdgeInsets.all(8),
+                            ),
+                            const SizedBox(height: 20),
+                            Expanded(
+                              child: ListView(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
+                                children: [
+                                  ExpandableNavItem('assets/icons/home.svg',
+                                      'Home', 0, isExpanded.value),
+                                  ExpandableNavItem('assets/icons/clock.svg',
+                                      'History', 1, isExpanded.value),
+                                  ExpandableNavItem(
+                                      'assets/icons/assistant.svg',
+                                      'Assistant',
+                                      2,
+                                      isExpanded.value),
+                                  ExpandableNavItem('assets/icons/profile.svg',
+                                      'Profile', 3, isExpanded.value),
+                                ],
+                              ),
+                            ),
+                            Spacer(),
+                            InkWell(
+                              onTap: () {
+                                var profileController =
+                                    Get.find<ProfileController>();
+
+                                Get.dialog(
+                                  BackdropFilter(
+                                    filter: ImageFilter.blur(
+                                        sigmaX: 15, sigmaY: 15),
+                                    child: CustomDialogPop(
+                                      solidBtnLabel: "Logout",
+                                      title: "Log Out ?",
+                                      message:
+                                          "Are you sure you want to log out of your Snapid account?",
+                                      svgPath: Assets.logout,
+                                      isActionPopUp: true,
+                                      backgroundColor: AppColors.cardColor,
+                                      onCancel: () => Get.back(),
+                                      onPressed: () {
+                                        profileController.logout();
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 4),
                                 decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: AppColors.primaryColor),
-                                child: Icon(
-                                  isExpanded.value
-                                      ? Icons.arrow_back_ios_rounded
-                                      : Icons.arrow_forward_ios_rounded,
-                                  color: Colors.white,
-                                  size: 14,
+                                  color: AppColors.backBtnColor,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                height: 50,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 14),
+                                child: Row(
+                                  children: [
+                                    SvgPicture.asset(
+                                      Assets.logout,
+                                      height: 20,
+                                      width: 20,
+                                      colorFilter: ColorFilter.mode(
+                                        Colors.white,
+                                        BlendMode.srcIn,
+                                      ),
+                                    ),
+                                    if (isExpanded.value) ...[
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: AnimatedOpacity(
+                                          duration:
+                                              const Duration(milliseconds: 300),
+                                          opacity: isExpanded.value ? 1.0 : 0.0,
+                                          child: Text(
+                                            "Logout",
+                                            style: CustomTextTheme.regular12
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
                                 ),
                               ),
                             ),
+                            SpaceH20()
                           ],
                         ),
                       ),
-                      Expanded(
-                        child: ListView(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          children: [
-                            buildExpandableNavItem('assets/icons/home.svg',
-                                'Home', 0, isExpanded.value),
-                            buildExpandableNavItem('assets/icons/clock.svg',
-                                'History', 1, isExpanded.value),
-                            buildExpandableNavItem('assets/icons/assistant.svg',
-                                'Assistant', 2, isExpanded.value),
-                            buildExpandableNavItem('assets/icons/profile.svg',
-                                'Profile', 3, isExpanded.value),
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                )),
-            Expanded(
-              child: Obx(() => _screens[controller.selectedIndex.value]),
+                ),
+                Expanded(
+                  child: Obx(() => _screens[controller.selectedIndex.value]),
+                ),
+              ],
+            ),
+            Obx(
+              () => AnimatedPositioned(
+                duration: const Duration(milliseconds: 300),
+                left: (isExpanded.value ? 250 : 85) - 20,
+                top: 50,
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.primaryColor,
+                  ),
+                  child: IconButton(
+                    onPressed: () => isExpanded.toggle(),
+                    icon: Icon(
+                      isExpanded.value
+                          ? Icons.arrow_back_ios_rounded
+                          : Icons.arrow_forward_ios_rounded,
+                      color: Colors.white,
+                      size: 14,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -104,7 +262,19 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       extendBody: true,
-      body: Obx(() => _screens[controller.selectedIndex.value]),
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(Assets.appBg),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Obx(() => _screens[controller.selectedIndex.value]),
+        ],
+      ),
       bottomNavigationBar: ClipRRect(
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(24),
@@ -127,11 +297,11 @@ class HomeScreen extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                buildNavBarItem('assets/icons/home.svg', 'Home', 0),
-                buildNavBarItem('assets/icons/clock.svg', 'History', 1),
+                navBarItem('assets/icons/home.svg', 'Home', 0),
+                navBarItem('assets/icons/clock.svg', 'History', 1),
                 const SizedBox(width: 20),
-                buildNavBarItem('assets/icons/assistant.svg', 'Assistant', 2),
-                buildNavBarItem('assets/icons/profile.svg', 'Profile', 3),
+                navBarItem('assets/icons/assistant.svg', 'Assistant', 2),
+                navBarItem('assets/icons/profile.svg', 'Profile', 3),
               ],
             ),
           ),
@@ -180,7 +350,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget buildExpandableNavItem(
+  Widget ExpandableNavItem(
       String svgPath, String label, int index, bool expanded) {
     return Obx(() {
       final isSelected = controller.selectedIndex.value == index;
@@ -191,7 +361,7 @@ class HomeScreen extends StatelessWidget {
           color: isSelected
               ? const Color.fromARGB(75, 121, 97, 255)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(12),
           child: InkWell(
             borderRadius: BorderRadius.circular(12),
             onTap: () {
@@ -245,7 +415,7 @@ class HomeScreen extends StatelessWidget {
     });
   }
 
-  Widget buildNavBarItem(String svgPath, String label, int index) {
+  Widget navBarItem(String svgPath, String label, int index) {
     return Obx(() {
       final isSelected = controller.selectedIndex.value == index;
 
