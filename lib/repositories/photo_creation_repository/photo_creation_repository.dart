@@ -1,10 +1,13 @@
-import 'dart:io';
-
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:dartz/dartz.dart';
 import 'package:snapid/keys_urls/urls.dart';
 import 'package:snapid/main.dart';
 import 'package:snapid/models/photo_creation/photo_creation_model.dart';
 import 'package:snapid/network/network_repository.dart';
+import 'dart:io' show File;
 
 class PhotoCreationRepository {
   final NetworkRepository _networkRepository = NetworkRepository();
@@ -12,7 +15,7 @@ class PhotoCreationRepository {
   Future<Either<String, PhotoCreationModel>> createPhotoSession({
     required String countryCode,
     required String documentType,
-    required List<File> userSessionPhotos,
+    required List<XFile> userSessionPhotos,
     required String platform,
     double? customWidth,
     double? customHeight,
@@ -21,13 +24,12 @@ class PhotoCreationRepository {
       print("Creating photo session with ${userSessionPhotos.length} photos");
       print("Document Type: $documentType");
 
-      // Prepare fields for FormData
+      // Prepare fields
       final fields = <String, dynamic>{
         'countryCode': countryCode,
         'platform': platform,
       };
 
-      // Only send documentType if it's not MANUAL_INPUT
       if (documentType != 'MANUAL_INPUT') {
         fields['documentType'] = documentType;
       }
@@ -39,21 +41,37 @@ class PhotoCreationRepository {
         fields['customHeight'] = customHeight;
       }
 
+      // Prepare files differently for web vs mobile
+      final Map<String, dynamic> multipleFiles = {};
+
+      if (kIsWeb) {
+        final fileList = <Map<String, dynamic>>[];
+
+        for (final photo in userSessionPhotos) {
+          Uint8List bytes = await photo.readAsBytes();
+          fileList.add({
+            'bytes': bytes,
+            'filename': photo.name,
+          });
+        }
+
+        multipleFiles['userSessionPhotos'] = fileList;
+      } else {
+        final files = userSessionPhotos.map((x) => File(x.path)).toList();
+        multipleFiles['userSessionPhotos'] = files;
+      }
+
       final formData = await _networkRepository.createFormData(
         fields: fields,
-        multipleFiles: {
-          'userSessionPhotos': userSessionPhotos,
-        },
+        multipleFiles: multipleFiles,
       );
 
-      // Prepare headers
       final token = appStorage.read("token") ?? "";
       final headers = <String, String>{
         'Content-Type': 'multipart/form-data',
         'Authorization': 'Bearer $token',
       };
 
-      // Make the API call using NetworkRepository
       final response = await _networkRepository.postMultipart(
         url: '$apiUrl/session/start-session',
         formData: formData,
@@ -76,7 +94,6 @@ class PhotoCreationRepository {
     required String id,
   }) async {
     try {
-      // Call API endpoint (replace with actual download URL)
       final response = await _networkRepository.post(
         url: '/session/download-photo',
         data: {'sessionID': id},

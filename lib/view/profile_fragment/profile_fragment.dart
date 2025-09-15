@@ -156,7 +156,7 @@ class ProfileFragment extends StatelessWidget {
 
                             return GridView.builder(
                               shrinkWrap: true,
-                              itemCount: 5,
+                              itemCount: 4,
                               physics: const NeverScrollableScrollPhysics(),
                               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: isMobile ? 1 : 3,
@@ -166,12 +166,12 @@ class ProfileFragment extends StatelessWidget {
                               ),
                               itemBuilder: (context, index) {
                                 final items = [
-                                  SettingItem(
-                                    svgPath: Assets.history,
-                                    title: 'My Orders',
-                                    subtitle: 'View History And Manage Downloads',
-                                    onTap: () => Get.toNamed(PrimaryRoute.history),
-                                  ),
+                                  // SettingItem(
+                                  //   svgPath: Assets.history,
+                                  //   title: 'My Orders',
+                                  //   subtitle: 'View History And Manage Downloads',
+                                  //   onTap: () => Get.toNamed(PrimaryRoute.history),
+                                  // ),
                                   SettingItem(
                                     svgPath: Assets.measurement,
                                     title: 'Measurement Unit',

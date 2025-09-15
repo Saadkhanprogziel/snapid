@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,12 +22,12 @@ enum Unit { cm, inch }
 class PhotoController extends GetxController {
   PhotoCreationRepository photoCreationRepository = PhotoCreationRepository();
   AuthRespository authRespository = AuthRespository();
+
   RxInt currentStep = 1.obs;
   var selectedUnit = Unit.cm.obs;
   var selectedType = DocumentType.visa.obs;
   var selectedCountry = Rxn<Country>();
   final canDownload = false.obs;
-  
 
   final isLoading = false.obs;
   var photoCreationModelData = Rxn<PhotoCreationModel>();
@@ -45,27 +47,21 @@ class PhotoController extends GetxController {
           (success) {
             if (success.credits != 0) {
               canDownload.value = true;
-             
             }
           },
         ));
   }
 
-  // Add this method to your PhotoController class
-
-void initializeFromNavigation({bool fromHistory =false }) {
-
-  if (!fromHistory) {
-    
-    currentStep.value = 1;
-    // Optionally clear other data when starting fresh
-    clearAllPhotos();
-    selectedCountry.value = null;
-    photoCreationModelData.value = null;
-    processedWatermarkedUrl.value = '';
-    sessionId.value = '';
+  void initializeFromNavigation({bool fromHistory = false}) {
+    if (!fromHistory) {
+      currentStep.value = 1;
+      clearAllPhotos();
+      selectedCountry.value = null;
+      photoCreationModelData.value = null;
+      processedWatermarkedUrl.value = '';
+      sessionId.value = '';
+    }
   }
-}
 
   void selectCountry(Country country) {
     selectedCountry.value = country;
@@ -85,51 +81,50 @@ void initializeFromNavigation({bool fromHistory =false }) {
   }
 
   Future<void> goToNextStep() async {
-  if (currentStep.value < 4) {
-    if (currentStep.value == 2 && selectedCountry.value == null) {
-      Get.snackbar(
-        'Missing Information',
-        'Please select a country before proceeding.',
-        backgroundColor: AppColors.red,
-        colorText: AppColors.whiteColor,
-      );
-      return;
-    }
-
-    if (currentStep.value == 2 && selectedCountry.value != null) {
-      if (capturedPhotos.isEmpty) {
+    if (currentStep.value < 4) {
+      if (currentStep.value == 2 && selectedCountry.value == null) {
         Get.snackbar(
-          'Missing Photos',
-          'Please capture some photos before proceeding.',
+          'Missing Information',
+          'Please select a country before proceeding.',
           backgroundColor: AppColors.red,
           colorText: AppColors.whiteColor,
         );
         return;
       }
-      print("Creating photo session...");
-      bool success = await createSession();
-      if (!success) return;
-      print("Reviewing photos... ${photoCreationModelData.value?.processedWatermarkedUrl}");
 
-      currentStep.value++;
-      return;
-    }
+      if (currentStep.value == 2 && selectedCountry.value != null) {
+        if (capturedPhotos.isEmpty) {
+          Get.snackbar(
+            'Missing Photos',
+            'Please capture some photos before proceeding.',
+            backgroundColor: AppColors.red,
+            colorText: AppColors.whiteColor,
+          );
+          return;
+        }
+        print("Creating photo session...");
+        bool success = await createSession();
+        if (!success) return;
+        print(
+            "Reviewing photos... ${photoCreationModelData.value?.processedWatermarkedUrl}");
 
-    if (currentStep.value == 3) {
-      if (photoCreationModelData.value?.canDownloadImage == true) {
-        await downloadImageById(photoCreationModelData.value!.id);
-        return; // stop here
-      } else {
         currentStep.value++;
         return;
       }
+
+      if (currentStep.value == 3) {
+        if (photoCreationModelData.value?.canDownloadImage == true) {
+          await downloadImageById(photoCreationModelData.value!.id);
+          return; // stop here
+        } else {
+          currentStep.value++;
+          return;
+        }
+      }
+
+      currentStep.value++;
     }
-
-    // default increment
-    currentStep.value++;
   }
-}
-
 
   void goToPreviousStep() {
     if (currentStep.value > 1) {
@@ -138,29 +133,29 @@ void initializeFromNavigation({bool fromHistory =false }) {
   }
 
   Future<void> downloadImageById(String id) async {
-  isLoading.value = true;
+    isLoading.value = true;
 
-  await photoCreationRepository.downloadImage(id: id).then((response) {
-    response.fold((error) {
-      Get.snackbar(
-        'Error',
-        error,
-        backgroundColor: AppColors.red,
-        colorText: AppColors.whiteColor,
-      );
-      isLoading.value = false;
-    }, (photoCreationModel) {
-      isLoading.value = false;
-      photoCreationModelData.value = photoCreationModel;
-      _storeSessionData(photoCreationModel);
-      Get.toNamed(PrimaryRoute.photo_preview);
+    await photoCreationRepository.downloadImage(id: id).then((response) {
+      response.fold((error) {
+        Get.snackbar(
+          'Error',
+          error,
+          backgroundColor: AppColors.red,
+          colorText: AppColors.whiteColor,
+        );
+        isLoading.value = false;
+      }, (photoCreationModel) {
+        isLoading.value = false;
+        photoCreationModelData.value = photoCreationModel;
+        _storeSessionData(photoCreationModel);
+        Get.toNamed(PrimaryRoute.photo_preview);
+      });
     });
-  });
-}
+  }
 
-
+  /// ✅ Updated: Use XFile for cross-platform
   final selectedPhotos = <ImageProvider>[].obs;
-  final capturedPhotos = <File>[].obs;
+  final capturedPhotos = <XFile>[].obs;
   final ImagePicker _picker = ImagePicker();
   final isCapturingPhotos = false.obs;
 
@@ -169,9 +164,16 @@ void initializeFromNavigation({bool fromHistory =false }) {
 
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      final file = File(pickedFile.path);
-      selectedPhotos.add(FileImage(file));
-      capturedPhotos.add(file); // ✅ Also add to capturedPhotos for consistency
+      capturedPhotos.add(pickedFile);
+
+      if (kIsWeb) {
+        Uint8List bytes = await pickedFile.readAsBytes();
+        selectedPhotos.add(MemoryImage(bytes));
+      } else {
+        selectedPhotos.add(Image.file(
+          File(pickedFile.path),
+        ).image);
+      }
     }
   }
 
@@ -192,9 +194,17 @@ void initializeFromNavigation({bool fromHistory =false }) {
         );
 
         if (pickedFile != null) {
-          final file = File(pickedFile.path);
-          capturedPhotos.add(file);
-          selectedPhotos.add(FileImage(file));
+          capturedPhotos.add(pickedFile);
+
+          if (kIsWeb) {
+            Uint8List bytes = await pickedFile.readAsBytes();
+            selectedPhotos.add(MemoryImage(bytes));
+          } else {
+            selectedPhotos.add(Image.file(
+              File(pickedFile.path),
+            ).image);
+          }
+
           photoCount++;
 
           if (photoCount < 5) {
@@ -225,13 +235,11 @@ void initializeFromNavigation({bool fromHistory =false }) {
     }
   }
 
-// Modify your createSession method to use the processing loading
   Future<bool> createSession() async {
     try {
-      isProcessingLoading.value = true; // Show processing screen
-      isLoading.value = false; // Hide regular loading
+      isProcessingLoading.value = true;
+      isLoading.value = false;
 
-      // ✅ Validate inputs before making the request
       if (capturedPhotos.isEmpty) {
         Get.snackbar(
           'Error',
@@ -257,7 +265,7 @@ void initializeFromNavigation({bool fromHistory =false }) {
         countryCode: selectedCountry.value!.code,
         documentType: _mapDocumentType(selectedType.value),
         userSessionPhotos: capturedPhotos,
-        platform: 'MOBILE_APP',
+        platform: kIsWeb ? 'WEB_APP' : 'MOBILE_APP',
         customHeight: double.tryParse(heightController.text) ?? 0.0,
         customWidth: double.tryParse(widthController.text) ?? 0.0,
       );
@@ -298,12 +306,11 @@ void initializeFromNavigation({bool fromHistory =false }) {
       );
       return false;
     } finally {
-      isProcessingLoading.value = false; // Hide processing screen
+      isProcessingLoading.value = false;
       isLoading.value = false;
     }
   }
 
-  /// ✅ Helper to format types correctly
   String _mapDocumentType(DocumentType type) {
     switch (type) {
       case DocumentType.passport:
@@ -318,7 +325,6 @@ void initializeFromNavigation({bool fromHistory =false }) {
   }
 
   void _storeSessionData(PhotoCreationModel model) {
-    // Save as JSON string
     appStorage.write('photoSession', model.toJson());
   }
 

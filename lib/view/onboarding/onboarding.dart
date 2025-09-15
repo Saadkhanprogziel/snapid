@@ -88,7 +88,7 @@ class OnBoardingView extends GetView<OnBoardingController> {
               },
             ),
 
-            // Buttons at the bottom (fixed)
+            
             Positioned(
               bottom: 30,
               left: 16,
@@ -96,7 +96,7 @@ class OnBoardingView extends GetView<OnBoardingController> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Skip button (conditionally hidden)
+                  
                   Obx(() {
                     return Visibility(
                       visible: !controller.isLastPage,
@@ -115,7 +115,7 @@ class OnBoardingView extends GetView<OnBoardingController> {
                     );
                   }),
 
-                  // Next button (always visible)
+                  
                   SizedBox(
                     height: 54,
                     width: 54,

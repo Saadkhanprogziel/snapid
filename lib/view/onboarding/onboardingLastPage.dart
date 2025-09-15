@@ -26,7 +26,7 @@ class OnboardingLastPage extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 00),
           child: Column(
             children: [
               const SizedBox(height: 80),
@@ -66,6 +66,7 @@ class OnboardingLastPage extends StatelessWidget {
                     ),
                   ),
                 ),
+                Spacer(),
               Center(
                 child: SizedBox(
                   width: 160,

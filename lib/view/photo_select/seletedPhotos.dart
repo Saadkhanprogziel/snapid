@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart'; // for kIsWeb
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
@@ -11,6 +12,9 @@ class SelectedPhotosScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double deviceWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = deviceWidth <= 800;
+    final bool isDesktop = deviceWidth >= 1000;
     return Scaffold(
       body: Stack(
         children: [
@@ -35,13 +39,17 @@ class SelectedPhotosScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Obx(() {
                     final count = controller.selectedPhotos.length;
+
                     return GridView.builder(
                       itemCount: 5,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
+                        crossAxisCount: isMobile ? 2 : 3,
                         crossAxisSpacing: 15,
                         mainAxisSpacing: 15,
+                        childAspectRatio: !isDesktop ? 1 : 1.8,
                       ),
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
                       itemBuilder: (ctx, index) {
                         if (index < count) {
                           final img = controller.selectedPhotos[index];
@@ -53,6 +61,22 @@ class SelectedPhotosScreen extends StatelessWidget {
                                   image: img,
                                   fit: BoxFit.cover,
                                   width: double.infinity,
+                                  height: double.infinity,
+                                  // ✅ Add error handling for web compatibility
+                                  errorBuilder: (context, error, stackTrace) {
+                                    print('Image load error: $error');
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[300],
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Icon(
+                                        Icons.error,
+                                        color: Colors.red,
+                                        size: 32,
+                                      ),
+                                    );
+                                  },
                                 ),
                               ),
                               Positioned(
@@ -89,34 +113,38 @@ class SelectedPhotosScreen extends StatelessWidget {
                   }),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 10),
               Text(
                 "You can upload up to 5 photos for best AI results.",
                 style: TextStyle(color: Colors.white60),
               ),
               SizedBox(height: 10),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
+                padding:  EdgeInsets.symmetric(horizontal: isDesktop ? 200:40),
                 child: CustomElevatedButton(
                   onPressed: () {
                     if (controller.selectedPhotos.isEmpty) {
-                      Get.snackbar("No Photos", "Please select at least one photo.", backgroundColor: Colors.red, colorText: Colors.white);
+                      Get.snackbar(
+                          "No Photos", "Please select at least one photo.",
+                          backgroundColor: Colors.red, colorText: Colors.white);
                       return;
-                      
                     }
-                     if (controller.selectedPhotos.length < 3) {
-                      Get.snackbar("Insufficient Photos", "Please select at least three photos for better results.", backgroundColor: Colors.orange, colorText: Colors.white);
+                    if (controller.selectedPhotos.length < 3) {
+                      Get.snackbar("Insufficient Photos",
+                          "Please select at least three photos for better results.",
+                          backgroundColor: Colors.orange,
+                          colorText: Colors.white);
                       return;
-                      
                     }
-                    Get.toNamed(PrimaryRoute.photo_creation,arguments: {"fromSelection": true});
+                    Get.toNamed(PrimaryRoute.photo_creation,
+                        arguments: {"fromSelection": true});
                     controller.setStep(2);
                   },
                   text: "Continue",
-                  minHeight: 60,
+                  minHeight: isDesktop ? 70:60,
                 ),
               ),
-              SizedBox(height: 20), // Add bottom spacing if needed
+              SizedBox(height: 20),
             ],
           ),
         ],

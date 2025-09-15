@@ -285,8 +285,8 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                             child: SizedBox(
                               height: cardHeight,
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 20.0),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: isMobile ? 0: 20.0),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(25),
                                   child: BackdropFilter(
