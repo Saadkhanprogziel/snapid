@@ -185,7 +185,7 @@ class HistoryFragment extends StatelessWidget {
       final dateTime = DateTime.parse(dateString);
       return DateFormat(pattern).format(dateTime);
     } catch (e) {
-      return dateString; // fallback in case parsing fails
+      return dateString; 
     }
   }
 }
