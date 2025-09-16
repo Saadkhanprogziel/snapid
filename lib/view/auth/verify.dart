@@ -26,7 +26,8 @@ class _VerificationScreenState extends State<VerificationScreen> {
   @override
   void initState() {
     super.initState();
-    final args = Get.arguments as Map<String, dynamic>;
+    // ✅ Safe conversion to Map<String, dynamic>
+    final args = Map<String, dynamic>.from(Get.arguments ?? {});
     email = args["email"] ?? "";
     phone = args["phone"] ?? "";
   }
@@ -36,7 +37,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background Image
+          // Background
           SizedBox.expand(
             child: Image.asset(
               Assets.appBg,
@@ -44,17 +45,73 @@ class _VerificationScreenState extends State<VerificationScreen> {
             ),
           ),
 
-          // Foreground Content
-          Column(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              bool isWideScreen = constraints.maxWidth > 800;
+
+              if (isWideScreen) {
+                // ✅ Desktop/Web layout
+                return Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Row(
+                    children: [
+                      // Left side text/logo
+                      Expanded(
+                        flex: 1,
+                        child: Center(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Image.asset(
+                              Assets.login_image,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: _buildOptionsCard(context, isWideScreen),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                // ✅ Mobile layout
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: _buildOptionsCard(context, isWideScreen),
+                    ),
+                  ],
+                );
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// ✅ Extracted card with radio options + button
+  Widget _buildOptionsCard(BuildContext context, bool isWideScreen) {
+    return Center(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(25),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // SnapID Title Section
               Column(
                 children: [
                   Text(
                     "Verify Your Identity",
-                    style: CustomTextTheme.headingLarge
-                        .copyWith(fontSize: 32, color: AppColors.whiteColor),
+                    style: CustomTextTheme.headingLarge.copyWith(
+                      fontSize: 32,
+                      color: AppColors.whiteColor,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -62,124 +119,102 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     textAlign: TextAlign.center,
                     style: CustomTextTheme.regular16.copyWith(
                       color: Colors.white70,
-                      // fontSize: 16,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 50),
-
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: ClipRRect(
+              const SizedBox(height: 40),
+              Container(
+                width: isWideScreen ? 600 : 450, // desktop max width
+                padding: const EdgeInsets.all(30),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(20, 223, 222, 222),
                   borderRadius: BorderRadius.circular(25),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 30, vertical: 30),
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(10, 223, 222, 222),
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                _buildRadioTile(
-                                  value: ContactMethod.email,
-                                  groupValue: _selectedMethod,
-                                  title: "Send code to email",
-                                  subtitle: email,
-                                ),
-                                SizedBox(height: 40),
-                                _buildRadioTile(
-                                  value: ContactMethod.mobile,
-                                  groupValue: _selectedMethod,
-                                  title: "Send code to mobile",
-                                  subtitle: phone,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
                 ),
-              ),
-              SizedBox(height: 40),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    final identifier =
-                        _selectedMethod == ContactMethod.email ? email : phone;
-                    final sendTo = _selectedMethod == ContactMethod.email
-                        ? "emailAddress"
-                        : "phoneNumber";
-
-                    final result =
-                        await authRepository.sendOtp(identifier, sendTo);
-
-                    result.fold(
-                      (failureMessage) {
-                        // LEFT = error
-                        Get.snackbar(
-                          "Error",
-                          failureMessage,
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: Colors.redAccent,
-                          colorText: Colors.white,
-                        );
-                      },
-                      (success) {
-                        // RIGHT = success
-                        Get.toNamed(
-                          PrimaryRoute.otpScreen,
-                          arguments: {
-                            "identifier": identifier,
-                          },
-                        );
-                      },
-                    );
-
-                     Get.toNamed(
-                          PrimaryRoute.otpScreen,
-                          arguments: {
-                            "identifier": identifier,
-                          },
-                        );
-                    
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryColor,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildRadioTile(
+                      value: ContactMethod.email,
+                      groupValue: _selectedMethod,
+                      title: "Send code to email",
+                      subtitle: email.isNotEmpty ? email : "No email provided",
                     ),
-                    minimumSize:
-                        const Size.fromHeight(60), // Changed from 50 to 55
-                  ),
-                  child: Text(
-                    "Continue",
-                    style: CustomTextTheme.regular16
-                        .copyWith(color: AppColors.whiteColor),
-                  ),
+                    const SizedBox(height: 40),
+                    _buildRadioTile(
+                      value: ContactMethod.mobile,
+                      groupValue: _selectedMethod,
+                      title: "Send code to mobile",
+                      subtitle: phone.isNotEmpty ? phone : "No phone provided",
+                    ),
+                    const SizedBox(height: 40),
+                    ElevatedButton(
+                      onPressed: () async {
+                        final identifier =
+                            _selectedMethod == ContactMethod.email
+                                ? email
+                                : phone;
+                        final sendTo = _selectedMethod == ContactMethod.email
+                            ? "emailAddress"
+                            : "phoneNumber";
+
+                        if (identifier.isEmpty) {
+                          Get.snackbar(
+                            "Error",
+                            "No ${sendTo == 'emailAddress' ? 'email' : 'phone'} provided.",
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: Colors.redAccent,
+                            colorText: Colors.white,
+                          );
+                          return;
+                        }
+
+                        final result =
+                            await authRepository.sendOtp(identifier, sendTo);
+
+                        result.fold(
+                          (failureMessage) {
+                            Get.snackbar(
+                              "Error",
+                              failureMessage,
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.redAccent,
+                              colorText: Colors.white,
+                            );
+                          },
+                          (success) {
+                            Get.toNamed(
+                              PrimaryRoute.otpScreen,
+                              arguments: {"identifier": identifier},
+                            );
+                          },
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryColor,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        minimumSize: const Size.fromHeight(60),
+                      ),
+                      child: Text(
+                        "Continue",
+                        style: CustomTextTheme.regular16
+                            .copyWith(color: AppColors.whiteColor),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
 
+  /// ✅ Custom radio tile
   Widget _buildRadioTile({
     required ContactMethod value,
     required ContactMethod groupValue,
@@ -196,7 +231,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
           Container(
             height: 20,
             width: 20,
-            margin: EdgeInsets.only(right: 16),
+            margin: const EdgeInsets.only(right: 16),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
@@ -210,7 +245,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     child: Container(
                       height: 8,
                       width: 8,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.white,
                       ),
@@ -226,7 +261,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 style: CustomTextTheme.bold16
                     .copyWith(color: AppColors.whiteColor),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 subtitle,
                 style: TextStyle(color: Colors.grey[400], fontSize: 14),

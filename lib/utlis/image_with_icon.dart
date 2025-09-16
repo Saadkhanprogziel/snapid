@@ -5,6 +5,7 @@ class ImageWithIcon extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
   final double imageWidth;
+  final double imageHeight; // new
   final double borderRadius;
   final double iconSize;
 
@@ -14,6 +15,7 @@ class ImageWithIcon extends StatelessWidget {
     required this.icon,
     required this.iconColor,
     this.imageWidth = 130,
+    this.imageHeight = 130, // default height
     this.borderRadius = 16,
     this.iconSize = 28,
   }) : super(key: key);
@@ -27,6 +29,8 @@ class ImageWithIcon extends StatelessWidget {
           child: Image.asset(
             imagePath,
             width: imageWidth,
+            height: imageHeight, // added height
+            fit: BoxFit.cover,   // ensures uniform sizing
           ),
         ),
         Positioned(

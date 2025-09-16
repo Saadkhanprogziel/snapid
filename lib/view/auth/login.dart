@@ -11,12 +11,12 @@ import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
 import 'package:snapid/utlis/custom_header.dart';
+import 'package:snapid/utlis/custom_spaces.dart';
 import 'package:snapid/utlis/custom_text_field.dart';
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
 
-  
   final _mobileFormKey = GlobalKey<FormState>();
   final _webFormKey = GlobalKey<FormState>();
 
@@ -27,11 +27,20 @@ class LoginScreen extends StatelessWidget {
 
     return GetBuilder<LoginController>(
       init: LoginController(),
+      autoRemove: false, // Prevent auto removal
+      global: true, // Make it globally accessible
       builder: (logincontroller) {
+        // Safety check to ensure controller is not disposed
+        if (!Get.isRegistered<LoginController>()) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
         return Scaffold(
           body: Stack(
             children: [
-              
+              // Background image
               SizedBox.expand(
                 child: Image.asset(
                   Assets.appBg,
@@ -39,7 +48,7 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
 
-              
+              // Responsive layout
               isMobile
                   ? _buildMobileLayout(logincontroller)
                   : _buildWebLayout(logincontroller),
@@ -53,7 +62,7 @@ class LoginScreen extends StatelessWidget {
   Widget _buildMobileLayout(LoginController logincontroller) {
     return Stack(
       children: [
-        
+        // Background image
         SizedBox.expand(
           child: Image.asset(
             Assets.appBg,
@@ -63,7 +72,7 @@ class LoginScreen extends StatelessWidget {
         Column(
           children: [
             const Spacer(flex: 1),
-            
+            // Logo and title
             Column(
               children: [
                 Text(
@@ -102,9 +111,7 @@ class LoginScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               child: Column(
                 children: [
-                  CustomHeader(
-                    showBackButton: true,
-                  ),
+                  SpaceH40(),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 60),
                     child: Row(
@@ -143,7 +150,7 @@ class LoginScreen extends StatelessWidget {
                           ),
                         ),
                     
-                        
+                        // Sign-in form
                         Expanded(
                           flex: 1,
                           child: Container(
@@ -180,7 +187,7 @@ class LoginScreen extends StatelessWidget {
           ),
           const SizedBox(height: 40),
 
-          
+          // Email field
           CustomTextField(
             controller: logincontroller.emailController,
             hintText: Strings.enterEmail,
@@ -200,13 +207,13 @@ class LoginScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          
+          // Password field
           CustomTextField(
             controller: logincontroller.passwordController,
             hintText: Strings.yourPassword,
-            obscureText: logincontroller.isPasswordObscured,
+            obscureText: logincontroller.isPasswordObscured.value,
             prefixIcon: Icons.lock,
-            suffixIcon: logincontroller.isPasswordObscured
+            suffixIcon: logincontroller.isPasswordObscured.value
                 ? Icons.visibility
                 : Icons.visibility_off,
             onSuffixIconPressed: () {
@@ -238,7 +245,8 @@ class LoginScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-   
+
+          // Sign in button
           logincontroller.isLoading
               ? const SizedBox(
                   height: 60,
@@ -259,7 +267,7 @@ class LoginScreen extends StatelessWidget {
                 ),
           const SizedBox(height: 30),
 
-          
+          // Divider
           Row(
             children: [
               Expanded(child: Divider(color: Colors.white24)),
@@ -275,16 +283,14 @@ class LoginScreen extends StatelessWidget {
           ),
           const SizedBox(height: 30),
 
-          
+          // Social login buttons
           Row(
             children: [
-              
+              // Google button
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: () {
-                    
                     try {
-                      
                       debugPrint('Google sign in pressed');
                     } catch (e) {
                       debugPrint('Error in Google sign in: $e');
@@ -310,13 +316,11 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              
+              // Apple button
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: () {
-                    
                     try {
-                      
                       debugPrint('Apple sign in pressed');
                     } catch (e) {
                       debugPrint('Error in Apple sign in: $e');
@@ -345,7 +349,7 @@ class LoginScreen extends StatelessWidget {
           ),
           const SizedBox(height: 40),
 
-          
+          // Sign up link
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -397,7 +401,7 @@ class LoginScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  
+                  // Email field
                   CustomTextField(
                     controller: logincontroller.emailController,
                     hintText: Strings.enterEmail,
@@ -417,13 +421,13 @@ class LoginScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
 
-                  
+                  // Password field
                   CustomTextField(
                     controller: logincontroller.passwordController,
                     hintText: Strings.yourPassword,
-                    obscureText: logincontroller.isPasswordObscured,
+                    obscureText: logincontroller.isPasswordObscured.value,
                     prefixIcon: Icons.lock,
-                    suffixIcon: logincontroller.isPasswordObscured
+                    suffixIcon: logincontroller.isPasswordObscured.value
                         ? Icons.visibility
                         : Icons.visibility_off,
                     onSuffixIconPressed: () {
@@ -441,7 +445,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
 
-                  
+                  // Forgot password
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
@@ -457,7 +461,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
 
-                  
+                  // Sign in button
                   logincontroller.isLoading
                       ? const SizedBox(
                           height: 60,
@@ -479,8 +483,10 @@ class LoginScreen extends StatelessWidget {
 
                   const SizedBox(height: 30),
 
+                  // Biometric button
                   GetBuilder<BiometricController>(
                     init: BiometricController(),
+                    autoRemove: false, // Prevent auto removal
                     builder: (biometricController) {
                       var isBiometricEnabled =
                           appStorage.read('biometric_enabled') ?? false;
@@ -532,11 +538,10 @@ class LoginScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  
+                  // Google sign in
                   OutlinedButton.icon(
                     onPressed: () {
                       try {
-                        
                         debugPrint('Google sign in pressed');
                       } catch (e) {
                         debugPrint('Error in Google sign in: $e');
@@ -562,11 +567,10 @@ class LoginScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  
+                  // Apple sign in
                   OutlinedButton.icon(
                     onPressed: () {
                       try {
-                        
                         debugPrint('Apple sign in pressed');
                       } catch (e) {
                         debugPrint('Error in Apple sign in: $e');
@@ -592,7 +596,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  
+                  // Sign up link
                   Padding(
                     padding: const EdgeInsets.only(bottom: 16.0),
                     child: Row(

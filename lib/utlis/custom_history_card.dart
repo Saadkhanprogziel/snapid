@@ -39,7 +39,7 @@ Widget build(BuildContext context) {
 
   // Responsive adjustments
   final imageSize = isMobile ? 130.0 : 100.0;
-  final cardPadding = isMobile ? 20.0 : 14.0;
+  final cardPadding = isMobile ? 15.0 : 14.0;
   final titleStyle = isMobile
       ? CustomTextTheme.regular22.copyWith(color: AppColors.whiteColor)
       : CustomTextTheme.regular18.copyWith(color: AppColors.whiteColor);
@@ -56,6 +56,7 @@ Widget build(BuildContext context) {
       filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: cardPadding, vertical: cardPadding),
+        constraints: BoxConstraints(minHeight: isMobile ? 220 : 170),
         decoration: BoxDecoration(
           color: AppColors.cardColor,
           borderRadius: BorderRadius.circular(20),

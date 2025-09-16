@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/profile/edit_profile_controller.dart';
 import 'package:snapid/theme/text_theme.dart';
-// import 'package:snapid/utlis/countries.dart';
-// import 'package:snapid/utlis/country_model.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
 import 'package:snapid/utlis/custom_header.dart';
 import 'package:snapid/utlis/custom_outline_button.dart';
@@ -432,94 +429,4 @@ class EditProfile extends StatelessWidget {
     );
   }
 
-  // void _showCountryCodePicker(EditProfileController controller) {
-  //   showModalBottomSheet(
-  //     context: Get.context!,
-  //     backgroundColor: const Color.fromARGB(255, 41, 42, 50),
-  //     shape: const RoundedRectangleBorder(
-  //       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-  //     ),
-  //     builder: (_) {
-  //       TextEditingController searchController = TextEditingController();
-  //       RxList<Country> filteredCountries = allCountries.obs;
-
-  //       return Padding(
-  //         padding: EdgeInsets.only(
-  //           bottom: MediaQuery.of(Get.context!).viewInsets.bottom,
-  //         ),
-  //         child: Container(
-  //           padding: const EdgeInsets.all(16),
-  //           child: Column(
-  //             mainAxisSize: MainAxisSize.min,
-  //             children: [
-  //               Text(
-  //                 'Select Country',
-  //                 style: CustomTextTheme.regular16.copyWith(
-  //                   color: AppColors.whiteColor,
-  //                   fontWeight: FontWeight.w600,
-  //                 ),
-  //               ),
-  //               const SizedBox(height: 16),
-  //               TextField(
-  //                 controller: searchController,
-  //                 cursorColor: AppColors.whiteColor,
-  //                 style: TextStyle(color: AppColors.whiteColor),
-  //                 decoration: InputDecoration(
-  //                   prefixIcon: Icon(Icons.search, color: AppColors.whiteColor),
-  //                   labelText: 'Search country or dial code',
-  //                   labelStyle: TextStyle(color: AppColors.whiteColor),
-  //                   enabledBorder: OutlineInputBorder(
-  //                     borderSide: BorderSide(color: Colors.grey.shade800),
-  //                     borderRadius: BorderRadius.circular(12),
-  //                   ),
-  //                   focusedBorder: OutlineInputBorder(
-  //                     borderSide: const BorderSide(color: Colors.white),
-  //                     borderRadius: BorderRadius.circular(12),
-  //                   ),
-  //                 ),
-  //                 onChanged: (value) {
-  //                   filteredCountries.value = allCountries
-  //                       .where((c) =>
-  //                           c.name
-  //                               .toLowerCase()
-  //                               .contains(value.toLowerCase()) ||
-  //                           c.dialCode.contains(value))
-  //                       .toList();
-  //                 },
-  //               ),
-  //               const SizedBox(height: 16),
-  //               Obx(
-  //                 () => SizedBox(
-  //                   height: 300,
-  //                   child: ListView.builder(
-  //                     itemCount: filteredCountries.length,
-  //                     itemBuilder: (_, index) {
-  //                       final country = filteredCountries[index];
-  //                       return ListTile(
-  //                         leading: SvgPicture.asset(
-  //                           country.flag,
-  //                           width: 24,
-  //                           height: 24,
-  //                         ),
-  //                         title: Text(
-  //                           '${country.name} (${country.dialCode})',
-  //                           style: CustomTextTheme.regular14.copyWith(
-  //                             color: AppColors.whiteColor,
-  //                           ),
-  //                         ),
-  //                         onTap: () {
-  //                           controller.selectCountryCode(country);
-  //                         },
-  //                       );
-  //                     },
-  //                   ),
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 }

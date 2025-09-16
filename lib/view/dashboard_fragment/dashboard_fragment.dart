@@ -66,7 +66,7 @@ class _DashboardFragmentState extends State<DashboardFragment> {
       bool isMobile = deviceWidth <= 800;
       bool isDesktop = deviceWidth < 1200;
       print("$deviceWidth $isMobile");
-     
+
       return Stack(
         children: [
           CustomScrollView(
@@ -112,17 +112,39 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                               ),
                             ),
                             SpaceW20(),
-                            GestureDetector(
-                              onTap: () {},
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 15, vertical: 14),
-                                decoration: BoxDecoration(
-                                  color: AppColors.cardColor,
-                                  borderRadius: BorderRadius.circular(10),
+                            Row(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white24.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    controller.credits == 0
+                                        ? "Purchase Credits"
+                                        : "${Strings.creditsRemaining}  ${controller.credits}",
+                                    style: CustomTextTheme.regular14.copyWith(
+                                      color: AppColors.whiteColor,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
-                                child: SvgPicture.asset(Assets.bellIcon),
-                              ),
+                                SpaceW10(),
+                                GestureDetector(
+                                  onTap: () {},
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 15, vertical: 14),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.cardColor,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: SvgPicture.asset(Assets.bellIcon),
+                                  ),
+                                ),
+                              ],
                             )
                           ],
                         ),
@@ -286,7 +308,7 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                               height: cardHeight,
                               child: Padding(
                                 padding: EdgeInsets.symmetric(
-                                    horizontal: isMobile ? 0: 20.0),
+                                    horizontal: isMobile ? 0 : 20.0),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(25),
                                   child: BackdropFilter(
@@ -518,14 +540,14 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                                               const SizedBox(width: 12),
                                               ImageWithIcon(
                                                 imagePath:
-                                                    'assets/images/correct_image_1.jpg',
+                                                    'assets/images/correct_image_2.jpg',
                                                 icon: Icons.check_circle,
                                                 iconColor: Colors.green,
                                               ),
                                               const SizedBox(width: 12),
                                               ImageWithIcon(
                                                 imagePath:
-                                                    'assets/images/correct_image_1.jpg',
+                                                    'assets/images/correct_image_3.jpg',
                                                 icon: Icons.check_circle,
                                                 iconColor: Colors.green,
                                               ),
@@ -538,21 +560,21 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                                             children: [
                                               ImageWithIcon(
                                                 imagePath:
-                                                    'assets/images/correct_image_1.jpg',
+                                                    'assets/images/incorrect_image_1.jpg',
                                                 icon: Icons.close,
                                                 iconColor: Colors.redAccent,
                                               ),
                                               const SizedBox(width: 12),
                                               ImageWithIcon(
                                                 imagePath:
-                                                    'assets/images/correct_image_1.jpg',
+                                                    'assets/images/incorrect_image_2.jpg',
                                                 icon: Icons.close,
                                                 iconColor: Colors.redAccent,
                                               ),
                                               const SizedBox(width: 12),
                                               ImageWithIcon(
                                                 imagePath:
-                                                    'assets/images/correct_image_1.jpg',
+                                                    'assets/images/incorrect_image_3.jpg',
                                                 icon: Icons.close,
                                                 iconColor: Colors.redAccent,
                                               ),
@@ -612,7 +634,7 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                   height: 220,
                   child: ListView(
                     scrollDirection: Axis.horizontal,
-                    
+                    physics: AlwaysScrollableScrollPhysics(),
                     padding: EdgeInsets.only(left: 20),
                     children: const [
                       CountryCard(

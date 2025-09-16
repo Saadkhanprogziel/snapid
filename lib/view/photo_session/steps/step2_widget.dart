@@ -50,8 +50,8 @@ class Step2Widget extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20, horizontal: 20),
                   ),
                   child: Row(
                     children: [
@@ -146,7 +146,7 @@ class Step2Widget extends StatelessWidget {
                   return const SizedBox();
                 }
               }),
-              const SpaceH10(),
+              // const SpaceH10(),
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -156,7 +156,7 @@ class Step2Widget extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SpaceH10(),
+                    SpaceH10(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -176,19 +176,18 @@ class Step2Widget extends StatelessWidget {
                         )
                       ],
                     ),
-                    const SpaceH20(),
-                    Obx(
-                       () {
+                    SpaceH20(),
+                   Obx((){
                         return _infoRow(
                           "Country:",
-                          controller.selectedCountry.value?.name ?? 'Select Country',
+                          controller.selectedCountry.value?.name ??
+                              "Select Country",
                           flagPath: controller.selectedCountry.value?.flag,
                         );
                       }
                     ),
                     const Divider(color: Colors.white12),
-                   Obx(
-                       () {
+                   Obx((){
                         return _infoRow("Document:", controller.selectedType.value.name);
                       }
                     ),
@@ -205,33 +204,38 @@ class Step2Widget extends StatelessWidget {
   }
 
   Widget _infoRow(String label, String value, {String? flagPath}) {
-    return Row(
-      children: [
-        Text(
-          label,
-          style:
-              CustomTextTheme.regular16.copyWith(color: AppColors.whiteColor),
-        ),
-        const SizedBox(width: 8),
-        if (flagPath != null) ...[
-          SvgPicture.asset(
-            flagPath,
-            width: 20,
-            height: 20,
-          ),
-          const SizedBox(width: 8),
-        ],
-        Expanded(
-          child: Text(
-            value,
-            style: CustomTextTheme.regular16.copyWith(
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: CustomTextTheme.regular14.copyWith(
               color: AppColors.whiteColor,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w400,
             ),
-            overflow: TextOverflow.ellipsis,
           ),
-        ),
-      ],
+          Row(
+            children: [
+              if (flagPath != null && flagPath.isNotEmpty) ...[
+                SvgPicture.asset(
+                  flagPath,
+                  width: 30,
+                ),
+                SpaceW12(),
+              ],
+              Text(
+                value,
+                style: CustomTextTheme.regular14.copyWith(
+                  color: AppColors.whiteColor,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -288,6 +292,125 @@ class Step2Widget extends StatelessWidget {
   }
 
   void _showCountryPicker(BuildContext context, PhotoController controller) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Use dialog for larger screens (tablets/desktop), bottomsheet for mobile
+    if (screenWidth >= 800) {
+      _showCountryDialog(context, controller);
+    } else {
+      _showCountryBottomSheet(context, controller);
+    }
+  }
+
+  void _showCountryDialog(BuildContext context, PhotoController controller) {
+    TextEditingController searchController = TextEditingController();
+    RxList<Country> filteredCountries = allCountries.obs;
+
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: const Color.fromARGB(255, 41, 42, 50),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Container(
+          width: 500,
+          height: 600,
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              // Header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Select Country',
+                    style: CustomTextTheme.regular20.copyWith(
+                      color: AppColors.whiteColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    icon: const Icon(Icons.close, color: Colors.white70),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Search Field
+              TextField(
+                controller: searchController,
+                cursorColor: AppColors.whiteColor,
+                style: const TextStyle(color: AppColors.whiteColor),
+                decoration: InputDecoration(
+                  prefixIcon:
+                      const Icon(Icons.search, color: AppColors.whiteColor),
+                  labelText: 'Search country',
+                  labelStyle: const TextStyle(color: AppColors.whiteColor),
+                  hintStyle: CustomTextTheme.regular14
+                      .copyWith(color: AppColors.whiteColor),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey.shade800),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.white),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onChanged: (value) {
+                  filteredCountries.value = allCountries
+                      .where((c) =>
+                          c.name.toLowerCase().contains(value.toLowerCase()))
+                      .toList();
+                },
+              ),
+              const SizedBox(height: 20),
+
+              // Country List
+              Expanded(
+                child: Obx(() => ListView.builder(
+                      itemCount: filteredCountries.length,
+                      itemBuilder: (_, index) {
+                        final country = filteredCountries[index];
+                        return ListTile(
+                          leading: SvgPicture.asset(
+                            country.flag,
+                            width: 24,
+                            height: 24,
+                          ),
+                          title: Text(
+                            country.name,
+                            style: CustomTextTheme.regular14.copyWith(
+                              color: AppColors.whiteColor,
+                            ),
+                          ),
+                          onTap: () {
+                            controller.selectCountry(country);
+                          },
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          hoverColor: Colors.white12,
+                        );
+                      },
+                    )),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showCountryBottomSheet(
+      BuildContext context, PhotoController controller) {
+    final searchController = TextEditingController();
+    final filteredCountries = allCountries.obs;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -295,70 +418,81 @@ class Step2Widget extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (_) {
-        TextEditingController searchController = TextEditingController();
-        RxList<Country> filteredCountries = allCountries.obs;
-
+      builder: (context) {
         return Padding(
           padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: searchController,
-                  cursorColor: AppColors.whiteColor,
-                  style: const TextStyle(color: AppColors.whiteColor),
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.search, color: AppColors.whiteColor),
-                    labelText: 'Search country',
-                    labelStyle: const TextStyle(color: AppColors.whiteColor),
-                    hintStyle: CustomTextTheme.regular14
-                        .copyWith(color: AppColors.whiteColor),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey.shade800),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(color: Colors.white),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onChanged: (value) {
-                    filteredCountries.value = allCountries
-                        .where((c) =>
-                            c.name.toLowerCase().contains(value.toLowerCase()))
-                        .toList();
-                  },
-                ),
-                const SizedBox(height: 16),
-                Obx(() => SizedBox(
-                      height: 300,
-                      child: ListView.builder(
-                        itemCount: filteredCountries.length,
-                        itemBuilder: (_, index) {
-                          final country = filteredCountries[index];
-                          return ListTile(
-                            leading: SvgPicture.asset(
-                              country.flag,
-                              width: 24,
-                              height: 24,
-                            ),
-                            title: Text(
-                              country.name,
-                              style: CustomTextTheme.regular14.copyWith(
-                                color: AppColors.whiteColor,
-                              ),
-                            ),
-                            onTap: () => controller.selectCountry(country),
-                          );
-                        },
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: DraggableScrollableSheet(
+            expand: false,
+            initialChildSize: 0.7,
+            minChildSize: 0.5,
+            maxChildSize: 0.9,
+            builder: (_, controllerSheet) {
+              return Container(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    // Search Field
+                    TextField(
+                      controller: searchController,
+                      cursorColor: AppColors.whiteColor,
+                      style: const TextStyle(color: AppColors.whiteColor),
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(Icons.search,
+                            color: AppColors.whiteColor),
+                        labelText: 'Search country',
+                        labelStyle:
+                            const TextStyle(color: AppColors.whiteColor),
+                        hintStyle: CustomTextTheme.regular14
+                            .copyWith(color: AppColors.whiteColor),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey.shade800),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: Colors.white),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                    )),
-              ],
-            ),
+                      onChanged: (value) {
+                        filteredCountries.value = allCountries
+                            .where((c) => c.name
+                                .toLowerCase()
+                                .contains(value.toLowerCase()))
+                            .toList();
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Country List
+                    Expanded(
+                      child: Obx(() => ListView.builder(
+                            controller: controllerSheet,
+                            itemCount: filteredCountries.length,
+                            itemBuilder: (_, index) {
+                              final country = filteredCountries[index];
+                              return ListTile(
+                                leading: SvgPicture.asset(
+                                  country.flag,
+                                  width: 24,
+                                  height: 24,
+                                ),
+                                title: Text(
+                                  country.name,
+                                  style: CustomTextTheme.regular14.copyWith(
+                                    color: AppColors.whiteColor,
+                                  ),
+                                ),
+                                onTap: () => controller.selectCountry(country),
+                              );
+                            },
+                          )),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
         );
       },

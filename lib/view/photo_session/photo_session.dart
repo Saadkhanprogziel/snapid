@@ -15,6 +15,7 @@ import 'package:snapid/view/photo_session/steps/upload_photo_step1.dart';
 import 'package:snapid/view/photo_session/steps/step2_widget.dart';
 import 'package:snapid/view/photo_session/steps/step3_widget.dart';
 import 'package:snapid/view/photo_session/steps/step4_widget.dart';
+// Import your ProcessingLoadingScreen
 
 class PhotoSessionScreen extends StatelessWidget {
   const PhotoSessionScreen({super.key});
@@ -62,30 +63,70 @@ class PhotoSessionScreen extends StatelessWidget {
                 final double width = constraints.maxWidth;
 
                 if (width >= 800) {
-                  return Row(
+                  return Stack(
                     children: [
-                      
-                      Expanded(
-                        flex: 1, // smaller portion (40%)
-                        child: _buildCircleWithFloatingIcons(controller, width),
-                      ),
-
-                      Expanded(
-                        flex: 1,
-                        child: Center(
-                          child: Container(
-                            constraints: const BoxConstraints(maxWidth: 600),
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 40),
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 1, // smaller portion (40%)
+                            child: _buildCircleWithFloatingIcons(
+                                controller, width),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Center(
+                              child: Container(
+                                constraints:
+                                    const BoxConstraints(maxWidth: 600),
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 40),
                                 padding: EdgeInsets.only(top: 50),
-                            decoration: BoxDecoration(
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(30),
-                                topRight: Radius.circular(30),
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(30),
+                                    topRight: Radius.circular(30),
+                                  ),
+                                  color: AppColors.cardColor,
+                                ),
+                                child: _buildMainContent(controller),
                               ),
-                              color: AppColors.cardColor,
                             ),
-                            child: _buildMainContent(controller),
+                          ),
+                        ],
+                      ),
+                      Positioned(
+                        top: 40,
+                        left: 70,
+                        child: GestureDetector(
+                          onTap: () {
+                            if (fromHistory) {
+                              Get.back();
+                            } else {
+                              Get.dialog(CustomDialogPop(
+                                svgPath: Assets.closeIcon,
+                                title: "Exit Photo Creation?",
+                                message:
+                                    "You haven't completed all steps. Are you sure you want to exit? Your progress may be lost.",
+                                onCancel: () => Get.back(),
+                                onPressed: () =>
+                                    Get.offAllNamed(PrimaryRoute.home),
+                                solidBtnLabel: "Exit Anyway",
+                                isActionPopUp: true,
+                                solidBtnBg: AppColors.red,
+                              ));
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: Colors.black26,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Icon(
+                              Icons.close,
+                              color: AppColors.whiteColor,
+                              size: 28,
+                            ),
                           ),
                         ),
                       ),
@@ -134,167 +175,172 @@ class PhotoSessionScreen extends StatelessWidget {
                 }
               },
             ),
+            // Processing Loading Overlay
+            Obx(() => ProcessingLoadingScreen(
+                  isVisible: controller.isProcessingLoading.value,
+                )),
           ],
         ),
       ),
     );
   }
 
-Widget _buildCircleWithFloatingIcons(PhotoController controller, double screenWidth) {
-  return Obx(() {
-    final icons = [
-      Icons.person_outline,
-      Icons.shield_outlined,
-      Icons.cloud_download_outlined,
-    ];
+  Widget _buildCircleWithFloatingIcons(
+      PhotoController controller, double screenWidth) {
+    return Obx(() {
+      final icons = [
+        Icons.person_outline,
+        Icons.shield_outlined,
+        Icons.cloud_download_outlined,
+      ];
 
-    final labels = [
-      "Step 1",
-      "Step 2",
-      "Step 3",
-    ];
+      final labels = [
+        "Step 1",
+        "Step 2",
+        "Step 3",
+      ];
 
-    final descriptions = [
-      "Upload your photo",
-      "AI processes your photo",
-      "Download or print",
-    ];
+      final descriptions = [
+        "Upload your photo",
+        "Choose Country or Doc Type",
+        "Download or print",
+      ];
 
-    final double outerCircleSize = screenWidth * 0.25; // scales with screen size
-    final double innerCircleSize = outerCircleSize * 0.75;
-    final double outerRadius = outerCircleSize / 2;
-    final double iconSize = outerCircleSize * 0.15; // scales too
-    final double padding = 30;
+      final double outerCircleSize =
+          screenWidth * 0.25; // scales with screen size
+      final double innerCircleSize = outerCircleSize * 0.75;
+      final double outerRadius = outerCircleSize / 2;
+      final double iconSize = outerCircleSize * 0.15; // scales too
+      final double padding = 30;
 
-    final double centerX = (outerCircleSize / 2) + padding;
-    final double centerY = (outerCircleSize / 2) + padding;
+      final double centerX = (outerCircleSize / 2) + padding;
+      final double centerY = (outerCircleSize / 2) + padding;
 
-    final List<double> angles = [
-      -45,
-      0,
-      45,
-    ];
+      final List<double> angles = [
+        -45,
+        0,
+        45,
+      ];
 
-    return SizedBox(
-      width: outerCircleSize + 170,
-      height: outerCircleSize + 100, // little taller to fit descriptions
-      child: Stack(
-        alignment: Alignment.centerLeft,
-        children: [
-          // Outer Circle
-          Positioned(
-            left: padding,
-            top: padding,
-            child: Container(
-              width: outerCircleSize,
-              height: outerCircleSize,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppColors.primaryColor.withAlpha(50),
-                  width: 2,
-                ),
-              ),
-            ),
-          ),
-
-          // Inner Circle
-          Positioned(
-            left: centerX - innerCircleSize / 2,
-            top: centerY - innerCircleSize / 2,
-            child: Container(
-              width: innerCircleSize,
-              height: innerCircleSize,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.cardColor,
-              ),
-            ),
-          ),
-
-          // Center text
-          Positioned(
-            left: centerX - 20,
-            top: centerY - 20,
-            child: Text(
-              "${controller.currentStep.value}/4",
-              style: CustomTextTheme.regular26.copyWith(
-                color: AppColors.whiteColor,
-              ),
-            ),
-          ),
-
-          // Icons + Labels + Descriptions on the arc
-          ...List.generate(icons.length, (index) {
-            final angle = angles[index] * (math.pi / 180);
-            final offsetX = outerRadius * math.cos(angle);
-            final offsetY = outerRadius * math.sin(angle);
-
-            final bool isActive = (index + 1) <= controller.currentStep.value;
-
-            // Icon position
-            final double iconLeft = centerX + offsetX - iconSize / 2;
-            final double iconTop = centerY + offsetY - iconSize / 2;
-
-            // Text position (right of icon)
-            final double textLeft = iconLeft + iconSize + 8;
-            final double textTop = iconTop + (iconSize / 2) - 25;
-
-            return Stack(
-              children: [
-                // Icon
-                Positioned(
-                  left: iconLeft,
-                  top: iconTop,
-                  child: Container(
-                    width: iconSize,
-                    height: iconSize,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isActive
-                          ? AppColors.primaryColor
-                          : Colors.grey[800],
-                    ),
-                    child: Icon(
-                      icons[index],
-                      color: Colors.white,
-                      size: 22,
-                    ),
+      return SizedBox(
+        width: outerCircleSize + 170,
+        height: outerCircleSize + 100, // little taller to fit descriptions
+        child: Stack(
+          alignment: Alignment.centerLeft,
+          children: [
+            // Outer Circle
+            Positioned(
+              left: padding,
+              top: padding,
+              child: Container(
+                width: outerCircleSize,
+                height: outerCircleSize,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppColors.primaryColor.withAlpha(50),
+                    width: 2,
                   ),
                 ),
+              ),
+            ),
 
-                // Label
-                Positioned(
-                  left: textLeft,
-                  top: textTop,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        labels[index],
-                        style: CustomTextTheme.regular18.copyWith(
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        descriptions[index],
-                        style: CustomTextTheme.regular14.copyWith(
-                          color: Colors.white70,
-                        ),
-                      ),
-                    ],
-                  ),
+            // Inner Circle
+            Positioned(
+              left: centerX - innerCircleSize / 2,
+              top: centerY - innerCircleSize / 2,
+              child: Container(
+                width: innerCircleSize,
+                height: innerCircleSize,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.cardColor,
                 ),
-              ],
-            );
-          }),
-        ],
-      ),
-    );
-  });
-}
+              ),
+            ),
 
+            // Center text
+            Positioned(
+              left: centerX - 20,
+              top: centerY - 20,
+              child: Text(
+                "${controller.currentStep.value}/4",
+                style: CustomTextTheme.regular26.copyWith(
+                  color: AppColors.whiteColor,
+                ),
+              ),
+            ),
+
+            // Icons + Labels + Descriptions on the arc
+            ...List.generate(icons.length, (index) {
+              final angle = angles[index] * (math.pi / 180);
+              final offsetX = outerRadius * math.cos(angle);
+              final offsetY = outerRadius * math.sin(angle);
+
+              final bool isActive = (index + 1) <= controller.currentStep.value;
+
+              // Icon position
+              final double iconLeft = centerX + offsetX - iconSize / 2;
+              final double iconTop = centerY + offsetY - iconSize / 2;
+
+              // Text position (right of icon)
+              final double textLeft = iconLeft + iconSize + 8;
+              final double textTop = iconTop + (iconSize / 2) - 25;
+
+              return Stack(
+                children: [
+                  // Icon
+                  Positioned(
+                    left: iconLeft,
+                    top: iconTop,
+                    child: Container(
+                      width: iconSize,
+                      height: iconSize,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isActive
+                            ? AppColors.primaryColor
+                            : Colors.grey[800],
+                      ),
+                      child: Icon(
+                        icons[index],
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                    ),
+                  ),
+
+                  // Label
+                  Positioned(
+                    left: textLeft,
+                    top: textTop,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          labels[index],
+                          style: CustomTextTheme.regular18.copyWith(
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          descriptions[index],
+                          style: CustomTextTheme.regular14.copyWith(
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }),
+          ],
+        ),
+      );
+    });
+  }
 
   Widget floatingIcons(PhotoController controller) {
     final List<IconData> icons = [
@@ -426,6 +472,7 @@ Widget _buildCircleWithFloatingIcons(PhotoController controller, double screenWi
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SpaceH15(),
             Obx(() => Row(
                   mainAxisAlignment: controller.currentStep.value > 1
                       ? MainAxisAlignment.spaceBetween

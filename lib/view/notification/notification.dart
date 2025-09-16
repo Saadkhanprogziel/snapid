@@ -34,7 +34,6 @@ class _NotificationScreenState extends State<NotificationScreen>
       }
     });
 
-    // Keep TabController in sync with controller
     controller.selectedTab.listen((index) {
       if (_tabController.index != index) {
         _tabController.animateTo(index);
