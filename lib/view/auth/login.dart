@@ -16,7 +16,7 @@ import 'package:snapid/utlis/custom_text_field.dart';
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
 
-  // Separate form keys for different layouts to avoid conflicts
+  
   final _mobileFormKey = GlobalKey<FormState>();
   final _webFormKey = GlobalKey<FormState>();
 
@@ -31,7 +31,7 @@ class LoginScreen extends StatelessWidget {
         return Scaffold(
           body: Stack(
             children: [
-              // Background Image
+              
               SizedBox.expand(
                 child: Image.asset(
                   Assets.appBg,
@@ -39,7 +39,7 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
 
-              // Foreground Content
+              
               isMobile
                   ? _buildMobileLayout(logincontroller)
                   : _buildWebLayout(logincontroller),
@@ -53,7 +53,7 @@ class LoginScreen extends StatelessWidget {
   Widget _buildMobileLayout(LoginController logincontroller) {
     return Stack(
       children: [
-        // Background Image
+        
         SizedBox.expand(
           child: Image.asset(
             Assets.appBg,
@@ -63,7 +63,7 @@ class LoginScreen extends StatelessWidget {
         Column(
           children: [
             const Spacer(flex: 1),
-            // SnapID Title Section
+            
             Column(
               children: [
                 Text(
@@ -143,7 +143,7 @@ class LoginScreen extends StatelessWidget {
                           ),
                         ),
                     
-                        // Right side - Login form
+                        
                         Expanded(
                           flex: 1,
                           child: Container(
@@ -180,7 +180,7 @@ class LoginScreen extends StatelessWidget {
           ),
           const SizedBox(height: 40),
 
-          // Email field
+          
           CustomTextField(
             controller: logincontroller.emailController,
             hintText: Strings.enterEmail,
@@ -200,7 +200,7 @@ class LoginScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Password field with toggle
+          
           CustomTextField(
             controller: logincontroller.passwordController,
             hintText: Strings.yourPassword,
@@ -259,7 +259,7 @@ class LoginScreen extends StatelessWidget {
                 ),
           const SizedBox(height: 30),
 
-          // Divider with "Or"
+          
           Row(
             children: [
               Expanded(child: Divider(color: Colors.white24)),
@@ -275,16 +275,16 @@ class LoginScreen extends StatelessWidget {
           ),
           const SizedBox(height: 30),
 
-          // Social login buttons
+          
           Row(
             children: [
-              // Google button
+              
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: () {
-                    // Add null safety check
+                    
                     try {
-                      // Your Google sign in logic here
+                      
                       debugPrint('Google sign in pressed');
                     } catch (e) {
                       debugPrint('Error in Google sign in: $e');
@@ -310,13 +310,13 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              // Apple button
+              
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: () {
-                    // Add null safety check
+                    
                     try {
-                      // Your Apple sign in logic here
+                      
                       debugPrint('Apple sign in pressed');
                     } catch (e) {
                       debugPrint('Error in Apple sign in: $e');
@@ -345,7 +345,7 @@ class LoginScreen extends StatelessWidget {
           ),
           const SizedBox(height: 40),
 
-          // Sign up row
+          
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -397,7 +397,7 @@ class LoginScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Email field
+                  
                   CustomTextField(
                     controller: logincontroller.emailController,
                     hintText: Strings.enterEmail,
@@ -417,7 +417,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
 
-                  // Password field with toggle
+                  
                   CustomTextField(
                     controller: logincontroller.passwordController,
                     hintText: Strings.yourPassword,
@@ -441,7 +441,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
 
-                  // Forgot password
+                  
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
@@ -457,7 +457,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
 
-                  // Sign In Button
+                  
                   logincontroller.isLoading
                       ? const SizedBox(
                           height: 60,
@@ -532,11 +532,11 @@ class LoginScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  // Google button
+                  
                   OutlinedButton.icon(
                     onPressed: () {
                       try {
-                        // Your Google sign in logic here
+                        
                         debugPrint('Google sign in pressed');
                       } catch (e) {
                         debugPrint('Error in Google sign in: $e');
@@ -562,11 +562,11 @@ class LoginScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  // Apple button
+                  
                   OutlinedButton.icon(
                     onPressed: () {
                       try {
-                        // Your Apple sign in logic here
+                        
                         debugPrint('Apple sign in pressed');
                       } catch (e) {
                         debugPrint('Error in Apple sign in: $e');
@@ -592,7 +592,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  // Sign Up row
+                  
                   Padding(
                     padding: const EdgeInsets.only(bottom: 16.0),
                     child: Row(

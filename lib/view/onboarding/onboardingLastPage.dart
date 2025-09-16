@@ -5,6 +5,7 @@ import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/onboarding/onbording_controller.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
+import 'package:snapid/utlis/custom_spaces.dart';
 
 class OnboardingLastPage extends StatelessWidget {
   @override
@@ -12,7 +13,7 @@ class OnboardingLastPage extends StatelessWidget {
     final OnBoardingController onBoardingController =
         Get.find<OnBoardingController>();
 
-    final isMobile = MediaQuery.of(context).size.width <= 600;
+    final isMobile = MediaQuery.of(context).size.width <= 800;
 
     return Scaffold(
       backgroundColor: AppColors.blackColor,
@@ -45,7 +46,7 @@ class OnboardingLastPage extends StatelessWidget {
                   child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: const [
                         FeatureTile(
@@ -53,9 +54,14 @@ class OnboardingLastPage extends StatelessWidget {
                           text: "Use Any Casual Photos",
                         ),
                         SizedBox(height: 24),
-                        FeatureTile(
-                          icon: Icons.verified,
-                          text: "Requirement Compliance",
+                         Row(
+                          children: [
+                            SpaceW30(),
+                            FeatureTile(
+                              icon: Icons.verified,
+                              text: "Requirement Compliance  ",
+                            ),
+                          ],
                         ),
                         SizedBox(height: 24),
                         FeatureTile(

@@ -1,2 +1,2 @@
-const baseUrl = 'http://192.168.18.46:5000';
+const baseUrl = 'https://v8lf8kds-5000.uks1.devtunnels.ms';
 const apiUrl = "$baseUrl/api";
