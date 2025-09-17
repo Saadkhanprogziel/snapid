@@ -9,8 +9,8 @@ import 'package:snapid/view/auth/register.dart';
 import 'package:snapid/view/auth/change_password.dart';
 import 'package:snapid/view/auth/verify.dart';
 import 'package:snapid/view/biometric/biometric.dart';
-import 'package:snapid/view/delete_account/delete_account.dart';
-import 'package:snapid/view/help_support/help_support.dart';
+import 'package:snapid/view/profile_fragment/delete_account/delete_account.dart';
+import 'package:snapid/view/profile_fragment/help_support/help_support.dart';
 import 'package:snapid/view/history_fragment/history_fragment.dart';
 import 'package:snapid/view/home/home.dart';
 import 'package:snapid/view/notification/notification.dart';
@@ -20,10 +20,12 @@ import 'package:snapid/view/onboarding/onboardingLastPage.dart';
 import 'package:snapid/view/payment_method/payment_method.dart';
 import 'package:snapid/view/photo_session/photo_session.dart';
 import 'package:snapid/view/photo_session/photo_preview.dart';
-import 'package:snapid/view/photo_select/seletedPhotos.dart';
+import 'package:snapid/view/photo_session/photo_select/seletedPhotos.dart';
 import 'package:snapid/view/popular_countries.dart/popular_countries.dart';
-import 'package:snapid/view/profile_fragment/edit_profile.dart';
-import 'package:snapid/view/profile_fragment/report_bug/report_bug.dart';
+import 'package:snapid/view/profile_fragment/edit_profile/edit_profile.dart';
+import 'package:snapid/view/profile_fragment/help_support/report_bug/report_bug.dart';
+import 'package:snapid/view/profile_fragment/help_support/ticket_management/chat_screen/chat_screen.dart';
+import 'package:snapid/view/profile_fragment/help_support/ticket_management/ticket_management.dart';
 import 'package:snapid/view/security_setting/security_setting.dart';
 import 'package:snapid/view/splash/splash.dart';
 
@@ -149,6 +151,16 @@ class Pages {
       GetPage(
           name: PrimaryRoute.photo_preview,
           page: () => PhotoPreview(),
+          binding: ControllerBindings(),
+          transition: Transition.downToUp),
+      GetPage(
+          name: PrimaryRoute.ticket_management,
+          page: () => TicketManagement(),
+          binding: ControllerBindings(),
+          transition: Transition.cupertino),
+      GetPage(
+          name: PrimaryRoute.chat_screen,
+          page: () => ChatScreen(),
           binding: ControllerBindings(),
           transition: Transition.downToUp),
     ];

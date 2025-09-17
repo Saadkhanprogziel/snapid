@@ -66,7 +66,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                 CustomHeader(
                   title: "Notifications",
                   showBackButton: true,
-                    rightWidget: _buildPopupMenu(), // This replaces the SVG icon
+                  rightWidget: _buildPopupMenu(), // This replaces the SVG icon
 
                   // rightIconPath: Assets.more_vert,
                   // onRightIconTap: () {
@@ -105,7 +105,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Obx(
-                    () => TabBarWidget(
+                    () => TabBarWidgetFlexible(
                       tabs: ['All ', 'Success', 'Reminders'],
                       selectedIndex: controller.selectedTab.value,
                       onTabSelected: (index) {

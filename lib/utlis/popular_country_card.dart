@@ -24,42 +24,48 @@ class PopularCountryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 130,
-            child: Column(
-              children: [
-                SvgPicture.asset(flagAsset, height: 40, width: 40),
-                SpaceH15(),
-                Text(
-                  countryName,
-                  textAlign: TextAlign.center,
-                  style: CustomTextTheme.regular16.copyWith(
-                    color: Colors.white70,
-                    fontWeight: FontWeight.w400,
-                  ),
-                )
-              ],
+      child: Center( // ✅ centers the Row inside the card
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center, // ✅ center horizontally
+          crossAxisAlignment: CrossAxisAlignment.center, // ✅ center vertically
+          children: [
+            Container(
+              width: 130,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center, // ✅ vertical center
+                crossAxisAlignment: CrossAxisAlignment.center, // ✅ horizontal center
+                children: [
+                  SvgPicture.asset(flagAsset, height: 40, width: 40),
+                  SpaceH15(),
+                  Text(
+                    countryName,
+                    textAlign: TextAlign.center,
+                    style: CustomTextTheme.regular16.copyWith(
+                      color: Colors.white70,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  )
+                ],
+              ),
             ),
-          ),
-          SpaceW12(),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _infoRow('Passport:', passportSize),
-                const SizedBox(height: 12),
-                _infoRow('Visa:', passportSize),
-                const SizedBox(height: 12),
-                _infoRow('Driving License:', passportSize),
-                const SizedBox(height: 12),
-                _infoRow('8G Color:', passportSize),
-              ],
-            ),
-          )
-        ],
+            SpaceW12(),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center, // ✅ center vertically
+                crossAxisAlignment: CrossAxisAlignment.center, // ✅ center horizontally
+                children: [
+                  _infoRow('Passport:', passportSize),
+                  const SizedBox(height: 12),
+                  _infoRow('Visa:', passportSize),
+                  const SizedBox(height: 12),
+                  _infoRow('Driving License:', passportSize),
+                  const SizedBox(height: 12),
+                  _infoRow('8G Color:', passportSize),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

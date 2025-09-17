@@ -23,4 +23,6 @@ class PrimaryRoute {
   static const String popularCountires = '/popularCountries';
   static const String payment_method= '/payment_method';
   static const String report_bug= '/report_bug';
+  static const String ticket_management= '/ticket_management';
+  static const String chat_screen= '/chat_screen';
 }

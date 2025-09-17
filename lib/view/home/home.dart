@@ -56,12 +56,11 @@ class HomeScreen extends StatelessWidget {
                   () => ClipRRect(
                     child: AnimatedSize(
                       alignment: Alignment.topLeft,
-                        duration: const Duration(milliseconds: 300),
-                          curve: Curves.linear,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.linear,
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                         child: Container(
-                        
                           width: isExpanded.value ? 250 : 80,
                           color: AppColors.cardColor,
                           child: Column(
@@ -151,8 +150,11 @@ class HomeScreen extends StatelessWidget {
                                         'Assistant',
                                         2,
                                         isExpanded.value),
-                                    ExpandableNavItem('assets/icons/profile.svg',
-                                        'Profile', 3, isExpanded.value),
+                                    ExpandableNavItem(
+                                        'assets/icons/profile.svg',
+                                        'Profile',
+                                        3,
+                                        isExpanded.value),
                                   ],
                                 ),
                               ),
@@ -161,7 +163,7 @@ class HomeScreen extends StatelessWidget {
                                 onTap: () {
                                   var profileController =
                                       Get.find<ProfileController>();
-                      
+
                                   Get.dialog(
                                     BackdropFilter(
                                       filter: ImageFilter.blur(
@@ -190,8 +192,8 @@ class HomeScreen extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   height: 50,
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 14),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 14),
                                   child: Row(
                                     children: [
                                       SvgPicture.asset(
@@ -207,13 +209,13 @@ class HomeScreen extends StatelessWidget {
                                         const SizedBox(width: 16),
                                         Expanded(
                                           child: AnimatedOpacity(
-                                            duration:
-                                                const Duration(milliseconds: 300),
-                                            opacity: isExpanded.value ? 1.0 : 0.0,
-                                            child: Text(
-                                              "Logout",
-                                              style: CustomTextTheme.regular12
-                                            ),
+                                            duration: const Duration(
+                                                milliseconds: 300),
+                                            opacity:
+                                                isExpanded.value ? 1.0 : 0.0,
+                                            child: Text("Logout",
+                                                style:
+                                                    CustomTextTheme.regular12),
                                           ),
                                         ),
                                       ],

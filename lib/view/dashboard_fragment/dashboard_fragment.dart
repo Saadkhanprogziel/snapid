@@ -334,121 +334,115 @@ class _DashboardFragmentState extends State<DashboardFragment> {
                                             ),
                                           ),
                                           const SizedBox(height: 20),
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: Container(
-                                                  height: 120,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.transparent,
-                                                    border: Border.all(
-                                                      color: Colors.white
-                                                          .withOpacity(0.3),
-                                                      width: 1.5,
-                                                    ),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            16),
-                                                  ),
-                                                  child: Material(
-                                                    color: Colors.transparent,
-                                                    child: InkWell(
-                                                      onTap: () async {
-                                                        photoController
-                                                            .capturePhotosSimple();
-                                                      },
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: isMobile ? 10: 50),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Container(
+                                                    height: 120,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.transparent,
+                                                      border: Border.all(
+                                                        color: Colors.white
+                                                            .withOpacity(0.3),
+                                                        width: 1.5,
+                                                      ),
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               16),
-                                                      child: Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Icon(
-                                                            Icons
-                                                                .camera_alt_outlined,
-                                                            color: AppColors
-                                                                .whiteColor,
-                                                            size: 28,
-                                                          ),
-                                                          const SizedBox(
-                                                              height: 8),
-                                                          Text(
-                                                            "Take a Photo",
-                                                            style:
-                                                                CustomTextTheme
-                                                                    .regular16
-                                                                    .copyWith(
+                                                    ),
+                                                    child: Material(
+                                                      color: Colors.transparent,
+                                                      child: InkWell(
+                                                        onTap: () async {
+                                                          photoController
+                                                              .capturePhotosSimple();
+                                                        },
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                16),
+                                                        child: Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Icon(
+                                                              Icons
+                                                                  .camera_alt_outlined,
                                                               color: AppColors
                                                                   .whiteColor,
+                                                              size: 28,
                                                             ),
-                                                          ),
-                                                        ],
+                                                            const SizedBox(
+                                                                height: 8),
+                                                            Text(
+                                                              "Take a Photo",
+                                                              style:
+                                                                  CustomTextTheme
+                                                                      .regular16
+                                                                      .copyWith(
+                                                                color: AppColors
+                                                                    .whiteColor,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
                                                 ),
-                                              ),
-                                              const SizedBox(width: 16),
-                                              Expanded(
-                                                child: Container(
-                                                  height: 120,
-                                                  decoration: BoxDecoration(
-                                                    gradient:
-                                                        const LinearGradient(
-                                                      begin: Alignment.topLeft,
-                                                      end:
-                                                          Alignment.bottomRight,
-                                                      colors: [
-                                                        Color(0xFF6366F1),
-                                                        Color(0xFF8B5CF6),
-                                                      ],
-                                                    ),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            16),
-                                                  ),
-                                                  child: Material(
-                                                    color: Colors.transparent,
-                                                    child: InkWell(
-                                                      onTap: () {
-                                                        Get.toNamed(PrimaryRoute
-                                                            .selectedPhoto);
-                                                      },
+                                                const SizedBox(width: 16),
+                                                Expanded(
+                                                  child: Container(
+                                                    height: 120,
+                                                    decoration: BoxDecoration(
+                                                      color:AppColors.primaryColor,
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               16),
-                                                      child: Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Icon(
-                                                            Icons
-                                                                .cloud_upload_outlined,
-                                                            color: Colors.white,
-                                                            size: 28,
-                                                          ),
-                                                          const SizedBox(
-                                                              height: 8),
-                                                          Text(
-                                                            "Upload Photo",
-                                                            style:
-                                                                CustomTextTheme
-                                                                    .regular16
-                                                                    .copyWith(
-                                                              color:
-                                                                  Colors.white,
+                                                    ),
+                                                    child: Material(
+                                                      color: Colors.transparent,
+                                                      child: InkWell(
+                                                        onTap: () {
+                                                          Get.toNamed(PrimaryRoute
+                                                              .selectedPhoto);
+                                                        },
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                16),
+                                                        child: Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Icon(
+                                                              Icons
+                                                                  .cloud_upload_outlined,
+                                                              color: Colors.white,
+                                                              size: 28,
                                                             ),
-                                                          ),
-                                                        ],
+                                                            const SizedBox(
+                                                                height: 8),
+                                                            Text(
+                                                              "Upload Photo",
+                                                              style:
+                                                                  CustomTextTheme
+                                                                      .regular16
+                                                                      .copyWith(
+                                                                color:
+                                                                    Colors.white,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                           // const SizedBox(height: 30),
                                           BulletList(

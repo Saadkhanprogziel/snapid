@@ -428,6 +428,12 @@
       "languageVersion": "3.2"
     },
     {
+      "name": "logging",
+      "rootUri": "file:///C:/Users/CC/AppData/Local/Pub/Cache/hosted/pub.dev/logging-1.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
       "name": "matcher",
       "rootUri": "file:///C:/Users/CC/AppData/Local/Pub/Cache/hosted/pub.dev/matcher-0.12.16+1",
       "packageUri": "lib/",
@@ -600,6 +606,18 @@
       "rootUri": "file:///C:/src/flutter3.24/bin/cache/pkg/sky_engine",
       "packageUri": "lib/",
       "languageVersion": "3.2"
+    },
+    {
+      "name": "socket_io_client",
+      "rootUri": "file:///C:/Users/CC/AppData/Local/Pub/Cache/hosted/pub.dev/socket_io_client-3.1.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "socket_io_common",
+      "rootUri": "file:///C:/Users/CC/AppData/Local/Pub/Cache/hosted/pub.dev/socket_io_common-3.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
     },
     {
       "name": "source_span",
@@ -818,7 +836,7 @@
       "languageVersion": "3.6"
     }
   ],
-  "generated": "2025-09-16T04:22:35.677084Z",
+  "generated": "2025-09-17T11:09:10.537627Z",
   "generator": "pub",
   "generatorVersion": "3.6.2",
   "flutterRoot": "file:///C:/src/flutter3.24",
