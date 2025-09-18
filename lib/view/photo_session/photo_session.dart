@@ -41,7 +41,7 @@ class PhotoSessionScreen extends StatelessWidget {
             message:
                 "You haven't completed all steps. Are you sure you want to exit? Your progress may be lost.",
             onCancel: () => Get.back(),
-            onPressed: () => Get.offAllNamed(PrimaryRoute.home),
+            onPressed: () => Get.offNamed(PrimaryRoute.home),
             solidBtnLabel: "Exit Anyway",
             isActionPopUp: true,
             solidBtnBg: AppColors.red,
@@ -109,7 +109,7 @@ class PhotoSessionScreen extends StatelessWidget {
                                     "You haven't completed all steps. Are you sure you want to exit? Your progress may be lost.",
                                 onCancel: () => Get.back(),
                                 onPressed: () =>
-                                    Get.offAllNamed(PrimaryRoute.home),
+                                    Get.offNamed(PrimaryRoute.home),
                                 solidBtnLabel: "Exit Anyway",
                                 isActionPopUp: true,
                                 solidBtnBg: AppColors.red,
@@ -495,7 +495,7 @@ class PhotoSessionScreen extends StatelessWidget {
                             message:
                                 "You haven't completed all steps. Are you sure you want to exit? Your progress may be lost.",
                             onCancel: () => Get.back(),
-                            onPressed: () => Get.offAllNamed(PrimaryRoute.home),
+                            onPressed: () => Get.offNamed(PrimaryRoute.home),
                             solidBtnLabel: "Exit Anyway",
                             isActionPopUp: true,
                             solidBtnBg: AppColors.red,

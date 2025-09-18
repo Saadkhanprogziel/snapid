@@ -20,6 +20,7 @@ class ChatController extends GetxController {
   late String ticketSubject;
   late String ticketStatus;
   late String ticketDate;
+  late String chatId;
 
   @override
   void onInit() {
@@ -38,12 +39,36 @@ class ChatController extends GetxController {
     ticketSubject = arguments['subject'] ?? 'Support Ticket';
     ticketStatus = arguments['status'] ?? 'Open';
     ticketDate = arguments['date'] ?? 'Today';
+    chatId = arguments['chat_id'] ?? '';
 
 
     log('Initialized with ticket ID: $ticketId'); 
     log('Ticket subject: $ticketSubject');
     log('Ticket status: $ticketStatus');
+    log('Chat Id: $chatId');
 
-    appSocket.fireEvent("event", {});
+    // appSocket.fireEvent("event", {});
+    joinRoom();
+
+
+  
+  }
+    void joinRoom() {
+    log("[joinRoom] Joining room with chatId: $chatId");
+    appSocket.fireEvent('join_chat', {
+      'chatID': chatId,
+    });
+
+    listenEvents();
+  }
+  
+  void listenEvents() {
+    log("[listenEvents] Listening to socket events");
+    appSocket.listenToRecieveMessageEvent((data) {
+      log("[listenEvents] Message received: $data");
+      print(data);
+      // final message = MessageModel.fromJson(data);
+      // appendToList(message);
+    });
   }
 }

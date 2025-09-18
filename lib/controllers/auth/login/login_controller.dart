@@ -134,7 +134,7 @@ class LoginController extends GetxController {
             Get.snackbar("Success", "Login successful",
                 colorText: Colors.white);
 
-            Get.offAllNamed(PrimaryRoute.home, arguments: {'index': 0});
+            Get.offNamed(PrimaryRoute.home, arguments: {'index': 0});
           });
         });
   }
@@ -164,7 +164,7 @@ class LoginController extends GetxController {
             Get.snackbar("Success", "login successful",
                 colorText: Colors.white);
 
-            Get.offAllNamed(PrimaryRoute.home, arguments: {'index': 0});
+            Get.offNamed(PrimaryRoute.home, arguments: {'index': 0});
           },
         );
       });

@@ -42,18 +42,29 @@ class SocketService {
       }
     });
   }
-
-  void listenToRecieveMessageEvent(void Function(dynamic data) dataCallBack) {
-    _socket.off("receive_message");
-    _socket.on('receive_message', (data) {
+void listenToRecieveMessageEvent(void Function(dynamic data) dataCallBack) {
+    _socket.off("chat_joined");
+    _socket.on('chat_joined', (data) {
       log("Recieved data in sockets: $data");
       if (data != null) {
         dataCallBack.call(data);
       }
     });
 
-    log("Is reciever initialized: ${_socket.hasListeners("receive_message")}");
+    log("Is reciever initialized: ${_socket.hasListeners("chat_joined")}");
   }
+
+  // void listenToRecieveMessageEvent(void Function(dynamic data) dataCallBack) {
+  //   _socket.off("receive_message");
+  //   _socket.on('receive_message', (data) {
+  //     log("Recieved data in sockets: $data");
+  //     if (data != null) {
+  //       dataCallBack.call(data);
+  //     }
+  //   });
+
+  //   log("Is reciever initialized: ${_socket.hasListeners("receive_message")}");
+  // }
 
   void listenToEvent(String event, dynamic Function(dynamic) callBackData) {
     _socket.on(event, callBackData);

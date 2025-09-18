@@ -26,11 +26,10 @@ class LoginScreen extends StatelessWidget {
     final bool isMobile = deviceWidth <= 800;
 
     return GetBuilder<LoginController>(
-      init: LoginController(),
+      init: Get.find<LoginController>(), // Use existing instance if available
       autoRemove: false, // Prevent auto removal
       global: true, // Make it globally accessible
       builder: (logincontroller) {
-        // Safety check to ensure controller is not disposed
         if (!Get.isRegistered<LoginController>()) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
@@ -113,7 +112,8 @@ class LoginScreen extends StatelessWidget {
                 children: [
                   SpaceH40(),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 60),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 60),
                     child: Row(
                       children: [
                         Expanded(
@@ -139,7 +139,7 @@ class LoginScreen extends StatelessWidget {
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(20),
                                       child: Image.asset(
-                                        Assets.login_image, 
+                                        Assets.login_image,
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -149,7 +149,7 @@ class LoginScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                    
+
                         // Sign-in form
                         Expanded(
                           flex: 1,

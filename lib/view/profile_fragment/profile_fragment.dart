@@ -202,7 +202,7 @@ class ProfileFragment extends StatelessWidget {
                                     icon: Icons.question_mark,
                                     title: 'Help & Support',
                                     subtitle: 'Chat Or Contact Us Directly.',
-                                    onTap: () => Get.toNamed(PrimaryRoute.help_support),
+                                    onTap: () =>Get.toNamed(PrimaryRoute.help_support),
                                   ),
                                   SettingItem(
                                     svgPath: Assets.logout,

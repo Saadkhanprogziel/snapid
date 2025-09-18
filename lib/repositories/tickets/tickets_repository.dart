@@ -7,8 +7,9 @@ class TicketsRepository {
 
   Future<Either<String, List<Ticket>>> fetchTickets() async {
     try {
-      final response = await networkRepository.get(url: "/ticket/get-all-tickets");
-      
+      final response =
+          await networkRepository.get(url: "/ticket/get-all-tickets");
+
       if (response.success) {
         final List<dynamic> data = response.data['data'];
 
@@ -20,7 +21,25 @@ class TicketsRepository {
 
       return Left(response.message);
     } on Exception catch (e) {
-      return Left(e.toString()); 
+      return Left(e.toString());
+    }
+  }
+
+  Future<Either<String, bool>> createTicket(
+      String subject, String description) async {
+    try {
+      final response = await networkRepository
+          .post(url: "/ticket/create-ticket", data: {"title": subject,"description": description});
+
+      if (response.success) {
+    
+
+        return Right(true);
+      }
+
+      return Left(response.message);
+    } on Exception catch (e) {
+      return Left(e.toString());
     }
   }
 }

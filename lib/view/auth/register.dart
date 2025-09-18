@@ -266,7 +266,7 @@ class RegisterScreen extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   SizedBox(
-                                    height: 60,
+                                    height: 65,
                                     child: OutlinedButton(
                                       onPressed: () =>
                                           _showCountryCodePicker(controller),

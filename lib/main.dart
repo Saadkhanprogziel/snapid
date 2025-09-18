@@ -17,6 +17,7 @@ late SocketService appSocket;
 
 
 void main() async { 
+  
     // setUrlStrategy(PathUrlStrategy());
 
   WidgetsFlutterBinding.ensureInitialized();

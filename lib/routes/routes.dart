@@ -1,5 +1,5 @@
 class PrimaryRoute {
-  static const String splash = '/Splash';
+  static const String splash = '/';
   static const String onBoard = '/OnBoard';
   static const String onBoard3 = '/OnBoard3';
   static const String login = '/login';

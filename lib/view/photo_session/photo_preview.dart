@@ -137,7 +137,7 @@ class _PhotoPreviewState extends State<PhotoPreview> {
                                 SpaceH20(),
                                 CustomElevatedButton(
                                   onPressed: () {
-                                    Get.offAllNamed(PrimaryRoute.home);
+                                    Get.offNamed(PrimaryRoute.home);
                                   },
                                   text: "Go to Dashboard",
                                   minHeight: 60,
@@ -203,7 +203,7 @@ class _PhotoPreviewState extends State<PhotoPreview> {
                       SpaceH20(),
                       CustomElevatedButton(
                         onPressed: () {
-                          Get.offAllNamed(PrimaryRoute.home);
+                          Get.offNamed(PrimaryRoute.home);
                         },
                         text: "Go to Dashboard",
                         minHeight: 60,
