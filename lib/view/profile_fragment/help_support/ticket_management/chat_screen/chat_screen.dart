@@ -3,8 +3,11 @@ import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/chat/chat_controller.dart';
+import 'package:snapid/models/chat_message/chat_message.dart';
+import 'package:snapid/models/tickets/tickets_model.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
+import 'package:snapid/view/profile_fragment/help_support/ticket_management/ticket_management.dart';
 
 class ChatScreen extends StatelessWidget {
   const ChatScreen({super.key});
@@ -13,9 +16,11 @@ class ChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final double deviceWidth = MediaQuery.of(context).size.width;
     final bool isLargeScreen = deviceWidth >= 800;
-    final ChatController controller = Get.put(ChatController());
+    final ChatController chatController = Get.put(ChatController());
 
     return Scaffold(
+      // Add resizeToAvoidBottomInset to handle keyboard properly
+      resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
           Container(
@@ -29,9 +34,17 @@ class ChatScreen extends StatelessWidget {
           SafeArea(
             child: isLargeScreen
                 ? _buildLargeScreenLayout(
-                    context, controller.ticketSubject, controller.ticketStatus, controller.ticketDate, controller.ticketId)
+                    context,
+                    chatController.ticketSubject,
+                    chatController.ticketStatus,
+                    chatController.ticketDate,
+                    chatController.ticketId)
                 : _buildMobileLayout(
-                    context, controller.ticketSubject, controller.ticketStatus, controller.ticketDate, controller.ticketId),
+                    context,
+                    chatController.ticketSubject,
+                    chatController.ticketStatus,
+                    chatController.ticketDate,
+                    chatController.ticketId),
           ),
         ],
       ),
@@ -57,7 +70,6 @@ class ChatScreen extends StatelessWidget {
         ),
         Column(
           children: [
-            // Support icon instead of bot
             Container(
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -276,8 +288,16 @@ class ChatScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildChatContent(BuildContext context, bool isLargeScreen,
-      String subject, String status, String date, String ticketId) {
+  Widget _buildChatContent(
+    BuildContext context,
+    bool isLargeScreen,
+    String subject,
+    String status,
+    String date,
+    String ticketId,
+  ) {
+    final ChatController chatController = Get.find<ChatController>();
+
     return Column(
       children: [
         if (!isLargeScreen) ...[
@@ -309,7 +329,7 @@ class ChatScreen extends StatelessWidget {
                                 ),
                                 SizedBox(height: 4),
                                 Text(
-                                  '$ticketId • $date',
+                                  '$date',
                                   style: CustomTextTheme.regular16.copyWith(
                                     color:
                                         AppColors.whiteColor.withOpacity(0.6),
@@ -319,37 +339,6 @@ class ChatScreen extends StatelessWidget {
                               ],
                             ),
                           ),
-                          // GestureDetector(
-                          //   onTap: () {
-                          //     Get.dialog(CustomDialogPop(
-                          //       title: "Clear Chat History?",
-                          //       message: "Are you sure you want to clear this conversation for ticket $ticketId?",
-                          //       isActionPopUp: true,
-                          //       svgPath: Assets.clearIcon,
-                          //       solidBtnLabel: "Clear Chat",
-                          //       solidBtnBg: AppColors.red,
-                          //       onCancel: () {
-                          //         Get.back();
-                          //       },
-                          //       onPressed: () {
-                          //         Get.toNamed(PrimaryRoute.home);
-                          //       },
-                          //     ));
-                          //   },
-                          //   child: Row(
-                          //     mainAxisSize: MainAxisSize.min,
-                          //     children: [
-                          //       SvgPicture.asset(Assets.clearIcon),
-                          //       SpaceW10(),
-                          //       Text(
-                          //         "Clear All",
-                          //         style: CustomTextTheme.regular16.copyWith(
-                          //           color: AppColors.whiteColor,
-                          //         ),
-                          //       ),
-                          //     ],
-                          //   ),
-                          // ),
                         ],
                       ),
                     ],
@@ -366,94 +355,115 @@ class ChatScreen extends StatelessWidget {
               horizontal: isLargeScreen ? 24.0 : 16.0,
               vertical: isLargeScreen ? 12.0 : 0.0,
             ),
-            child: ListView(
-              children: [
-                SupportMessage(
-                    text: 'Hello! Thank you for contacting SnapID support.'),
-                SupportMessage(
-                    text:
-                        "I'm here to help you with your inquiry about: \"$subject\""),
-                UserMessage(text: 'I need help with this issue'),
-                TypingIndicator(),
-              ],
-            ),
+            child: Obx(() => ListView.builder(
+                  controller: chatController.scrollController,
+                  physics: AlwaysScrollableScrollPhysics(),
+                  itemCount: chatController.messages.length,
+                  itemBuilder: (context, index) {
+                    final message = chatController.messages[index];
+                    return MessageBubble(
+                      message: message,
+                      isLargeScreen: isLargeScreen,
+                    );
+                  },
+                )),
           ),
         ),
-        Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: isLargeScreen ? 24.0 : 10.0,
-            vertical: isLargeScreen ? 16.0 : 20.0,
+        // Wrap input area with Padding and add keyboard padding
+        Padding(
+          padding: EdgeInsets.only(
+            left: isLargeScreen ? 24.0 : 10.0,
+            right: isLargeScreen ? 24.0 : 10.0,
+            top: isLargeScreen ? 16.0 : 20.0,
+            bottom: isLargeScreen ? 16.0 : 45.0,
           ),
-          decoration: BoxDecoration(
-            color: isLargeScreen
-                ? Colors.grey[900]?.withOpacity(0.3)
-                : Colors.transparent,
-            borderRadius: isLargeScreen
-                ? const BorderRadius.only(
-                    bottomLeft: Radius.circular(16),
-                    bottomRight: Radius.circular(16),
-                  )
-                : null,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    boxShadow: isLargeScreen
-                        ? [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
+          child: Container(
+            decoration: BoxDecoration(
+              color: isLargeScreen
+                  ? Colors.grey[900]?.withOpacity(0.3)
+                  : Colors.transparent,
+              borderRadius: isLargeScreen
+                  ? const BorderRadius.only(
+                      bottomLeft: Radius.circular(16),
+                      bottomRight: Radius.circular(16),
+                    )
+                  : null,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      boxShadow: isLargeScreen
+                          ? [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ]
+                          : null,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: TextField(
+                      controller: chatController.messageController,
+                      // Add text input action and onSubmitted
+                      textInputAction: TextInputAction.send,
+                      onSubmitted: (value) {
+                        if (value.trim().isNotEmpty) {
+                          chatController.sendMessage();
+                        }
+                      },
+                      // Add maxLines and minLines for better UX
+                      maxLines: 4,
+                      minLines: 1,
+                      decoration: InputDecoration(
+                        suffixIcon: GestureDetector(
+                          onTap: () {
+                            if (chatController.messageController.text
+                                .trim()
+                                .isNotEmpty) {
+                              chatController.sendMessage();
+                            }
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryColor,
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                          ]
-                        : null,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      suffixIcon: GestureDetector(
-                        onTap: () {
-                          print("Send button tapped");
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryColor,
-                            borderRadius: BorderRadius.circular(10),
+                            padding: const EdgeInsets.all(14),
+                            child: const Icon(Icons.send,
+                                color: Colors.white, size: 20),
                           ),
-                          padding: const EdgeInsets.all(10),
-                          child: const Icon(Icons.send,
-                              color: Colors.white, size: 18),
+                        ),
+                        filled: true,
+                        fillColor:
+                            isLargeScreen ? Colors.grey[800] : Colors.grey[850],
+                        hintText: 'Type your message...',
+                        hintStyle: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 15,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 20,
                         ),
                       ),
-                      filled: true,
-                      fillColor:
-                          isLargeScreen ? Colors.grey[800] : Colors.grey[850],
-                      hintText: 'Type your message...',
-                      hintStyle: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 14,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
                       ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: isLargeScreen ? 16 : 16,
-                        vertical: isLargeScreen ? 14 : 16,
-                      ),
-                    ),
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-            ],
+                const SizedBox(width: 8),
+              ],
+            ),
           ),
         ),
       ],
@@ -477,124 +487,184 @@ class ChatScreen extends StatelessWidget {
     }
   }
 }
+class MessageBubble extends StatelessWidget {
+  final ChatMessage message;
+  final bool isLargeScreen;
 
-// Support message bubble (renamed from BotMessage)
-class SupportMessage extends StatelessWidget {
-  final String text;
-  const SupportMessage({required this.text});
+  const MessageBubble({
+    Key? key,
+    required this.message,
+    required this.isLargeScreen,
+  }) : super(key: key);
+
+  bool get isUserMessage => message.sender.role.toLowerCase() == 'user';
 
   @override
   Widget build(BuildContext context) {
-    final double deviceWidth = MediaQuery.of(context).size.width;
-    final bool isLargeScreen = deviceWidth >= 800;
-
     return Align(
-      alignment: Alignment.centerLeft,
+      alignment: isUserMessage ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 6),
-        padding: EdgeInsets.all(isLargeScreen ? 16 : 22),
+        margin: const EdgeInsets.symmetric(vertical: 4), // reduced margin
+        padding: EdgeInsets.symmetric(
+          horizontal: isLargeScreen ? 14 : 16,
+          vertical: isLargeScreen ? 8 : 10, // reduced padding
+        ),
         constraints: BoxConstraints(
           maxWidth: isLargeScreen
               ? MediaQuery.of(context).size.width * 0.7
               : MediaQuery.of(context).size.width * 0.8,
         ),
         decoration: BoxDecoration(
-          color: isLargeScreen
-              ? Colors.grey[800]?.withOpacity(0.6)
-              : AppColors.cardColor,
+          color: _getBubbleColor(),
           border: Border.all(
-            color: isLargeScreen
-                ? Colors.grey.withOpacity(0.3)
-                : Colors.grey.withOpacity(0.2),
+            color: _getBorderColor(),
           ),
-          borderRadius: const BorderRadius.only(
-            topRight: Radius.circular(16),
-            bottomLeft: Radius.circular(16),
-            bottomRight: Radius.circular(16),
-          ),
-          boxShadow: isLargeScreen
-              ? [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
+          borderRadius: _getBorderRadius(),
+          boxShadow: _getBoxShadow(),
         ),
-        child: Text(
-          text,
-          style: CustomTextTheme.regular16.copyWith(
-            color: AppColors.whiteColor,
-            fontWeight: FontWeight.w400,
-            fontSize: isLargeScreen ? 14 : 14,
-            height: 1.4,
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min, // shrink to fit content
+          children: [
+            if (!isUserMessage) ...[
+              Text(
+                '${message.sender.firstName} ${message.sender.lastName}',
+                style: TextStyle(
+                  color: AppColors.whiteColor.withOpacity(0.7),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 2), // smaller gap
+            ],
+            Text(
+              message.content,
+              style: CustomTextTheme.regular16.copyWith(
+                color: AppColors.whiteColor,
+                fontWeight: FontWeight.w400,
+                fontSize: 14,
+                height: 1.2, // reduced line spacing
+              ),
+            ),
+            const SizedBox(height: 2), // smaller gap
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _formatTime(message.createdAt),
+                  style: TextStyle(
+                    color: isUserMessage
+                        ? AppColors.whiteColor.withOpacity(0.7)
+                        : AppColors.whiteColor.withOpacity(0.5),
+                    fontSize: 10,
+                  ),
+                ),
+                if (isUserMessage) ...[
+                  const SizedBox(width: 4),
+                  // Icon(
+                  //   _getStatusIcon(),
+                  //   size: 12,
+                  //   color: AppColors.whiteColor.withOpacity(0.7),
+                  // ),
+                ],
+              ],
+            ),
+          ],
         ),
       ),
     );
   }
-}
 
-// User message bubble
-class UserMessage extends StatelessWidget {
-  final String text;
-  const UserMessage({required this.text});
+  Color _getBubbleColor() {
+    if (isUserMessage) {
+      return AppColors.primaryColor;
+    }
+    return isLargeScreen
+        ? Colors.grey[800]?.withOpacity(0.6) ?? Colors.grey[800]!
+        : AppColors.cardColor;
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    final double deviceWidth = MediaQuery.of(context).size.width;
-    final bool isLargeScreen = deviceWidth >= 800;
+  Color _getBorderColor() {
+    if (isUserMessage) {
+      return Colors.transparent;
+    }
+    return isLargeScreen
+        ? Colors.grey.withOpacity(0.3)
+        : Colors.grey.withOpacity(0.2);
+  }
 
-    return Align(
-      alignment: Alignment.centerRight,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 6),
-        padding: EdgeInsets.all(isLargeScreen ? 16 : 22),
-        constraints: BoxConstraints(
-          maxWidth: isLargeScreen
-              ? MediaQuery.of(context).size.width * 0.7
-              : MediaQuery.of(context).size.width * 0.8,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.primaryColor,
-          borderRadius: const BorderRadius.only(
-            topRight: Radius.circular(16),
-            bottomLeft: Radius.circular(16),
-            topLeft: Radius.circular(16),
-          ),
-          boxShadow: isLargeScreen
-              ? [
-                  BoxShadow(
-                    color: AppColors.primaryColor.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
-                  ),
-                ]
-              : null,
-        ),
-        child: Text(
-          text,
-          style: CustomTextTheme.regular16.copyWith(
-            color: AppColors.whiteColor,
-            fontWeight: FontWeight.w400,
-            fontSize: isLargeScreen ? 14 : 14,
-            height: 1.4,
-          ),
-        ),
-      ),
+  BorderRadius _getBorderRadius() {
+    if (isUserMessage) {
+      return const BorderRadius.only(
+        topRight: Radius.circular(16),
+        bottomLeft: Radius.circular(16),
+        topLeft: Radius.circular(16),
+      );
+    }
+    return const BorderRadius.only(
+      topRight: Radius.circular(16),
+      bottomLeft: Radius.circular(16),
+      bottomRight: Radius.circular(16),
     );
+  }
+
+  List<BoxShadow>? _getBoxShadow() {
+    if (!isLargeScreen) return null;
+
+    if (isUserMessage) {
+      return [
+        BoxShadow(
+          color: AppColors.primaryColor.withOpacity(0.3),
+          blurRadius: 8,
+          offset: const Offset(0, 3),
+        ),
+      ];
+    }
+    return [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.1),
+        blurRadius: 6,
+        offset: const Offset(0, 2),
+      ),
+    ];
+  }
+
+  IconData _getStatusIcon() {
+    switch (message.status.toLowerCase()) {
+      case 'sent':
+        return Icons.check;
+      case 'delivered':
+        return Icons.done_all;
+      case 'read':
+        return Icons.done_all;
+      default:
+        return Icons.access_time;
+    }
+  }
+
+  String _formatTime(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inDays > 0) {
+      return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours}h ago';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes}m ago';
+    } else {
+      return 'now';
+    }
   }
 }
 
-// Typing indicator
 class TypingIndicator extends StatelessWidget {
-  const TypingIndicator();
+  const TypingIndicator({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0), // reduced gap
       child: Text(
         'Support team is typing...',
         style: TextStyle(color: Colors.grey[500], fontStyle: FontStyle.italic),

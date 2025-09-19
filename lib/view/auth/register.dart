@@ -71,7 +71,7 @@ class RegisterScreen extends StatelessWidget {
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(20),
                                         child: Image.asset(
-                                          Assets.login_image,
+                                          Assets.sign_up,
                                           fit: BoxFit.cover,
                                         ),
                                       ),

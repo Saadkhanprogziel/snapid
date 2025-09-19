@@ -42,26 +42,23 @@ class HistoryFragment extends StatelessWidget {
                 Flexible(
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(25),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: AppColors.cardColor,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Obx(
-                          () {
-                            return TabBarWidgetFlexible(
-                              tabs: ['All Orders', 'Credited', 'Processed'],
-                              selectedIndex: controller.selectedTab.value,
-                              onTabSelected: (index) {
-                                controller.onTabChanged(index);
-                              },
-                            );
-                          },
-                        ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: AppColors.cardColor,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Obx(
+                        () {
+                          return TabBarWidgetFlexible(
+                            tabs: ['All Orders', 'Credited', 'Processed'],
+                            selectedIndex: controller.selectedTab.value,
+                            onTabSelected: (index) {
+                              controller.onTabChanged(index);
+                            },
+                          );
+                        },
                       ),
                     ),
                   ),

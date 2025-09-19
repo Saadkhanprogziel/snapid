@@ -26,7 +26,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
   @override
   void initState() {
     super.initState();
-    // ✅ Safe conversion to Map<String, dynamic>
+    
     final args = Map<String, dynamic>.from(Get.arguments ?? {});
     email = args["email"] ?? "";
     phone = args["phone"] ?? "";
@@ -37,7 +37,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background
+          
           SizedBox.expand(
             child: Image.asset(
               Assets.appBg,
@@ -50,19 +50,19 @@ class _VerificationScreenState extends State<VerificationScreen> {
               bool isWideScreen = constraints.maxWidth > 800;
 
               if (isWideScreen) {
-                // ✅ Desktop/Web layout
+                
                 return Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Row(
                     children: [
-                      // Left side text/logo
+                      
                       Expanded(
                         flex: 1,
                         child: Center(
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(20),
                             child: Image.asset(
-                              Assets.login_image,
+                              Assets.verify_screen,
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -76,7 +76,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   ),
                 );
               } else {
-                // ✅ Mobile layout
+                
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -94,7 +94,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
     );
   }
 
-  /// ✅ Extracted card with radio options + button
+  
   Widget _buildOptionsCard(BuildContext context, bool isWideScreen) {
     return Center(
       child: ClipRRect(
@@ -125,7 +125,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
               ),
               const SizedBox(height: 40),
               Container(
-                width: isWideScreen ? 600 : 450, // desktop max width
+                width: isWideScreen ? 600 : 450, 
                 padding: const EdgeInsets.all(30),
                 decoration: BoxDecoration(
                   color: const Color.fromARGB(20, 223, 222, 222),
@@ -214,7 +214,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
     );
   }
 
-  /// ✅ Custom radio tile
+  
   Widget _buildRadioTile({
     required ContactMethod value,
     required ContactMethod groupValue,

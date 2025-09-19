@@ -37,7 +37,7 @@ class ChangePassword extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Heading
+                        
                         Text(
                           "Create a New Password",
                           style: CustomTextTheme.headingLarge.copyWith(
@@ -55,7 +55,7 @@ class ChangePassword extends StatelessWidget {
                         ),
                         const SizedBox(height: 30),
 
-                        // Current Password
+                        
                         CustomTextField(
                           controller: controller.currentPasswordController,
                           label: "Current Password",
@@ -83,7 +83,7 @@ class ChangePassword extends StatelessWidget {
                         ),
                         const SizedBox(height: 20),
 
-                        // New Password
+                        
                         CustomTextField(
                           controller: controller.newPasswordController,
                           label: "New Password",
@@ -111,7 +111,7 @@ class ChangePassword extends StatelessWidget {
                         ),
                         const SizedBox(height: 20),
 
-                        // Confirm Password
+                        
                         CustomTextField(
                           controller: controller.confirmPasswordController,
                           label: "Confirm Password",
@@ -139,7 +139,7 @@ class ChangePassword extends StatelessWidget {
                         ),
                         const SizedBox(height: 30),
 
-                        // Reset Password Button
+                        
                         controller.isLoading
                             ? const CircularProgressIndicator()
                             : CustomElevatedButton(
@@ -163,7 +163,7 @@ class ChangePassword extends StatelessWidget {
         return Scaffold(
           body: Stack(
             children: [
-              // Background
+              
               SizedBox.expand(
                 child: Image.asset(
                   Assets.appBg,
@@ -197,7 +197,7 @@ class ChangePassword extends StatelessWidget {
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(20),
                                       child: Image.asset(
-                                        Assets.login_image,
+                                        Assets.reset_password,
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -214,10 +214,10 @@ class ChangePassword extends StatelessWidget {
                       ],
                     );
                   } else {
-                    // ✅ Mobile layout with header at top
+                    
                     return Column(
                       children: [
-                        const SizedBox(height: 40), // top spacing
+                        const SizedBox(height: 40), 
                         const CustomHeader(
                           title: "Change Password",
                           showBackButton: true,

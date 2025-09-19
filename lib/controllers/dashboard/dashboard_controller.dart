@@ -6,9 +6,10 @@ import 'package:snapid/models/user/user_model.dart';
 class DashboardController extends GetxController {
   final ScrollController scrollController = ScrollController();
 
-  // Observables
+  
   var showGreeting = true.obs;
-  var user = UserModel().obs; // store full user reactively
+  var user = UserModel().obs; 
+  var isCollapsed = false.obs; 
 
   String get userName => user.value.firstName ?? 'User';
   int get credits => user.value.credits ?? 0;
@@ -16,7 +17,25 @@ class DashboardController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    loadUser(); // initial load
+    loadUser(); 
+    _setupScrollListener(); 
+  }
+
+  void _setupScrollListener() {
+    scrollController.addListener(_scrollListener);
+  }
+
+  void _scrollListener() {
+    const double expandedHeight = 200;
+    const double toolbarHeight = 100;
+    const double collapseThreshold = expandedHeight - toolbarHeight - 20;
+
+    bool shouldCollapse = scrollController.hasClients &&
+        scrollController.offset > collapseThreshold;
+
+    if (shouldCollapse != isCollapsed.value) {
+      isCollapsed.value = shouldCollapse;
+    }
   }
 
   void loadUser() {
@@ -35,6 +54,8 @@ class DashboardController extends GetxController {
 
   @override
   void onClose() {
+    scrollController.removeListener(_scrollListener);
+    scrollController.dispose();
     super.onClose();
   }
 }

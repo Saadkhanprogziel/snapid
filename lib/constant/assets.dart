@@ -44,4 +44,9 @@ class Assets {
   static const String apple= 'assets/icons/apple.png';
   static const String google= 'assets/icons/google.png';
   static const String login_image= 'assets/images/login_image.png';
+  static const String reset_password= 'assets/images/reset_password.png';
+  static const String otp_screen= 'assets/images/otp_screen.png';
+  static const String sign_up= 'assets/images/sign_up.png';
+  static const String verify_screen= 'assets/images/verify_screen.png';
+  static const String forgot_password= 'assets/images/forgot_password.png';
 }

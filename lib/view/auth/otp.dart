@@ -186,7 +186,7 @@ class OtpScreen extends StatelessWidget {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(20),
                             child: Image.asset(
-                              Assets.login_image,
+                              Assets.otp_screen,
                               fit: BoxFit.cover,
                             ),
                           ),

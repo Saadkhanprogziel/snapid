@@ -51,7 +51,7 @@ class HelpSupport extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(isMobile  ? 20.0 : 50),
+            padding: EdgeInsets.all(isMobile  ? 8.0 : 50),
             child: Column(
               children: [
                 SafeArea(
@@ -60,7 +60,7 @@ class HelpSupport extends StatelessWidget {
                     showBackButton: true,
                   ),
                 ),
-                SpaceH20(),
+                // SpaceH20(),
                 Expanded(
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),

@@ -214,7 +214,6 @@ class EditProfileController extends GetxController {
         barrierDismissible: false,
       );
 
-      // Pass all data to repository - let repository handle FormData creation
       final result = await authRespository.updateProfile(
         firstName: firstNameController.text.trim(),
         lastName: lastNameController.text.trim(),

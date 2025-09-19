@@ -37,7 +37,6 @@ Widget build(BuildContext context) {
   final screenWidth = MediaQuery.of(context).size.width;
   final isMobile = screenWidth <= 800;
 
-  // Responsive adjustments
   final imageSize = isMobile ? 130.0 : 100.0;
   final cardPadding = isMobile ? 15.0 : 14.0;
   final titleStyle = isMobile
@@ -52,137 +51,134 @@ Widget build(BuildContext context) {
 
   return ClipRRect(
     borderRadius: BorderRadius.circular(25),
-    child: BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: cardPadding, vertical: cardPadding),
-        constraints: BoxConstraints(minHeight: isMobile ? 220 : 170),
-        decoration: BoxDecoration(
-          color: AppColors.cardColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Top section: Image + Details + Menu
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Left: Image
-                Container(
-                  width: imageSize,
-                  height: imageSize,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: CustomCachedImage(
-                      imageUrl: photoCreationModel.processedImageUrl ??
-                          photoCreationModel.processedWatermarkedUrl,
-                    ),
+    child: Container(
+      padding: EdgeInsets.symmetric(horizontal: cardPadding, vertical: cardPadding),
+      constraints: BoxConstraints(minHeight: isMobile ? 220 : 170),
+      decoration: BoxDecoration(
+        color: AppColors.cardColor,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              
+              Container(
+                width: imageSize,
+                height: imageSize,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: CustomCachedImage(
+                    imageUrl: photoCreationModel.processedImageUrl ??
+                        photoCreationModel.processedWatermarkedUrl,
                   ),
                 ),
-
-                const SizedBox(width: 12),
-
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(photoCreationModel.countryName, style: titleStyle),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Text("Created", style: subtitleStyle),
-                          const SpaceW10(),
+              ),
+    
+              const SizedBox(width: 12),
+    
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(photoCreationModel.countryName, style: titleStyle),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Text("Created", style: subtitleStyle),
+                        const SpaceW10(),
+                        Text(
+                          formatDate(photoCreationModel.createdAt, pattern: 'dd MMM, yyyy'),
+                          style: subtitleStyle,
+                        ),
+                      ],
+                    ),
+                    const SpaceH20(),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: photoCreationModel.status == "CREDITED"
+                                ? Colors.green.withValues(alpha: 0.5)
+                                : Colors.orange.withValues(alpha: 0.6),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(photoCreationModel.status, style: statusTextStyle),
+                        ),
+                        const SizedBox(height: 8),
+                        if (photoCreationModel.status != "CREDITED")
                           Text(
-                            formatDate(photoCreationModel.createdAt, pattern: 'dd MMM, yyyy'),
+                            "Expire Within 7 days",
                             style: subtitleStyle,
                           ),
-                        ],
-                      ),
-                      const SpaceH20(),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: photoCreationModel.status == "CREDITED"
-                                  ? Colors.green.withValues(alpha: 0.5)
-                                  : Colors.orange.withValues(alpha: 0.6),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(photoCreationModel.status, style: statusTextStyle),
-                          ),
-                          const SizedBox(height: 8),
-                          if (photoCreationModel.status != "CREDITED")
-                            Text(
-                              "Expire Within 7 days",
-                              style: subtitleStyle,
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                PopupMenuButton<String>(
-                  color: const Color.fromARGB(194, 46, 46, 46),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  onSelected: (value) {
-                    if (value == 'delete') {
-                      _showDeleteDialog(context);
-                    } else if (value == 'redownload') {
-                      _handleDownload(controller);
-                    }
-                  },
-                  itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                    _buildMenuItem(Icons.file_download_outlined, 'Download', 'redownload'),
-                    _buildDivider(),
-                    _buildMenuItem(Icons.delete, 'Delete', 'delete'),
+                      ],
+                    ),
                   ],
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(159, 46, 46, 46),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: const Icon(
-                      Icons.more_vert,
-                      color: Colors.white,
-                    ),
-                  ),
-                )
-              ],
-            ),
-
-            const SpaceH20(),
-
-            // Bottom section: Document Type
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                ),
+              ),
+    
+              PopupMenuButton<String>(
+                color: const Color.fromARGB(194, 46, 46, 46),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                onSelected: (value) {
+                  if (value == 'delete') {
+                    _showDeleteDialog(context);
+                  } else if (value == 'redownload') {
+                    _handleDownload(controller);
+                  }
+                },
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                  _buildMenuItem(Icons.file_download_outlined, 'Download', 'redownload'),
+                  _buildDivider(),
+                  _buildMenuItem(Icons.delete, 'Delete', 'delete'),
+                ],
+                child: Container(
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(20, 223, 222, 222),
-                    borderRadius: BorderRadius.circular(10),
+                    color: const Color.fromARGB(159, 46, 46, 46),
+                    borderRadius: BorderRadius.circular(30),
                   ),
-                  child: SvgPicture.asset(
-                    Assets.globeIcon,
-                    width: 15,
+                  child: const Icon(
+                    Icons.more_vert,
+                    color: Colors.white,
                   ),
                 ),
-                const SpaceW10(),
-                Text(
-                  photoCreationModel.documentType,
-                  style: subtitleStyle,
+              )
+            ],
+          ),
+    
+          const SpaceH20(),
+    
+          
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(20, 223, 222, 222),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-              ],
-            ),
-          ],
-        ),
+                child: SvgPicture.asset(
+                  Assets.globeIcon,
+                  width: 15,
+                ),
+              ),
+              const SpaceW10(),
+              Text(
+                photoCreationModel.documentType,
+                style: subtitleStyle,
+              ),
+            ],
+          ),
+        ],
       ),
     ),
   );
@@ -195,7 +191,7 @@ Widget build(BuildContext context) {
       final dateTime = DateTime.parse(dateString);
       return DateFormat(pattern).format(dateTime);
     } catch (e) {
-      return dateString; // fallback in case parsing fails
+      return dateString; 
     }
   }
 

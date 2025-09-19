@@ -39,7 +39,7 @@ class ForgotPassword extends StatelessWidget {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(20),
                           child: Image.asset(
-                            Assets.login_image,
+                            Assets.forgot_password,
                             fit: BoxFit.cover,
                           ),
                         ),
