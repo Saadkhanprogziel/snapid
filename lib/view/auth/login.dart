@@ -382,248 +382,245 @@ class LoginScreen extends StatelessWidget {
       {bool isWeb = false, required GlobalKey<FormState> formKey}) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(25),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(
-            horizontal: isWeb ? 40 : 30,
-            vertical: isWeb ? 40 : 30,
-          ),
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(5, 223, 222, 222),
-            borderRadius: BorderRadius.circular(25),
-          ),
-          child: SingleChildScrollView(
-            child: Form(
-              key: formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Email field
-                  CustomTextField(
-                    controller: logincontroller.emailController,
-                    hintText: Strings.enterEmail,
-                    prefixIcon: Icons.email,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your email or phone number';
-                      }
-                      if (GetUtils.isEmail(value)) {
-                        return null;
-                      }
-                      if (GetUtils.isPhoneNumber(value)) {
-                        return null;
-                      }
-                      return 'Enter a valid email or phone number';
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Password field
-                  CustomTextField(
-                    controller: logincontroller.passwordController,
-                    hintText: Strings.yourPassword,
-                    obscureText: logincontroller.isPasswordObscured.value,
-                    prefixIcon: Icons.lock,
-                    suffixIcon: logincontroller.isPasswordObscured.value
-                        ? Icons.visibility
-                        : Icons.visibility_off,
-                    onSuffixIconPressed: () {
-                      logincontroller.togglePasswordVisibility();
-                    },
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
-                      }
-                      if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
-                      }
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(
+          horizontal: isWeb ? 40 : 30,
+          vertical: isWeb ? 40 : 30,
+        ),
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(5, 223, 222, 222),
+          borderRadius: BorderRadius.circular(25),
+        ),
+        child: SingleChildScrollView(
+          child: Form(
+            key: formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Email field
+                CustomTextField(
+                  controller: logincontroller.emailController,
+                  hintText: Strings.enterEmail,
+                  prefixIcon: Icons.email,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your email or phone number';
+                    }
+                    if (GetUtils.isEmail(value)) {
                       return null;
+                    }
+                    if (GetUtils.isPhoneNumber(value)) {
+                      return null;
+                    }
+                    return 'Enter a valid email or phone number';
+                  },
+                ),
+                const SizedBox(height: 16),
+      
+                // Password field
+                CustomTextField(
+                  controller: logincontroller.passwordController,
+                  hintText: Strings.yourPassword,
+                  obscureText: logincontroller.isPasswordObscured.value,
+                  prefixIcon: Icons.lock,
+                  suffixIcon: logincontroller.isPasswordObscured.value
+                      ? Icons.visibility
+                      : Icons.visibility_off,
+                  onSuffixIconPressed: () {
+                    logincontroller.togglePasswordVisibility();
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    if (value.length < 6) {
+                      return 'Password must be at least 6 characters';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 10),
+      
+                // Forgot password
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {
+                      Get.toNamed(PrimaryRoute.forgotPassword);
                     },
-                  ),
-                  const SizedBox(height: 10),
-
-                  // Forgot password
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        Get.toNamed(PrimaryRoute.forgotPassword);
-                      },
-                      child: Text(
-                        Strings.forgotPassword,
-                        style: CustomTextTheme.regular14
-                            .copyWith(color: AppColors.whiteColor),
-                      ),
+                    child: Text(
+                      Strings.forgotPassword,
+                      style: CustomTextTheme.regular14
+                          .copyWith(color: AppColors.whiteColor),
                     ),
                   ),
-                  const SizedBox(height: 10),
-
-                  // Sign in button
-                  logincontroller.isLoading
-                      ? const SizedBox(
-                          height: 60,
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                            ),
+                ),
+                const SizedBox(height: 10),
+      
+                // Sign in button
+                logincontroller.isLoading
+                    ? const SizedBox(
+                        height: 60,
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
                           ),
-                        )
-                      : CustomElevatedButton(
-                          onPressed: () {
-                            if (formKey.currentState?.validate() ?? false) {
-                              logincontroller.onLogin();
-                            }
-                          },
-                          text: Strings.signIn,
-                          minHeight: 60,
                         ),
-
-                  const SizedBox(height: 30),
-
-                  // Biometric button
-                  GetBuilder<BiometricController>(
-                    init: BiometricController(),
-                    autoRemove: false, // Prevent auto removal
-                    builder: (biometricController) {
-                      var isBiometricEnabled =
-                          appStorage.read('biometric_enabled') ?? false;
-                      if (!isBiometricEnabled) {
-                        return const SizedBox.shrink();
-                      }
-                      return OutlinedButton.icon(
-                        onPressed: () async {
-                          try {
-                            await logincontroller.onBiometricButtonPressed();
-                          } catch (e) {
-                            debugPrint('Error in biometric authentication: $e');
+                      )
+                    : CustomElevatedButton(
+                        onPressed: () {
+                          if (formKey.currentState?.validate() ?? false) {
+                            logincontroller.onLogin();
                           }
                         },
-                        icon: biometricController.isLoading.value
-                            ? const SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white70,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : Icon(
-                                biometricController.biometricType.value ==
-                                        'Face ID'
-                                    ? Icons.face
-                                    : Icons.fingerprint,
+                        text: Strings.signIn,
+                        minHeight: 60,
+                      ),
+      
+                const SizedBox(height: 30),
+      
+                // Biometric button
+                GetBuilder<BiometricController>(
+                  init: BiometricController(),
+                  autoRemove: false, // Prevent auto removal
+                  builder: (biometricController) {
+                    var isBiometricEnabled =
+                        appStorage.read('biometric_enabled') ?? false;
+                    if (!isBiometricEnabled) {
+                      return const SizedBox.shrink();
+                    }
+                    return OutlinedButton.icon(
+                      onPressed: () async {
+                        try {
+                          await logincontroller.onBiometricButtonPressed();
+                        } catch (e) {
+                          debugPrint('Error in biometric authentication: $e');
+                        }
+                      },
+                      icon: biometricController.isLoading.value
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
                                 color: Colors.white70,
-                                size: 30,
+                                strokeWidth: 2,
                               ),
-                        label: Text(
-                          biometricController.isBiometricAvailable.value
-                              ? 'Sign in with Biometric'
-                              : Strings.signInWithBiometrics,
-                          style: CustomTextTheme.regular16.copyWith(
+                            )
+                          : Icon(
+                              biometricController.biometricType.value ==
+                                      'Face ID'
+                                  ? Icons.face
+                                  : Icons.fingerprint,
+                              color: Colors.white70,
+                              size: 30,
+                            ),
+                      label: Text(
+                        biometricController.isBiometricAvailable.value
+                            ? 'Sign in with Biometric'
+                            : Strings.signInWithBiometrics,
+                        style: CustomTextTheme.regular16.copyWith(
+                          color: AppColors.whiteColor,
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.white24),
+                        minimumSize: const Size.fromHeight(60),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
+      
+                // Google sign in
+                OutlinedButton.icon(
+                  onPressed: () {
+                    try {
+                      debugPrint('Google sign in pressed');
+                    } catch (e) {
+                      debugPrint('Error in Google sign in: $e');
+                    }
+                  },
+                  icon: Image.asset(
+                    'assets/icons/google.png',
+                    width: 24,
+                    height: 24,
+                  ),
+                  label: Text(
+                    Strings.continueWithGoogle,
+                    style: CustomTextTheme.regular16
+                        .copyWith(color: AppColors.whiteColor),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.white24),
+                    minimumSize: const Size.fromHeight(60),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+      
+                // Apple sign in
+                OutlinedButton.icon(
+                  onPressed: () {
+                    try {
+                      debugPrint('Apple sign in pressed');
+                    } catch (e) {
+                      debugPrint('Error in Apple sign in: $e');
+                    }
+                  },
+                  icon: Image.asset(
+                    'assets/icons/apple.png',
+                    width: 27,
+                    height: 27,
+                  ),
+                  label: Text(
+                    Strings.continueWithApple,
+                    style: CustomTextTheme.regular16
+                        .copyWith(color: AppColors.whiteColor),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.white24),
+                    minimumSize: const Size.fromHeight(60),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+      
+                // Sign up link
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        Strings.dontHaveAccount,
+                        style: CustomTextTheme.regular14.copyWith(
                             color: AppColors.whiteColor,
-                          ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.white24),
-                          minimumSize: const Size.fromHeight(60),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Google sign in
-                  OutlinedButton.icon(
-                    onPressed: () {
-                      try {
-                        debugPrint('Google sign in pressed');
-                      } catch (e) {
-                        debugPrint('Error in Google sign in: $e');
-                      }
-                    },
-                    icon: Image.asset(
-                      'assets/icons/google.png',
-                      width: 24,
-                      height: 24,
-                    ),
-                    label: Text(
-                      Strings.continueWithGoogle,
-                      style: CustomTextTheme.regular16
-                          .copyWith(color: AppColors.whiteColor),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.white24),
-                      minimumSize: const Size.fromHeight(60),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                            fontWeight: FontWeight.w400),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Apple sign in
-                  OutlinedButton.icon(
-                    onPressed: () {
-                      try {
-                        debugPrint('Apple sign in pressed');
-                      } catch (e) {
-                        debugPrint('Error in Apple sign in: $e');
-                      }
-                    },
-                    icon: Image.asset(
-                      'assets/icons/apple.png',
-                      width: 27,
-                      height: 27,
-                    ),
-                    label: Text(
-                      Strings.continueWithApple,
-                      style: CustomTextTheme.regular16
-                          .copyWith(color: AppColors.whiteColor),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.white24),
-                      minimumSize: const Size.fromHeight(60),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Sign up link
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          Strings.dontHaveAccount,
+                      TextButton(
+                        onPressed: () {
+                          Get.toNamed(PrimaryRoute.register);
+                        },
+                        child: Text(
+                          Strings.signUp,
                           style: CustomTextTheme.regular14.copyWith(
-                              color: AppColors.whiteColor,
+                              color: AppColors.primaryColor,
                               fontWeight: FontWeight.w400),
                         ),
-                        TextButton(
-                          onPressed: () {
-                            Get.toNamed(PrimaryRoute.register);
-                          },
-                          child: Text(
-                            Strings.signUp,
-                            style: CustomTextTheme.regular14.copyWith(
-                                color: AppColors.primaryColor,
-                                fontWeight: FontWeight.w400),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

@@ -95,23 +95,20 @@ class _NotificationScreenState extends State<NotificationScreen>
           Flexible(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(25),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(20, 223, 222, 222),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Obx(
-                    () => TabBarWidgetFlexible(
-                      tabs: ['All ', 'Success', 'Reminders'],
-                      selectedIndex: controller.selectedTab.value,
-                      onTabSelected: (index) {
-                        controller.onTabChanged(index);
-                      },
-                    ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(20, 223, 222, 222),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Obx(
+                  () => TabBarWidgetFlexible(
+                    tabs: ['All ', 'Success', 'Reminders'],
+                    selectedIndex: controller.selectedTab.value,
+                    onTabSelected: (index) {
+                      controller.onTabChanged(index);
+                    },
                   ),
                 ),
               ),

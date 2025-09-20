@@ -9,17 +9,20 @@ class ChatRepository {
   Future<Either<String, List<ChatMessage>>> fetchAllMessages({
     required int limit,
     required String chatId,
+    int offset = 0,
   }) async {
-    final response =
-        await networkRepository.get(url: "/chat/$chatId/get-all-messages", extraQuery: {
-      "limit": limit,
-    });
+    final response = await networkRepository.get(
+      url: "/chat/$chatId/get-all-messages",
+      extraQuery: {
+        "limit": limit,
+        "offset": offset,
+      },
+    );
 
     if (!response.failed) {
-              final List<dynamic> messages = response.data['data'];
-
-       List<ChatMessage> data =
-            messages.map((item) => ChatMessage.fromJson(item)).toList();
+      final List<dynamic> messages = response.data['data'];
+      List<ChatMessage> data =
+          messages.map((item) => ChatMessage.fromJson(item)).toList();
       return right(data);
     }
 

@@ -135,360 +135,357 @@ class RegisterScreen extends StatelessWidget {
     return Center(
       child: ClipRRect(
         borderRadius: BorderRadius.circular(25),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Container(
-            width: isWideScreen ? 600 :500, // keeps it clean on wide screens
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
-            decoration: BoxDecoration(
-              color: isWideScreen ? Colors.transparent: Color.fromARGB(20, 223, 222, 222),
-              borderRadius: BorderRadius.circular(25),
-            ),
-            child: SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    /// First name
-                    CustomTextField(
-                      onChanged: (value) {
-                        controller.register.firstName = value;
-                        controller.update();
-                      },
-                      hintText: Strings.firstName,
-                      prefixIcon: Icons.person,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'First name is required';
-                        }
-                        if (value.length < 2) {
-                          return 'First name must be at least 2 characters';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-
-                    /// Last name
-                    CustomTextField(
-                      onChanged: (value) {
-                        controller.register.lastName = value;
-                        controller.update();
-                      },
-                      hintText: Strings.lastName,
-                      prefixIcon: Icons.person,
-                    ),
-                    const SizedBox(height: 16),
-
-                    /// Email
-                    CustomTextField(
-                      onChanged: (value) {
-                        controller.register.email = value;
-                        controller.update();
-                      },
-                      hintText: Strings.email,
-                      prefixIcon: Icons.email,
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Email is required';
-                        }
-                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                            .hasMatch(value)) {
-                          return 'Please enter a valid email';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-
-                    /// Gender
-                    DropdownButtonFormField<String>(
-                      value: controller.register.gender,
-                      onChanged: (value) {
-                        controller.register.gender = value!;
-                        controller.update();
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please select your gender';
-                        }
-                        return null;
-                      },
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      icon: const Icon(Icons.arrow_drop_down,
-                          color: Colors.white),
-                      dropdownColor: const Color.fromARGB(216, 39, 43, 52),
-                      style: CustomTextTheme.regular14
-                          .copyWith(color: Colors.white),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white10,
-                        hintText: Strings.selectGender,
-                        hintStyle: const TextStyle(color: Colors.white70),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 22),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
+        child: Container(
+          width: isWideScreen ? 600 :500, // keeps it clean on wide screens
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+          decoration: BoxDecoration(
+            color: isWideScreen ? Colors.transparent: Color.fromARGB(20, 223, 222, 222),
+            borderRadius: BorderRadius.circular(25),
+          ),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  /// First name
+                  CustomTextField(
+                    onChanged: (value) {
+                      controller.register.firstName = value;
+                      controller.update();
+                    },
+                    hintText: Strings.firstName,
+                    prefixIcon: Icons.person,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'First name is required';
+                      }
+                      if (value.length < 2) {
+                        return 'First name must be at least 2 characters';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+        
+                  /// Last name
+                  CustomTextField(
+                    onChanged: (value) {
+                      controller.register.lastName = value;
+                      controller.update();
+                    },
+                    hintText: Strings.lastName,
+                    prefixIcon: Icons.person,
+                  ),
+                  const SizedBox(height: 16),
+        
+                  /// Email
+                  CustomTextField(
+                    onChanged: (value) {
+                      controller.register.email = value;
+                      controller.update();
+                    },
+                    hintText: Strings.email,
+                    prefixIcon: Icons.email,
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Email is required';
+                      }
+                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                          .hasMatch(value)) {
+                        return 'Please enter a valid email';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+        
+                  /// Gender
+                  DropdownButtonFormField<String>(
+                    value: controller.register.gender,
+                    onChanged: (value) {
+                      controller.register.gender = value!;
+                      controller.update();
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please select your gender';
+                      }
+                      return null;
+                    },
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    icon: const Icon(Icons.arrow_drop_down,
+                        color: Colors.white),
+                    dropdownColor: const Color.fromARGB(216, 39, 43, 52),
+                    style: CustomTextTheme.regular14
+                        .copyWith(color: Colors.white),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white10,
+                      hintText: Strings.selectGender,
+                      hintStyle: const TextStyle(color: Colors.white70),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 22),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
                       ),
-                      items: controller.genderOptions
-                          .map(
-                            (gender) => DropdownMenuItem(
-                              value: gender,
-                              child: Text(gender),
-                            ),
-                          )
-                          .toList(),
                     ),
-                    const SizedBox(height: 16),
-
-                    /// Phone number with country code
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          child: FormField<Country?>(
-                            validator: (value) {
-                              if (controller.selectedCountryCode.value ==
-                                  null) {
-                                return 'Required';
-                              }
-                              return null;
-                            },
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
-                            builder: (formFieldState) {
-                              final countryCode =
-                                  controller.selectedCountryCode.value;
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    height: 65,
-                                    child: OutlinedButton(
-                                      onPressed: () =>
-                                          _showCountryCodePicker(controller),
-                                      style: OutlinedButton.styleFrom(
-                                        backgroundColor: Colors.white10,
-                                        side: BorderSide(
-                                          color: formFieldState.hasError
-                                              ? Colors.red
-                                              : Colors.transparent,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 0,
-                                          horizontal: 8,
-                                        ),
+                    items: controller.genderOptions
+                        .map(
+                          (gender) => DropdownMenuItem(
+                            value: gender,
+                            child: Text(gender),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                  const SizedBox(height: 16),
+        
+                  /// Phone number with country code
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        child: FormField<Country?>(
+                          validator: (value) {
+                            if (controller.selectedCountryCode.value ==
+                                null) {
+                              return 'Required';
+                            }
+                            return null;
+                          },
+                          autovalidateMode:
+                              AutovalidateMode.onUserInteraction,
+                          builder: (formFieldState) {
+                            final countryCode =
+                                controller.selectedCountryCode.value;
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height: 65,
+                                  child: OutlinedButton(
+                                    onPressed: () =>
+                                        _showCountryCodePicker(controller),
+                                    style: OutlinedButton.styleFrom(
+                                      backgroundColor: Colors.white10,
+                                      side: BorderSide(
+                                        color: formFieldState.hasError
+                                            ? Colors.red
+                                            : Colors.transparent,
                                       ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          if (countryCode != null) ...[
-                                            SvgPicture.asset(
-                                              countryCode.flag,
-                                              width: 16,
-                                              height: 16,
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              countryCode.dialCode,
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          ] else
-                                            const Text(
-                                              "+00",
-                                              style: TextStyle(
-                                                color: Colors.white70,
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          const SizedBox(width: 4),
-                                          const Icon(
-                                            Icons.arrow_drop_down,
-                                            color: Colors.white,
-                                            size: 18,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 0,
+                                        horizontal: 8,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        if (countryCode != null) ...[
+                                          SvgPicture.asset(
+                                            countryCode.flag,
+                                            width: 16,
+                                            height: 16,
                                           ),
-                                        ],
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            countryCode.dialCode,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ] else
+                                          const Text(
+                                            "+00",
+                                            style: TextStyle(
+                                              color: Colors.white70,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        const SizedBox(width: 4),
+                                        const Icon(
+                                          Icons.arrow_drop_down,
+                                          color: Colors.white,
+                                          size: 18,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                if (formFieldState.hasError)
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 12, top: 6),
+                                    child: Text(
+                                      formFieldState.errorText!,
+                                      style: const TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 12,
+                                        height: 1,
                                       ),
                                     ),
                                   ),
-                                  if (formFieldState.hasError)
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 12, top: 6),
-                                      child: Text(
-                                        formFieldState.errorText!,
-                                        style: const TextStyle(
-                                          color: Colors.red,
-                                          fontSize: 12,
-                                          height: 1,
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          flex: 5,
-                          child: CustomTextField(
-                            onChanged: (value) {
-                              controller.register.phone = value;
-                            },
-                            hintText: Strings.phoneNumber,
-                            prefixIcon: Icons.phone,
-                            keyboardType: TextInputType.phone,
-                            validator: (value) => value == null || value.isEmpty
-                                ? 'Phone number is required'
-                                : (value.length < 10
-                                    ? 'Phone number must be at least 10 digits'
-                                    : null),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-
-                    /// Password
-                    CustomTextField(
-                      onChanged: (value) {
-                        controller.register.password = value;
-                        controller.update();
-                      },
-                      hintText: Strings.password,
-                      prefixIcon: Icons.lock,
-                      suffixIcon: controller.isPasswordObscured
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                      obscureText: controller.isPasswordObscured,
-                      onSuffixIconPressed: () {
-                        controller.togglePasswordVisibility();
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Password is required';
-                        }
-                        if (value.length < 8) {
-                          return 'Password must be at least 8 characters';
-                        }
-                        if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$')
-                            .hasMatch(value)) {
-                          return 'Must contain uppercase, lowercase and number';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-
-                    /// Confirm Password
-                    CustomTextField(
-                      onChanged: (value) {
-                        controller.register.confirmPassword = value;
-                        controller.update();
-                      },
-                      hintText: Strings.confirmPassword,
-                      prefixIcon: Icons.lock,
-                      obscureText: controller.isConfrimPasswordObscured,
-                      suffixIcon: controller.isConfrimPasswordObscured
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                      onSuffixIconPressed: () {
-                        controller.toggleConfrimPasswordVisibility();
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please confirm your password';
-                        }
-                        if (value != controller.register.password) {
-                          return 'Passwords do not match';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-
-                    /// Terms Checkbox
-                    Row(
-                      children: [
-                        Obx(
-                          () => Checkbox(
-                            value: controller.agreeToTerms.value,
-                            onChanged: (value) {
-                              controller.agreeToTerms.value = value ?? false;
-                            },
-                            activeColor: AppColors.primaryColor,
-                          ),
-                        ),
-                        Expanded(
-                          child: Text(
-                            Strings.agreeTerms,
-                            style: CustomTextTheme.regular12.copyWith(
-                              color: AppColors.whiteColor,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-
-                    /// Register Button
-                    Obx(() {
-                      return controller.isLoading.value
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : CustomElevatedButton(
-                              minHeight: 60,
-                              onPressed: () async {
-                                if (_formKey.currentState!.validate()) {
-                                  controller.onRegister();
-                                }
-                              },
-                              text: Strings.register,
+                              ],
                             );
-                    }),
-
-                    const SizedBox(height: 10),
-
-                    /// Already have account
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            Strings.alreadyHaveAccount,
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        flex: 5,
+                        child: CustomTextField(
+                          onChanged: (value) {
+                            controller.register.phone = value;
+                          },
+                          hintText: Strings.phoneNumber,
+                          prefixIcon: Icons.phone,
+                          keyboardType: TextInputType.phone,
+                          validator: (value) => value == null || value.isEmpty
+                              ? 'Phone number is required'
+                              : (value.length < 10
+                                  ? 'Phone number must be at least 10 digits'
+                                  : null),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+        
+                  /// Password
+                  CustomTextField(
+                    onChanged: (value) {
+                      controller.register.password = value;
+                      controller.update();
+                    },
+                    hintText: Strings.password,
+                    prefixIcon: Icons.lock,
+                    suffixIcon: controller.isPasswordObscured
+                        ? Icons.visibility
+                        : Icons.visibility_off,
+                    obscureText: controller.isPasswordObscured,
+                    onSuffixIconPressed: () {
+                      controller.togglePasswordVisibility();
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Password is required';
+                      }
+                      if (value.length < 8) {
+                        return 'Password must be at least 8 characters';
+                      }
+                      if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$')
+                          .hasMatch(value)) {
+                        return 'Must contain uppercase, lowercase and number';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+        
+                  /// Confirm Password
+                  CustomTextField(
+                    onChanged: (value) {
+                      controller.register.confirmPassword = value;
+                      controller.update();
+                    },
+                    hintText: Strings.confirmPassword,
+                    prefixIcon: Icons.lock,
+                    obscureText: controller.isConfrimPasswordObscured,
+                    suffixIcon: controller.isConfrimPasswordObscured
+                        ? Icons.visibility
+                        : Icons.visibility_off,
+                    onSuffixIconPressed: () {
+                      controller.toggleConfrimPasswordVisibility();
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please confirm your password';
+                      }
+                      if (value != controller.register.password) {
+                        return 'Passwords do not match';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+        
+                  /// Terms Checkbox
+                  Row(
+                    children: [
+                      Obx(
+                        () => Checkbox(
+                          value: controller.agreeToTerms.value,
+                          onChanged: (value) {
+                            controller.agreeToTerms.value = value ?? false;
+                          },
+                          activeColor: AppColors.primaryColor,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          Strings.agreeTerms,
+                          style: CustomTextTheme.regular12.copyWith(
+                            color: AppColors.whiteColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+        
+                  /// Register Button
+                  Obx(() {
+                    return controller.isLoading.value
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : CustomElevatedButton(
+                            minHeight: 60,
+                            onPressed: () async {
+                              if (_formKey.currentState!.validate()) {
+                                controller.onRegister();
+                              }
+                            },
+                            text: Strings.register,
+                          );
+                  }),
+        
+                  const SizedBox(height: 10),
+        
+                  /// Already have account
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          Strings.alreadyHaveAccount,
+                          style: CustomTextTheme.regular14.copyWith(
+                            color: AppColors.whiteColor,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Get.toNamed(PrimaryRoute.login);
+                          },
+                          child: Text(
+                            Strings.signIn,
                             style: CustomTextTheme.regular14.copyWith(
-                              color: AppColors.whiteColor,
+                              color: AppColors.primaryColor,
                               fontWeight: FontWeight.w400,
                             ),
                           ),
-                          TextButton(
-                            onPressed: () {
-                              Get.toNamed(PrimaryRoute.login);
-                            },
-                            child: Text(
-                              Strings.signIn,
-                              style: CustomTextTheme.regular14.copyWith(
-                                color: AppColors.primaryColor,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

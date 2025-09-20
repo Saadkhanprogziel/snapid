@@ -20,85 +20,82 @@ class CountryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          width: 300,
-          decoration: BoxDecoration(
-            color: AppColors.cardColor, // Light translucent color
-            borderRadius: BorderRadius.circular(15),
-          ),
-          padding: const EdgeInsets.all(15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 90,
-                height: 60,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: Colors.white, // Optional: background color
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: SvgPicture.asset(
-                  flagAsset,
-                  fit: BoxFit.cover,
-                ),
+      child: Container(
+        width: 300,
+        decoration: BoxDecoration(
+          color: AppColors.cardColor, // Light translucent color
+          borderRadius: BorderRadius.circular(15),
+        ),
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 90,
+              height: 60,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.white, // Optional: background color
               ),
-              const SizedBox(height: 20),
-              Text(countryName,
-                  style: CustomTextTheme.regular16
-                      .copyWith(color: AppColors.whiteColor)),
-              const SizedBox(height: 4),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Passport:',
-                      style: CustomTextTheme.regular12.copyWith(
-                          color: Colors.white70, fontWeight: FontWeight.w400)),
-                  Text('$passportSize',
-                      style: CustomTextTheme.regular12.copyWith(
-                          color: Colors.white70, fontWeight: FontWeight.w400)),
-                ],
+              clipBehavior: Clip.antiAlias,
+              child: SvgPicture.asset(
+                flagAsset,
+                fit: BoxFit.cover,
               ),
-              const SizedBox(height: 4),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Visa:',
-                      style: CustomTextTheme.regular12.copyWith(
-                          color: Colors.white70, fontWeight: FontWeight.w400)),
-                  Text('$passportSize',
-                      style: CustomTextTheme.regular12.copyWith(
-                          color: Colors.white70, fontWeight: FontWeight.w400)),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Driving License:',
-                      style: CustomTextTheme.regular12.copyWith(
-                          color: Colors.white70, fontWeight: FontWeight.w400)),
-                  Text('$passportSize',
-                      style: CustomTextTheme.regular12.copyWith(
-                          color: Colors.white70, fontWeight: FontWeight.w400)),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('8G Color',
-                      style: CustomTextTheme.regular12.copyWith(
-                          color: Colors.white70, fontWeight: FontWeight.w400)),
-                  Text('$passportSize',
-                      style: CustomTextTheme.regular12.copyWith(
-                          color: Colors.white70, fontWeight: FontWeight.w400)),
-                ],
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 20),
+            Text(countryName,
+                style: CustomTextTheme.regular16
+                    .copyWith(color: AppColors.whiteColor)),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Passport:',
+                    style: CustomTextTheme.regular12.copyWith(
+                        color: Colors.white70, fontWeight: FontWeight.w400)),
+                Text('$passportSize',
+                    style: CustomTextTheme.regular12.copyWith(
+                        color: Colors.white70, fontWeight: FontWeight.w400)),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Visa:',
+                    style: CustomTextTheme.regular12.copyWith(
+                        color: Colors.white70, fontWeight: FontWeight.w400)),
+                Text('$passportSize',
+                    style: CustomTextTheme.regular12.copyWith(
+                        color: Colors.white70, fontWeight: FontWeight.w400)),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Driving License:',
+                    style: CustomTextTheme.regular12.copyWith(
+                        color: Colors.white70, fontWeight: FontWeight.w400)),
+                Text('$passportSize',
+                    style: CustomTextTheme.regular12.copyWith(
+                        color: Colors.white70, fontWeight: FontWeight.w400)),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('8G Color',
+                    style: CustomTextTheme.regular12.copyWith(
+                        color: Colors.white70, fontWeight: FontWeight.w400)),
+                Text('$passportSize',
+                    style: CustomTextTheme.regular12.copyWith(
+                        color: Colors.white70, fontWeight: FontWeight.w400)),
+              ],
+            ),
+          ],
         ),
       ),
     );

@@ -10,6 +10,8 @@ class ChatController extends GetxController {
   final chatRepository = ChatRepository();
 
   final RxList<ChatMessage> messages = <ChatMessage>[].obs;
+  final int _pageSize = 50;
+  bool _hasMore = true;
   final RxBool isConnected = false.obs;
   final RxBool isTyping = false.obs;
   final RxBool isLoading = false.obs;
@@ -29,7 +31,9 @@ class ChatController extends GetxController {
   void onInit() {
     super.onInit();
     _initializeTicketData();
-    getAllMessages();
+    // Listen to scroll events for pagination
+    scrollController.addListener(_onScroll);
+    getAllMessages(isInitial: true);
   }
 
   @override
@@ -56,19 +60,36 @@ class ChatController extends GetxController {
     }
   }
 
-  Future<void> getAllMessages() async {
+  Future<void> getAllMessages({bool isInitial = false}) async {
+    if (!_hasMore && !isInitial) return;
     isLoading.value = true;
+    final int offset = isInitial ? 0 : messages.length;
     await chatRepository
-        .fetchAllMessages(limit: 20, chatId: chatId)
+        .fetchAllMessages(limit: _pageSize, chatId: chatId, offset: offset)
         .then((response) {
       response.fold((error) {
         isLoading.value = false;
         Get.snackbar("Error", error, colorText: Colors.redAccent);
       }, (success) {
         isLoading.value = false;
-        messages.value = success;
+        if (isInitial) {
+          messages.value = success;
+        } else {
+          messages.insertAll(0, success);
+        }
+        // If less than page size, no more messages
+        if (success.length < _pageSize) {
+          _hasMore = false;
+        }
       });
     });
+  }
+
+  void _onScroll() {
+    if (scrollController.hasClients && scrollController.position.pixels <= scrollController.position.minScrollExtent + 20) {
+      // At top, load more messages
+      getAllMessages();
+    }
   }
 
   void _initializeTicketData() {

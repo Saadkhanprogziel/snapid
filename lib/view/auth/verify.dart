@@ -99,116 +99,113 @@ class _VerificationScreenState extends State<VerificationScreen> {
     return Center(
       child: ClipRRect(
         borderRadius: BorderRadius.circular(25),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Column(
-                children: [
-                  Text(
-                    "Verify Your Identity",
-                    style: CustomTextTheme.headingLarge.copyWith(
-                      fontSize: 32,
-                      color: AppColors.whiteColor,
-                    ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Column(
+              children: [
+                Text(
+                  "Verify Your Identity",
+                  style: CustomTextTheme.headingLarge.copyWith(
+                    fontSize: 32,
+                    color: AppColors.whiteColor,
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "Select how you'd like to receive \nthe verification code.",
-                    textAlign: TextAlign.center,
-                    style: CustomTextTheme.regular16.copyWith(
-                      color: Colors.white70,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 40),
-              Container(
-                width: isWideScreen ? 600 : 450, 
-                padding: const EdgeInsets.all(30),
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(20, 223, 222, 222),
-                  borderRadius: BorderRadius.circular(25),
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildRadioTile(
-                      value: ContactMethod.email,
-                      groupValue: _selectedMethod,
-                      title: "Send code to email",
-                      subtitle: email.isNotEmpty ? email : "No email provided",
-                    ),
-                    const SizedBox(height: 40),
-                    _buildRadioTile(
-                      value: ContactMethod.mobile,
-                      groupValue: _selectedMethod,
-                      title: "Send code to mobile",
-                      subtitle: phone.isNotEmpty ? phone : "No phone provided",
-                    ),
-                    const SizedBox(height: 40),
-                    ElevatedButton(
-                      onPressed: () async {
-                        final identifier =
-                            _selectedMethod == ContactMethod.email
-                                ? email
-                                : phone;
-                        final sendTo = _selectedMethod == ContactMethod.email
-                            ? "emailAddress"
-                            : "phoneNumber";
-
-                        if (identifier.isEmpty) {
+                const SizedBox(height: 8),
+                Text(
+                  "Select how you'd like to receive \nthe verification code.",
+                  textAlign: TextAlign.center,
+                  style: CustomTextTheme.regular16.copyWith(
+                    color: Colors.white70,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 40),
+            Container(
+              width: isWideScreen ? 600 : 450, 
+              padding: const EdgeInsets.all(30),
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(20, 223, 222, 222),
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildRadioTile(
+                    value: ContactMethod.email,
+                    groupValue: _selectedMethod,
+                    title: "Send code to email",
+                    subtitle: email.isNotEmpty ? email : "No email provided",
+                  ),
+                  const SizedBox(height: 40),
+                  _buildRadioTile(
+                    value: ContactMethod.mobile,
+                    groupValue: _selectedMethod,
+                    title: "Send code to mobile",
+                    subtitle: phone.isNotEmpty ? phone : "No phone provided",
+                  ),
+                  const SizedBox(height: 40),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final identifier =
+                          _selectedMethod == ContactMethod.email
+                              ? email
+                              : phone;
+                      final sendTo = _selectedMethod == ContactMethod.email
+                          ? "emailAddress"
+                          : "phoneNumber";
+        
+                      if (identifier.isEmpty) {
+                        Get.snackbar(
+                          "Error",
+                          "No ${sendTo == 'emailAddress' ? 'email' : 'phone'} provided.",
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.redAccent,
+                          colorText: Colors.white,
+                        );
+                        return;
+                      }
+        
+                      final result =
+                          await authRepository.sendOtp(identifier, sendTo);
+        
+                      result.fold(
+                        (failureMessage) {
                           Get.snackbar(
                             "Error",
-                            "No ${sendTo == 'emailAddress' ? 'email' : 'phone'} provided.",
+                            failureMessage,
                             snackPosition: SnackPosition.BOTTOM,
                             backgroundColor: Colors.redAccent,
                             colorText: Colors.white,
                           );
-                          return;
-                        }
-
-                        final result =
-                            await authRepository.sendOtp(identifier, sendTo);
-
-                        result.fold(
-                          (failureMessage) {
-                            Get.snackbar(
-                              "Error",
-                              failureMessage,
-                              snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: Colors.redAccent,
-                              colorText: Colors.white,
-                            );
-                          },
-                          (success) {
-                            Get.toNamed(
-                              PrimaryRoute.otpScreen,
-                              arguments: {"identifier": identifier},
-                            );
-                          },
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryColor,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        minimumSize: const Size.fromHeight(60),
+                        },
+                        (success) {
+                          Get.toNamed(
+                            PrimaryRoute.otpScreen,
+                            arguments: {"identifier": identifier},
+                          );
+                        },
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryColor,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Text(
-                        "Continue",
-                        style: CustomTextTheme.regular16
-                            .copyWith(color: AppColors.whiteColor),
-                      ),
+                      minimumSize: const Size.fromHeight(60),
                     ),
-                  ],
-                ),
+                    child: Text(
+                      "Continue",
+                      style: CustomTextTheme.regular16
+                          .copyWith(color: AppColors.whiteColor),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

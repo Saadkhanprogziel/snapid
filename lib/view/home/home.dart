@@ -58,174 +58,171 @@ class HomeScreen extends StatelessWidget {
                       alignment: Alignment.topLeft,
                       duration: const Duration(milliseconds: 300),
                       curve: Curves.linear,
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                        child: Container(
-                          width: isExpanded.value ? 250 : 80,
-                          color: AppColors.cardColor,
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 30),
-                              Padding(
-                                padding: EdgeInsets.all(10.0),
-                                child: Row(
-                                  mainAxisAlignment: isExpanded.value
-                                      ? MainAxisAlignment.start
-                                      : MainAxisAlignment.center,
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: Image.network(
-                                        controller.user.value.profilePicture ??
-                                            'https://www.w3schools.com/howto/img_avatar2.png',
-                                        height: 50,
-                                        width: 50,
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return Container(
-                                            height: 50,
-                                            width: 50,
-                                            decoration: BoxDecoration(
-                                              color: Colors.grey[300],
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                            ),
-                                            child: Icon(
-                                              Icons.person,
-                                              color: Colors.grey[600],
-                                              size: 24,
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                    SpaceW10(),
-                                    if (isExpanded.value)
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              controller.user.value.firstName ??
-                                                  'User',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            const SizedBox(height: 2),
-                                            Text(
-                                              controller.user.value.email ??
-                                                  'user@example.com',
-                                              style: TextStyle(
-                                                color: Colors.white70,
-                                                fontSize: 12,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              Expanded(
-                                child: ListView(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 8),
-                                  children: [
-                                    ExpandableNavItem('assets/icons/home.svg',
-                                        'Home', 0, isExpanded.value),
-                                    ExpandableNavItem('assets/icons/clock.svg',
-                                        'History', 1, isExpanded.value),
-                                    ExpandableNavItem(
-                                        'assets/icons/assistant.svg',
-                                        'Assistant',
-                                        2,
-                                        isExpanded.value),
-                                    ExpandableNavItem(
-                                        'assets/icons/profile.svg',
-                                        'Profile',
-                                        3,
-                                        isExpanded.value),
-                                  ],
-                                ),
-                              ),
-                              Spacer(),
-                              InkWell(
-                                onTap: () {
-                                  var profileController =
-                                      Get.find<ProfileController>();
-
-                                  Get.dialog(
-                                    BackdropFilter(
-                                      filter: ImageFilter.blur(
-                                          sigmaX: 15, sigmaY: 15),
-                                      child: CustomDialogPop(
-                                        solidBtnLabel: "Logout",
-                                        title: "Log Out ?",
-                                        message:
-                                            "Are you sure you want to log out of your Snapid account?",
-                                        svgPath: Assets.logout,
-                                        isActionPopUp: true,
-                                        backgroundColor: AppColors.cardColor,
-                                        onCancel: () => Get.back(),
-                                        onPressed: () {
-                                          profileController.logout();
-                                        },
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.backBtnColor,
+                      child: Container(
+                        width: isExpanded.value ? 250 : 80,
+                        color: AppColors.cardColor,
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 30),
+                            Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child: Row(
+                                mainAxisAlignment: isExpanded.value
+                                    ? MainAxisAlignment.start
+                                    : MainAxisAlignment.center,
+                                children: [
+                                  ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
+                                    child: Image.network(
+                                      controller.user.value.profilePicture ??
+                                          'https://www.w3schools.com/howto/img_avatar2.png',
+                                      height: 50,
+                                      width: 50,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Container(
+                                          height: 50,
+                                          width: 50,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[300],
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
+                                          child: Icon(
+                                            Icons.person,
+                                            color: Colors.grey[600],
+                                            size: 24,
+                                          ),
+                                        );
+                                      },
+                                    ),
                                   ),
-                                  height: 50,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 14),
-                                  child: Row(
-                                    children: [
-                                      SvgPicture.asset(
-                                        Assets.logout,
-                                        height: 20,
-                                        width: 20,
-                                        colorFilter: ColorFilter.mode(
-                                          Colors.white,
-                                          BlendMode.srcIn,
+                                  SpaceW10(),
+                                  if (isExpanded.value)
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            controller.user.value.firstName ??
+                                                'User',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            controller.user.value.email ??
+                                                'user@example.com',
+                                            style: TextStyle(
+                                              color: Colors.white70,
+                                              fontSize: 12,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Expanded(
+                              child: ListView(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
+                                children: [
+                                  ExpandableNavItem('assets/icons/home.svg',
+                                      'Home', 0, isExpanded.value),
+                                  ExpandableNavItem('assets/icons/clock.svg',
+                                      'History', 1, isExpanded.value),
+                                  ExpandableNavItem(
+                                      'assets/icons/assistant.svg',
+                                      'Assistant',
+                                      2,
+                                      isExpanded.value),
+                                  ExpandableNavItem(
+                                      'assets/icons/profile.svg',
+                                      'Profile',
+                                      3,
+                                      isExpanded.value),
+                                ],
+                              ),
+                            ),
+                            Spacer(),
+                            InkWell(
+                              onTap: () {
+                                var profileController =
+                                    Get.find<ProfileController>();
+                      
+                                Get.dialog(
+                                  BackdropFilter(
+                                    filter: ImageFilter.blur(
+                                        sigmaX: 15, sigmaY: 15),
+                                    child: CustomDialogPop(
+                                      solidBtnLabel: "Logout",
+                                      title: "Log Out ?",
+                                      message:
+                                          "Are you sure you want to log out of your Snapid account?",
+                                      svgPath: Assets.logout,
+                                      isActionPopUp: true,
+                                      backgroundColor: AppColors.cardColor,
+                                      onCancel: () => Get.back(),
+                                      onPressed: () {
+                                        profileController.logout();
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: AppColors.backBtnColor,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                height: 50,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 14),
+                                child: Row(
+                                  children: [
+                                    SvgPicture.asset(
+                                      Assets.logout,
+                                      height: 20,
+                                      width: 20,
+                                      colorFilter: ColorFilter.mode(
+                                        Colors.white,
+                                        BlendMode.srcIn,
+                                      ),
+                                    ),
+                                    if (isExpanded.value) ...[
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: AnimatedOpacity(
+                                          duration: const Duration(
+                                              milliseconds: 300),
+                                          opacity:
+                                              isExpanded.value ? 1.0 : 0.0,
+                                          child: Text("Logout",
+                                              style:
+                                                  CustomTextTheme.regular12),
                                         ),
                                       ),
-                                      if (isExpanded.value) ...[
-                                        const SizedBox(width: 16),
-                                        Expanded(
-                                          child: AnimatedOpacity(
-                                            duration: const Duration(
-                                                milliseconds: 300),
-                                            opacity:
-                                                isExpanded.value ? 1.0 : 0.0,
-                                            child: Text("Logout",
-                                                style:
-                                                    CustomTextTheme.regular12),
-                                          ),
-                                        ),
-                                      ],
                                     ],
-                                  ),
+                                  ],
                                 ),
                               ),
-                              SpaceH20()
-                            ],
-                          ),
+                            ),
+                            SpaceH20()
+                          ],
                         ),
                       ),
                     ),

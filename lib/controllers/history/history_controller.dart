@@ -38,8 +38,6 @@ class HistoryController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Don't setup scroll listener here, it will be done when scrollController is first accessed
-    // 👇 Fetch default history when controller is created
     fetchHistory(status: "ALL");
   }
 

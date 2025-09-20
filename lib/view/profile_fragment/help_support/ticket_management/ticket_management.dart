@@ -34,11 +34,11 @@ class _TicketManagementState extends State<TicketManagement> {
       barrierDismissible: true,
       builder: (BuildContext context) {
         return Dialog(
-          backgroundColor: Colors.transparent,
+          backgroundColor: AppColors.cardColor,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(25),
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
               child: Container(
                 width: MediaQuery.of(context).size.width * 0.9,
                 constraints: BoxConstraints(maxWidth: 500),
@@ -225,6 +225,7 @@ class _TicketManagementState extends State<TicketManagement> {
                 SafeArea(
                   child: _buildHeader(isWide),
                 ),
+                _buildCustomTabBar(),
                 Expanded(
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
@@ -232,8 +233,6 @@ class _TicketManagementState extends State<TicketManagement> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SpaceH30(),
-                        _buildCustomTabBar(),
                         SpaceH10(),
                         _buildTicketsList(isWide),
                       ],
@@ -275,44 +274,41 @@ class _TicketManagementState extends State<TicketManagement> {
   Widget _buildWebAddButton() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(25),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(30, 255, 255, 255),
-            borderRadius: BorderRadius.circular(25),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.2),
-              width: 1,
-            ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(30, 255, 255, 255),
+          borderRadius: BorderRadius.circular(25),
+          border: Border.all(
+            color: Colors.white.withOpacity(0.2),
+            width: 1,
           ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(25),
-              onTap: _handleCreateTicket,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.add_rounded,
-                      color: Colors.white,
-                      size: 20,
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(25),
+            onTap: _handleCreateTicket,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 12,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.add_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    "New Ticket",
+                    style: CustomTextTheme.regular14.copyWith(
+                      fontWeight: FontWeight.w600,
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      "New Ticket",
-                      style: CustomTextTheme.regular14.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -324,22 +320,19 @@ class _TicketManagementState extends State<TicketManagement> {
   Widget _buildMobileFAB() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(30),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          decoration: BoxDecoration(
-            color: AppColors.primaryColor,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: FloatingActionButton(
-            onPressed: _handleCreateTicket,
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            child: const Icon(
-              Icons.add_rounded,
-              color: Colors.white,
-              size: 28,
-            ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.primaryColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: FloatingActionButton(
+          onPressed: _handleCreateTicket,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: const Icon(
+            Icons.add_rounded,
+            color: Colors.white,
+            size: 28,
           ),
         ),
       ),
@@ -440,7 +433,8 @@ class _TicketManagementState extends State<TicketManagement> {
                   Get.toNamed(PrimaryRoute.chat_screen, arguments: {
                     'subject': ticket.title,
                     'status': ticket.status,
-                    'date': displayUpdatedDate(ticket.closedAt, ticket.createdAt),
+                    'date':
+                        displayUpdatedDate(ticket.closedAt, ticket.createdAt),
                     'ticketId': ticket.id,
                     'chat_id': ticket.chat.id
                   });
@@ -498,24 +492,21 @@ class _TicketManagementState extends State<TicketManagement> {
           Flexible(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(25),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(20, 223, 222, 222),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Obx(
-                    () => TabBarWidgetFlexible(
-                      tabs: ['All ', 'Open', 'Pending', "Closed"],
-                      selectedIndex: controller.selectedTab.value,
-                      onTabSelected: (index) {
-                        controller.onTabChanged(index);
-                      },
-                    ),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(20, 223, 222, 222),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Obx(
+                  () => TabBarWidgetFlexible(
+                    tabs: ['All ', 'Open', 'Pending', "Closed"],
+                    selectedIndex: controller.selectedTab.value,
+                    onTabSelected: (index) {
+                      controller.onTabChanged(index);
+                    },
                   ),
                 ),
               ),
@@ -573,71 +564,68 @@ class TicketCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(25),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(20, 223, 222, 222),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              /// Subject
-              Text(
-                subject,
-                style: CustomTextTheme.regular20,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              SpaceH20(),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(20, 223, 222, 222),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            /// Subject
+            Text(
+              subject,
+              style: CustomTextTheme.regular20,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            SpaceH20(),
 
-              /// Status row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: _getStatusColor(status), // ✅ background
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      status,
-                      style: CustomTextTheme.regular12.copyWith(
-                        color: _getStatusTextColor(status), // ✅ text color
-                        fontWeight: FontWeight.bold,
-                      ),
+            /// Status row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: _getStatusColor(status), // ✅ background
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    status,
+                    style: CustomTextTheme.regular12.copyWith(
+                      color: _getStatusTextColor(status), // ✅ text color
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SpaceW10(),
-                  Flexible(
-                    child: Text(
-                      'Updated: $updatedDate',
-                      style: CustomTextTheme.regular12.copyWith(
-                        color: Colors.white70,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              SpaceH20(),
-
-              /// Description
-              Text(
-                description,
-                style: CustomTextTheme.regular12.copyWith(
-                  color: Colors.white.withOpacity(0.9),
                 ),
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
+                SpaceW10(),
+                Flexible(
+                  child: Text(
+                    'Updated: $updatedDate',
+                    style: CustomTextTheme.regular12.copyWith(
+                      color: Colors.white70,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            SpaceH20(),
+
+            /// Description
+            Text(
+              description,
+              style: CustomTextTheme.regular12.copyWith(
+                color: Colors.white.withOpacity(0.9),
               ),
-            ],
-          ),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ),
       ),
     );

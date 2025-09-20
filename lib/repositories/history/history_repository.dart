@@ -17,9 +17,6 @@ class HistoryRepository {
       );
 
       if (response.success) {
-        
- 
-
         final List<dynamic> sessions = response.data['data']['sessions'];
 
         List<PhotoCreationModel> history =
@@ -36,10 +33,8 @@ class HistoryRepository {
 
   Future<Either<String, bool>> deleteSession(id) async {
     try {
-      final response =
-          await networkRepository.delete(url: "/session/delete-photo-session",data: {
-            "sessionID": id
-          });
+      final response = await networkRepository.delete(
+          url: "/session/delete-photo-session", data: {"sessionID": id});
 
       if (response.success) {
         return right(true);

@@ -4,10 +4,8 @@ import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/chat/chat_controller.dart';
 import 'package:snapid/models/chat_message/chat_message.dart';
-import 'package:snapid/models/tickets/tickets_model.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
-import 'package:snapid/view/profile_fragment/help_support/ticket_management/ticket_management.dart';
 
 class ChatScreen extends StatelessWidget {
   const ChatScreen({super.key});
@@ -19,7 +17,6 @@ class ChatScreen extends StatelessWidget {
     final ChatController chatController = Get.put(ChatController());
 
     return Scaffold(
-      // Add resizeToAvoidBottomInset to handle keyboard properly
       resizeToAvoidBottomInset: true,
       body: Stack(
         children: [

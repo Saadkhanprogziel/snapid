@@ -265,7 +265,7 @@ class PhotoController extends GetxController {
         countryCode: selectedCountry.value!.code,
         documentType: _mapDocumentType(selectedType.value),
         userSessionPhotos: capturedPhotos,
-        platform: kIsWeb ? 'WEB_APP' : 'MOBILE_APP',
+        platform: 'WEB_APP',
         customHeight: double.tryParse(heightController.text) ?? 0.0,
         customWidth: double.tryParse(widthController.text) ?? 0.0,
       );
