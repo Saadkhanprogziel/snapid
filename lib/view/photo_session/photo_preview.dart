@@ -9,8 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/photoSession/photo_controller.dart';
+import 'package:snapid/main.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
@@ -21,7 +23,6 @@ import 'package:snapid/view/photo_session/cached_image.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:snapid/utlis/image_utlis/download_helper.dart';
-
 
 class PhotoPreview extends StatefulWidget {
   const PhotoPreview({super.key});
@@ -36,6 +37,8 @@ class _PhotoPreviewState extends State<PhotoPreview> {
   @override
   Widget build(BuildContext context) {
     final PhotoController controller = Get.find<PhotoController>();
+    var proccessdIMG = appStorage.read("processed_img") ?? "";
+    print(proccessdIMG);
 
     return PopScope(
       canPop: false,
@@ -68,7 +71,8 @@ class _PhotoPreviewState extends State<PhotoPreview> {
                             ),
                             color: AppColors.cardColor,
                           ),
-                          child: _buildMainContent(controller, width),
+                          child: _buildMainContent(
+                              controller, width, proccessdIMG),
                         ),
                       ),
                       Positioned(
@@ -103,16 +107,41 @@ class _PhotoPreviewState extends State<PhotoPreview> {
                           SpaceH40(),
                           Center(
                             child: Container(
-                              width: 230,
+                              width: 280,
                               height: 300,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: CustomCachedImage(
-                                imageUrl: controller.photoCreationModelData.value
+                              child: Obx(() {
+                                final imageUrl = controller
+                                        .photoCreationModelData
+                                        .value
                                         ?.processedImageUrl ??
-                                    "",
-                              ),
+                                    proccessdIMG ??
+                                    "";
+                                if (imageUrl.isEmpty) {
+                                  return Center(
+                                    child: Container(
+                                      width: 350,
+                                      height: 250,
+                                      child: Image.asset(Assets.demoResult2),
+                                    ),
+                                  );
+                                } else {
+                                  return Center(
+                                    child: Container(
+                                      width: 230,
+                                      height: 300,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: CustomCachedImage(
+                                        imageUrl: imageUrl,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              }),
                             ),
                           ),
                           Padding(
@@ -122,7 +151,9 @@ class _PhotoPreviewState extends State<PhotoPreview> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 _buildActionButtons(
-                                    controller, MediaQuery.of(context).size.width),
+                                    controller,
+                                    MediaQuery.of(context).size.width,
+                                    proccessdIMG),
                                 SpaceH20(),
                                 Text(
                                   "You can download this Image",
@@ -159,7 +190,8 @@ class _PhotoPreviewState extends State<PhotoPreview> {
     );
   }
 
-  Widget _buildMainContent(PhotoController controller, double width) {
+  Widget _buildMainContent(
+      PhotoController controller, double width, String proccessdIMG) {
     return Column(
       children: [
         Expanded(
@@ -170,16 +202,42 @@ class _PhotoPreviewState extends State<PhotoPreview> {
                 SpaceH20(),
                 Center(
                   child: Container(
-                    width: 200,
+                    width: 350,
                     height: 250,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: CustomCachedImage(
-                      imageUrl: controller.photoCreationModelData.value
+                    child: Obx(() {
+                      final imageUrl = controller.photoCreationModelData.value
                               ?.processedImageUrl ??
-                          "",
-                    ),
+                          proccessdIMG ??
+                          "";
+                      if (imageUrl.isEmpty) {
+                        return Center(
+                          child: Container(
+                            width: 350,
+                            height: 200,
+                            child: Image.asset(
+                              Assets.demoResult2,
+                              fit: BoxFit.fill,
+                            ),
+                          ),
+                        );
+                      } else {
+                        return Center(
+                          child: Container(
+                            width: 230,
+                            height: 300,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: CustomCachedImage(
+                              imageUrl: imageUrl,
+                            ),
+                          ),
+                        );
+                      }
+                    }),
                   ),
                 ),
                 Padding(
@@ -188,7 +246,7 @@ class _PhotoPreviewState extends State<PhotoPreview> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildActionButtons(controller, width),
+                      _buildActionButtons(controller, width, proccessdIMG),
                       SpaceH20(),
                       Text(
                         "You can download this Image",
@@ -220,7 +278,8 @@ class _PhotoPreviewState extends State<PhotoPreview> {
     );
   }
 
-  Widget _buildActionButtons(PhotoController controller, double width) {
+  Widget _buildActionButtons(
+      PhotoController controller, double width, String proccessdIMG) {
     final isWide = width >= 800;
 
     final downloadButton = _isSaving
@@ -233,7 +292,9 @@ class _PhotoPreviewState extends State<PhotoPreview> {
             onPressed: () {
               if (_isSaving) return;
               final url =
-                  controller.photoCreationModelData.value?.processedImageUrl ?? "";
+                  controller.photoCreationModelData.value?.processedImageUrl ??
+                      proccessdIMG ??
+                      "";
               if (url.isNotEmpty) {
                 setState(() => _isSaving = true);
                 saveImageToGallery(url).whenComplete(() {
@@ -292,123 +353,129 @@ class _PhotoPreviewState extends State<PhotoPreview> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Format:",
-                style:
-                    CustomTextTheme.regular18.copyWith(color: AppColors.whiteColor),
+                "Selected Format:",
+                style: CustomTextTheme.regular18
+                    .copyWith(color: AppColors.whiteColor),
               ),
+              GestureDetector(
+                onTap: () {
+                  controller.setStep(2);
+                },
+                child: SvgPicture.asset(
+                  Assets.edit_icon,
+                  width: 20,
+                ),
+              )
             ],
           ),
           SpaceH20(),
           infoRow(
             "Country:",
-            controller.photoCreationModelData.value?.countryName ?? '',
+            "${controller.selectedCountry.value?.name ?? 'Select Country'}",
             flagPath: controller.selectedCountry.value?.flag ?? '',
           ),
           const Divider(color: Colors.white12),
-          infoRow("Document:",
-              controller.photoCreationModelData.value?.documentType ?? ''),
+          infoRow("Document:", controller.selectedType.value.name),
           const Divider(color: Colors.white12),
           infoRow("Size:", "50x50 Cm"),
         ],
       ),
     );
   }
-  
 
   Future<void> saveImageToGallery(String url) async {
-  try {
-    if (kIsWeb) {
-      WebDownloadHelper.downloadImage(url);
+    try {
+      if (kIsWeb) {
+        WebDownloadHelper.downloadImage(url);
 
-      Get.snackbar(
-        "Success",
-        "Image downloaded successfully",
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
-      return;
-    }
-
-
-    PermissionStatus status;
-
-    if (Platform.isAndroid) {
-      status = await Permission.photos.request();
-
-      if (status.isDenied) {
-        status = await Permission.storage.request();
-      }
-
-      if (status.isDenied) {
-        status = await Permission.manageExternalStorage.request();
-      }
-    } else {
-      status = await Permission.photos.request();
-    }
-
-    if (status.isGranted || status.isLimited) {
-      final now = DateTime.now();
-      // final formattedDate =
-      //     "${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}";
-      final fileName = "snapid_image_${now.millisecondsSinceEpoch}.jpg";
-
-      final tempDir = await getTemporaryDirectory();
-      final filePath = "${tempDir.path}/$fileName";
-
-      await Dio().download(url, filePath);
-
-      final success =
-          await GallerySaver.saveImage(filePath, albumName: "SnapID");
-
-      if (success ?? false) {
         Get.snackbar(
           "Success",
-          "Image saved as $fileName",
+          "Image downloaded successfully",
           colorText: Colors.white,
           snackPosition: SnackPosition.TOP,
         );
+        return;
+      }
+
+      PermissionStatus status;
+
+      if (Platform.isAndroid) {
+        status = await Permission.photos.request();
+
+        if (status.isDenied) {
+          status = await Permission.storage.request();
+        }
+
+        if (status.isDenied) {
+          status = await Permission.manageExternalStorage.request();
+        }
       } else {
+        status = await Permission.photos.request();
+      }
+
+      if (status.isGranted || status.isLimited) {
+        final now = DateTime.now();
+        // final formattedDate =
+        //     "${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}";
+        final fileName = "snapid_image_${now.millisecondsSinceEpoch}.jpg";
+
+        final tempDir = await getTemporaryDirectory();
+        final filePath = "${tempDir.path}/$fileName";
+
+        await Dio().download(url, filePath);
+
+        final success =
+            await GallerySaver.saveImage(filePath, albumName: "SnapID");
+
+        if (success ?? false) {
+          Get.snackbar(
+            "Success",
+            "Image saved as $fileName",
+            colorText: Colors.white,
+            snackPosition: SnackPosition.TOP,
+          );
+        } else {
+          Get.snackbar(
+            "Failed",
+            "Could not save image",
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+            snackPosition: SnackPosition.TOP,
+          );
+        }
+      } else if (status.isDenied) {
         Get.snackbar(
-          "Failed",
-          "Could not save image",
+          "Permission Denied",
+          "Please allow storage access to save images",
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.TOP,
+        );
+      } else if (status.isPermanentlyDenied) {
+        Get.snackbar(
+          "Permission Permanently Denied",
+          "Please enable storage permission from app settings",
           backgroundColor: Colors.red,
           colorText: Colors.white,
           snackPosition: SnackPosition.TOP,
+          mainButton: TextButton(
+            onPressed: () => openAppSettings(),
+            child:
+                const Text("Settings", style: TextStyle(color: Colors.white)),
+          ),
         );
       }
-    } else if (status.isDenied) {
+    } catch (e) {
+      print("Error saving image: $e");
       Get.snackbar(
-        "Permission Denied",
-        "Please allow storage access to save images",
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
-    } else if (status.isPermanentlyDenied) {
-      Get.snackbar(
-        "Permission Permanently Denied",
-        "Please enable storage permission from app settings",
+        "Error",
+        "Error saving image: $e",
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.TOP,
-        mainButton: TextButton(
-          onPressed: () => openAppSettings(),
-          child: const Text("Settings", style: TextStyle(color: Colors.white)),
-        ),
       );
     }
-  } catch (e) {
-    print("Error saving image: $e");
-    Get.snackbar(
-      "Error",
-      "Error saving image: $e",
-      backgroundColor: Colors.red,
-      colorText: Colors.white,
-      snackPosition: SnackPosition.TOP,
-    );
   }
-}
-
 
   Future<void> shareImage(String url) async {
     try {

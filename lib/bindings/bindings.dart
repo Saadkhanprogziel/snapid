@@ -20,7 +20,7 @@ class ControllerBindings extends Bindings {
     Get.lazyPut(() => OnBoardingController());
     Get.lazyPut(() => NotificationController());
     Get.lazyPut(() => PhotoController());
-    Get.lazyPut(() => HomeController(), fenix: true);
+    Get.lazyPut(() => HomeController());
     Get.lazyPut(() => ForgotPasswordController());
     Get.lazyPut(() => SecuritySettingController());
     Get.lazyPut(() => ProfileController());

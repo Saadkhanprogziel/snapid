@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:snapid/bindings/bindings.dart';
+import 'package:snapid/view/photo_session/drag_and_drop.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/view/assistant_fragment/assistant.dart';
 import 'package:snapid/view/auth/forgot_password.dart';
@@ -123,6 +124,10 @@ class Pages {
           page: () => EditProfile(),
           binding: ControllerBindings(),
           transition: Transition.downToUp),
+      GetPage(
+          name: PrimaryRoute.drag,
+          page: () => const ImageDragAndDrop(),
+          binding: ControllerBindings()),
       GetPage(
           name: PrimaryRoute.selectedPhoto,
           page: () => SelectedPhotosScreen(),

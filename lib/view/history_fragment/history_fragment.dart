@@ -130,6 +130,7 @@ class HistoryFragment extends StatelessWidget {
                       final bool isMobile = constraints.maxWidth <= 800;
 
                       return GridView.builder(
+                        key: PageStorageKey("historyScroll"),
                         controller: controller.scrollController,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 10),
@@ -182,7 +183,7 @@ class HistoryFragment extends StatelessWidget {
       final dateTime = DateTime.parse(dateString);
       return DateFormat(pattern).format(dateTime);
     } catch (e) {
-      return dateString; 
+      return dateString;
     }
   }
 }

@@ -21,9 +21,9 @@ class ProfileHeader extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Obx(() {
-                  if (controller.selectedProfileImage.value != null) {
-                    return Image.file(
-                      controller.selectedProfileImage.value!,
+                  if (controller.selectedPhotos.isNotEmpty) {
+                    return Image(
+                      image: controller.selectedPhotos.first,
                       width: 120,
                       height: 120,
                       fit: BoxFit.cover,
@@ -51,7 +51,7 @@ class ProfileHeader extends StatelessWidget {
                 bottom: 0,
                 right: 0,
                 child: GestureDetector(
-                  onTap: () => controller.showImageSourceActionSheet(),
+                  onTap: () => controller.pickImages(),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white,

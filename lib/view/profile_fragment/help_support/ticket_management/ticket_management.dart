@@ -86,6 +86,7 @@ class _TicketManagementState extends State<TicketManagement> {
                     // Subject field
                     Text(
                       "Subject",
+
                       style: CustomTextTheme.regular14.copyWith(
                         fontWeight: FontWeight.w600,
                         color: Colors.white.withOpacity(0.9),
@@ -93,6 +94,7 @@ class _TicketManagementState extends State<TicketManagement> {
                     ),
                     const SizedBox(height: 8),
                     TextField(
+                      cursorColor: Colors.white, // 👈 Add this
                       controller: controller.subjectController,
                       style: CustomTextTheme.regular14.copyWith(
                         color: Colors.white,
@@ -141,6 +143,8 @@ class _TicketManagementState extends State<TicketManagement> {
                     ),
                     const SizedBox(height: 8),
                     TextField(
+                      cursorColor: Colors.white, // 👈 Add this
+
                       controller: controller.descriptionController,
                       maxLines: 4,
                       style: CustomTextTheme.regular14.copyWith(

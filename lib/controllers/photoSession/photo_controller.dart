@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -5,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:snapid/constant/colors.dart';
+import 'package:snapid/controllers/dashboard/dashboard_controller.dart';
 import 'package:snapid/main.dart';
 import 'package:snapid/models/photo_creation/photo_creation_model.dart';
 import 'package:snapid/repositories/auth/auth_respository.dart';
@@ -38,18 +40,189 @@ class PhotoController extends GetxController {
   TextEditingController widthController = TextEditingController();
   TextEditingController heightController = TextEditingController();
 
-  Future<void> getUserDetails() async {
-    await authRespository.getUserDetails().then((response) => response.fold(
-          (error) {
-            Get.snackbar("Error", error);
-            update();
-          },
-          (success) {
-            if (success.credits != 0) {
-              canDownload.value = true;
-            }
-          },
-        ));
+  /// ✅ Updated: Use XFile for cross-platform
+  final selectedPhotos = <ImageProvider>[].obs;
+  final capturedPhotos = <XFile>[].obs;
+  final ImagePicker _picker = ImagePicker();
+  final isCapturingPhotos = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    // ✅ NEW: Handle URL parameters on web
+    if (kIsWeb) {
+      _handleUrlParameters();
+      _loadSavedImages();
+    }
+  }
+
+  /// ✅ NEW: Handle URL parameters and set step accordingly
+  void _handleUrlParameters() {
+    if (!kIsWeb) return;
+
+    try {
+      // Get step parameter from URL
+      String? stepParam = Get.parameters['step'];
+
+      if (stepParam != null) {
+        int? step = int.tryParse(stepParam);
+        if (step != null && step >= 1 && step <= 4) {
+          currentStep.value = step;
+          print('✅ Set current step to $step from URL parameter');
+
+          // ✅ Load session data if we're on step 2 or higher
+          if (step > 1) {
+            _loadSessionDataFromStorage();
+          }
+        } else {
+          print('⚠️ Invalid step parameter: $stepParam, defaulting to step 1');
+          currentStep.value = 1;
+        }
+      }
+    } catch (e) {
+      print('❌ Error handling URL parameters: $e');
+      currentStep.value = 1;
+    }
+  }
+
+  void _loadSessionDataFromStorage() {
+    try {
+      Map<String, dynamic>? sessionData = appStorage.read('photoSession');
+      if (sessionData != null) {
+        photoCreationModelData.value = PhotoCreationModel.fromJson(sessionData);
+        processedWatermarkedUrl.value =
+            photoCreationModelData.value?.processedWatermarkedUrl ?? '';
+        sessionId.value = photoCreationModelData.value?.id ?? '';
+
+        String? countryCode = appStorage.read('selectedCountryCode');
+        if (countryCode != null) {
+          print('Loaded country code: $countryCode');
+        }
+
+        print('✅ Loaded session data from storage');
+      }
+    } catch (e) {
+      print('❌ Error loading session data: $e');
+    }
+  }
+
+  void navigateToStep(int step) {
+    if (step < 1 || step > 4) return;
+
+    currentStep.value = step;
+
+    if (kIsWeb) {
+      Get.toNamed(
+        PrimaryRoute.photo_creation,
+        parameters: {"step": "$step"},
+      );
+    } else {
+      Get.toNamed(
+        PrimaryRoute.photo_creation,
+      );
+    }
+  }
+
+  Future<void> _saveImagesToStorage() async {
+    if (!kIsWeb || capturedPhotos.isEmpty) return;
+
+    try {
+      List<String> imageDataList = [];
+
+      for (XFile photo in capturedPhotos) {
+        Uint8List bytes = await photo.readAsBytes();
+        String base64String = base64Encode(bytes);
+        imageDataList.add(base64String);
+      }
+
+      // Save to appStorage
+      await appStorage.write('saved_images', imageDataList);
+      await appStorage.write(
+          'images_timestamp', DateTime.now().millisecondsSinceEpoch);
+
+      print('Saved ${imageDataList.length} images to localStorage');
+    } catch (e) {
+      print('Error saving images to localStorage: $e');
+      Get.snackbar(
+        'Storage Warning',
+        'Could not save images locally. They will be lost if you refresh the page.',
+        backgroundColor: AppColors.orange,
+        colorText: AppColors.whiteColor,
+        duration: Duration(seconds: 3),
+      );
+    }
+  }
+
+  Future<void> _loadSavedImages() async {
+    if (!kIsWeb) return;
+
+    try {
+      List<dynamic>? savedImages = appStorage.read('saved_images');
+      int? timestamp = appStorage.read('images_timestamp');
+
+      if (savedImages != null && timestamp != null) {
+        // Check if images are less than 1 hour old (optional expiry)
+        int hoursSinceStored =
+            DateTime.now().millisecondsSinceEpoch - timestamp;
+        if (hoursSinceStored > 3600000) {
+          // 1 hour in milliseconds
+          await _clearStoredImages();
+          return;
+        }
+
+        selectedPhotos.clear();
+        capturedPhotos.clear();
+
+        for (String base64String in savedImages) {
+          Uint8List bytes = base64Decode(base64String);
+
+          // Create XFile from bytes (web-compatible)
+          XFile webFile = XFile.fromData(
+            bytes,
+            name: 'saved_image_${DateTime.now().millisecondsSinceEpoch}.jpg',
+            mimeType: 'image/jpeg',
+          );
+
+          capturedPhotos.add(webFile);
+          selectedPhotos.add(MemoryImage(bytes));
+        }
+
+        print('✅ Loaded ${savedImages.length} images from localStorage');
+      }
+    } catch (e) {
+      print('❌ Error loading saved images: $e');
+      await _clearStoredImages();
+    }
+  }
+
+  Future<void> _clearStoredImages() async {
+    if (!kIsWeb) return;
+
+    await appStorage.remove('saved_images');
+    await appStorage.remove('images_timestamp');
+    print('🗑️ Cleared stored images from localStorage');
+  }
+
+  Future<void> onContinuePressed() async {
+    if (selectedPhotos.isEmpty) {
+      Get.snackbar("No Photos", "Please select at least one photo.",
+          backgroundColor: Colors.red, colorText: Colors.white);
+      return;
+    }
+
+    if (selectedPhotos.length < 3) {
+      Get.snackbar("Insufficient Photos",
+          "Please select at least three photos for better results.",
+          backgroundColor: Colors.orange, colorText: Colors.white);
+      return;
+    }
+
+    // ✅ Save images to localStorage on web
+    if (kIsWeb) {
+      await _saveImagesToStorage();
+    }
+
+    navigateToStep(2);
   }
 
   void initializeFromNavigation({bool fromHistory = false}) {
@@ -60,16 +233,55 @@ class PhotoController extends GetxController {
       photoCreationModelData.value = null;
       processedWatermarkedUrl.value = '';
       sessionId.value = '';
+
+      // Clear stored images when starting fresh
+      if (kIsWeb) {
+        _clearStoredImages();
+      }
     }
+
+    // ✅ Handle URL parameters even when initializing
+    if (kIsWeb) {
+      _handleUrlParameters();
+    }
+  }
+
+  Future<void> getUserDetails() async {
+    await authRespository.getUserDetails().then((response) => response.fold(
+          (error) {
+            Get.snackbar("Error", error);
+            update();
+          },
+          (success) {
+
+            if (success.credits != 0) {
+              canDownload.value = true;
+              DashboardController dashboardController = Get.find<DashboardController>();
+              dashboardController.refreshUser();
+            }
+          },
+        ));
   }
 
   void selectCountry(Country country) {
     selectedCountry.value = country;
+
+    // ✅ Save country selection to storage for web
+    if (kIsWeb) {
+      appStorage.write('selectedCountryCode', country.code);
+      appStorage.write('selectedCountryName', country.name);
+    }
+
     Get.back();
   }
 
   void changeType(DocumentType type) {
     selectedType.value = type;
+
+    // ✅ Save document type to storage for web
+    if (kIsWeb) {
+      appStorage.write('selectedDocumentType', type.toString());
+    }
   }
 
   void changeUnit(Unit unit) {
@@ -78,9 +290,16 @@ class PhotoController extends GetxController {
 
   void setStep(int step) {
     currentStep.value = step;
+
+    // ✅ Update URL on web
+    if (kIsWeb) {
+      navigateToStep(step);
+    }
   }
 
   Future<void> goToNextStep() async {
+    final token = appStorage.read("token")?.toString() ?? "";
+
     if (currentStep.value < 4) {
       if (currentStep.value == 2 && selectedCountry.value == null) {
         Get.snackbar(
@@ -103,12 +322,15 @@ class PhotoController extends GetxController {
           return;
         }
         print("Creating photo session...");
-        bool success = await createSession();
-        if (!success) return;
+
+        if (token.isNotEmpty) {
+          bool success = await createSession();
+          if (!success) return;
+        }
         print(
             "Reviewing photos... ${photoCreationModelData.value?.processedWatermarkedUrl}");
 
-        currentStep.value++;
+        navigateToStep(3);
         return;
       }
 
@@ -117,18 +339,20 @@ class PhotoController extends GetxController {
           await downloadImageById(photoCreationModelData.value!.id);
           return; // stop here
         } else {
-          currentStep.value++;
+          navigateToStep(4);
           return;
         }
       }
 
-      currentStep.value++;
+      navigateToStep(currentStep.value + 1);
     }
   }
 
+  
+
   void goToPreviousStep() {
     if (currentStep.value > 1) {
-      currentStep.value--;
+      navigateToStep(currentStep.value - 1);
     }
   }
 
@@ -147,32 +371,45 @@ class PhotoController extends GetxController {
       }, (photoCreationModel) {
         isLoading.value = false;
         photoCreationModelData.value = photoCreationModel;
+        appStorage.write("processed_img", photoCreationModel.processedImageUrl);
         _storeSessionData(photoCreationModel);
+         getUserDetails();
         Get.toNamed(PrimaryRoute.photo_preview);
       });
     });
   }
 
-  /// ✅ Updated: Use XFile for cross-platform
-  final selectedPhotos = <ImageProvider>[].obs;
-  final capturedPhotos = <XFile>[].obs;
-  final ImagePicker _picker = ImagePicker();
-  final isCapturingPhotos = false.obs;
-
-  Future<void> pickImage() async {
+  Future<void> pickImages({bool allowMultiple = false}) async {
     if (selectedPhotos.length >= 5) return;
 
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      capturedPhotos.add(pickedFile);
+    if (allowMultiple) {
+      // Pick multiple images
+      final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+      if (pickedFiles != null && pickedFiles.isNotEmpty) {
+        for (final file in pickedFiles) {
+          if (capturedPhotos.length >= 5) break; // cap at 5
+          capturedPhotos.add(file);
 
-      if (kIsWeb) {
-        Uint8List bytes = await pickedFile.readAsBytes();
-        selectedPhotos.add(MemoryImage(bytes));
-      } else {
-        selectedPhotos.add(Image.file(
-          File(pickedFile.path),
-        ).image);
+          if (kIsWeb) {
+            Uint8List bytes = await file.readAsBytes();
+            selectedPhotos.add(MemoryImage(bytes));
+          } else {
+            selectedPhotos.add(Image.file(File(file.path)).image);
+          }
+        }
+      }
+    } else {
+      // Pick a single image
+      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        capturedPhotos.add(pickedFile);
+
+        if (kIsWeb) {
+          Uint8List bytes = await pickedFile.readAsBytes();
+          selectedPhotos.add(MemoryImage(bytes));
+        } else {
+          selectedPhotos.add(Image.file(File(pickedFile.path)).image);
+        }
       }
     }
   }
@@ -189,7 +426,7 @@ class PhotoController extends GetxController {
       while (photoCount < 5 && shouldContinue) {
         final pickedFile = await _picker.pickImage(
           source: ImageSource.camera,
-          imageQuality: 85,
+          // imageQuality: 85,
           preferredCameraDevice: CameraDevice.front,
         );
 
@@ -282,7 +519,9 @@ class PhotoController extends GetxController {
           return false;
         },
         (photoCreationModel) {
-          print("Photo session created: ${photoCreationModel.id}");
+          
+
+          // print("Photo session created: ${photoCreationModel.id}");
           Get.snackbar(
             'Success',
             'Photos uploaded successfully!',
@@ -293,6 +532,11 @@ class PhotoController extends GetxController {
           processedWatermarkedUrl.value =
               photoCreationModel.processedWatermarkedUrl;
           _storeSessionData(photoCreationModel);
+
+          if (kIsWeb) {
+            _clearStoredImages();
+          }
+
           return true;
         },
       );

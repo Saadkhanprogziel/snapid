@@ -65,7 +65,6 @@ class SelectedPhotosScreen extends StatelessWidget {
                                       fit: BoxFit.cover,
                                       width: double.infinity,
                                       height: double.infinity,
-                                      // ✅ Add error handling for web compatibility
                                       errorBuilder: (context, error, stackTrace) {
                                         print('Image load error: $error');
                                         return Container(
@@ -100,7 +99,7 @@ class SelectedPhotosScreen extends StatelessWidget {
                             } else {
                               return GestureDetector(
                                 onTap: () {
-                                  controller.pickImage();
+                                  controller.pickImages();
                                 },
                                 child: Container(
                                   decoration: BoxDecoration(
@@ -121,30 +120,29 @@ class SelectedPhotosScreen extends StatelessWidget {
                     "You can upload up to 5 photos for best AI results.",
                     style: TextStyle(color: Colors.white60),
                   ),
+                  // ✅ Show storage info on web
+                  if (kIsWeb)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(
+                        "Images will be saved locally in your browser.",
+                        style: TextStyle(
+                          color: Colors.blue[300],
+                          fontSize: 12,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                   SizedBox(height: 10),
                   Padding(
-                    padding:  EdgeInsets.symmetric(horizontal: isDesktop ? 200:40),
+                    padding: EdgeInsets.symmetric(horizontal: isDesktop ? 200 : 40),
                     child: CustomElevatedButton(
-                      onPressed: () {
-                        if (controller.selectedPhotos.isEmpty) {
-                          Get.snackbar(
-                              "No Photos", "Please select at least one photo.",
-                              backgroundColor: Colors.red, colorText: Colors.white);
-                          return;
-                        }
-                        if (controller.selectedPhotos.length < 3) {
-                          Get.snackbar("Insufficient Photos",
-                              "Please select at least three photos for better results.",
-                              backgroundColor: Colors.orange,
-                              colorText: Colors.white);
-                          return;
-                        }
-                        controller.setStep(2);
-                        Get.toNamed(PrimaryRoute.photo_creation,
-                            arguments: {"fromSelection": true});
+                      onPressed: () async {
+                        // ✅ Use the new method that handles web storage
+                        await controller.onContinuePressed();
                       },
                       text: "Continue",
-                      minHeight: isDesktop ? 70:60,
+                      minHeight: isDesktop ? 70 : 60,
                     ),
                   ),
                   SizedBox(height: 20),

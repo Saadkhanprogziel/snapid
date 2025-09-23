@@ -24,4 +24,9 @@ class HomeController extends GetxController {
 
     super.onInit();
   }
+
+  refreshUser() {
+    user.value = LocalStorage.getUser() ?? UserModel();
+    update();
+  }
 }

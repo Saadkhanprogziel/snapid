@@ -353,6 +353,8 @@ class ChatScreen extends StatelessWidget {
               vertical: isLargeScreen ? 12.0 : 0.0,
             ),
             child: Obx(() => ListView.builder(
+                  reverse: true, // ✅ this makes the list start at the bottom
+
                   controller: chatController.scrollController,
                   physics: AlwaysScrollableScrollPhysics(),
                   itemCount: chatController.messages.length,
@@ -484,6 +486,7 @@ class ChatScreen extends StatelessWidget {
     }
   }
 }
+
 class MessageBubble extends StatelessWidget {
   final ChatMessage message;
   final bool isLargeScreen;

@@ -24,48 +24,41 @@ class HistoryController extends GetxController {
   var currentStatus = "ALL";
   var canDownload = false.obs;
 
-  // Make ScrollController nullable and lazy initialize
-  ScrollController? _scrollController;
-  ScrollController get scrollController {
-    if (_scrollController == null || _scrollController!.hasClients == false) {
-      _scrollController?.dispose(); // Dispose old one if exists
-      _scrollController = ScrollController();
-      _setupScrollListener();
-    }
-    return _scrollController!;
-  }
+  ScrollController? scrollController;
 
   @override
   void onInit() {
     super.onInit();
+    initScrollController(); // ✅ init once
     fetchHistory(status: "ALL");
   }
 
   @override
   void onClose() {
-    _scrollController?.removeListener(_scrollListener);
-    _scrollController?.dispose();
-    _scrollController = null;
+    scrollController?.removeListener(_scrollListener);
+    scrollController?.dispose();
+    scrollController = null;
     super.onClose();
   }
+void initScrollController() {
+  if (scrollController != null) {
+    scrollController!.removeListener(_scrollListener);
+    scrollController!.dispose();
+  }
+  scrollController = ScrollController();
+  scrollController!.addListener(_scrollListener);
+}
 
-  // Extract scroll listener to a separate method to avoid memory leaks
+
   void _scrollListener() {
-    if (_scrollController == null || !_scrollController!.hasClients) return;
-    
+    if (scrollController == null || !scrollController!.hasClients) return;
     // Check if user has scrolled to near the bottom (80% of scroll)
-    if (_scrollController!.position.pixels >=
-            _scrollController!.position.maxScrollExtent * 0.8 &&
+    if (scrollController!.position.pixels >=
+            scrollController!.position.maxScrollExtent * 0.8 &&
         !isLoadingMore.value &&
         hasMoreData.value &&
         !isLoading.value) {
       loadMoreData();
-    }
-  }
-
-  void _setupScrollListener() {
-    if (_scrollController != null) {
-      _scrollController!.addListener(_scrollListener);
     }
   }
 

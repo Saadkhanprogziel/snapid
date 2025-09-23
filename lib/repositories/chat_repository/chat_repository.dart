@@ -7,15 +7,15 @@ class ChatRepository {
   final networkRepository = NetworkRepository();
 
   Future<Either<String, List<ChatMessage>>> fetchAllMessages({
-    required int limit,
+    required int page,
     required String chatId,
-    int offset = 0,
+    int pageSize = 15,
   }) async {
     final response = await networkRepository.get(
       url: "/chat/$chatId/get-all-messages",
       extraQuery: {
-        "limit": limit,
-        "offset": offset,
+        "page": page,
+        "pageSize": pageSize,
       },
     );
 

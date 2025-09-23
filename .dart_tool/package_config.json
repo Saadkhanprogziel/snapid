@@ -134,6 +134,12 @@
       "languageVersion": "2.17"
     },
     {
+      "name": "desktop_drop",
+      "rootUri": "file:///C:/Users/CC/AppData/Local/Pub/Cache/hosted/pub.dev/desktop_drop-0.6.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
       "name": "device_info_plus",
       "rootUri": "file:///C:/Users/CC/AppData/Local/Pub/Cache/hosted/pub.dev/device_info_plus-11.3.0",
       "packageUri": "lib/",
@@ -710,6 +716,12 @@
       "languageVersion": "3.5"
     },
     {
+      "name": "universal_platform",
+      "rootUri": "file:///C:/Users/CC/AppData/Local/Pub/Cache/hosted/pub.dev/universal_platform-1.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "url_launcher_linux",
       "rootUri": "file:///C:/Users/CC/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_linux-3.2.1",
       "packageUri": "lib/",
@@ -836,7 +848,7 @@
       "languageVersion": "3.6"
     }
   ],
-  "generated": "2025-09-17T11:09:10.537627Z",
+  "generated": "2025-09-22T10:13:58.279433Z",
   "generator": "pub",
   "generatorVersion": "3.6.2",
   "flutterRoot": "file:///C:/src/flutter3.24",

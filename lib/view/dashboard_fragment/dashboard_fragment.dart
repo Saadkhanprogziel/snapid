@@ -24,6 +24,7 @@ class DashboardFragment extends StatelessWidget {
   Widget build(BuildContext context) {
     final PhotoController photoController = Get.find<PhotoController>();
     final DashboardController controller = Get.find<DashboardController>();
+    controller.initScrollController();
 
     return LayoutBuilder(builder: (context, constraints) {
       final double deviceWidth = MediaQuery.of(context).size.width;
@@ -33,6 +34,7 @@ class DashboardFragment extends StatelessWidget {
       return Stack(
         children: [
           CustomScrollView(
+            key: PageStorageKey("dashboardScroll"),
             controller: controller.scrollController,
             physics: AlwaysScrollableScrollPhysics(),
             slivers: [
@@ -142,7 +144,7 @@ class DashboardFragment extends StatelessWidget {
                                     decoration: BoxDecoration(
                                       color: AppColors.cardColor,
                                       borderRadius: BorderRadius.circular(25),
-                                    ),  
+                                    ),
                                     child: Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -184,8 +186,8 @@ class DashboardFragment extends StatelessWidget {
                                                             .capturePhotosSimple();
                                                       },
                                                       borderRadius:
-                                                          BorderRadius
-                                                              .circular(16),
+                                                          BorderRadius.circular(
+                                                              16),
                                                       child: Column(
                                                         mainAxisAlignment:
                                                             MainAxisAlignment
@@ -221,8 +223,8 @@ class DashboardFragment extends StatelessWidget {
                                                 child: Container(
                                                   height: 120,
                                                   decoration: BoxDecoration(
-                                                    color: AppColors
-                                                        .primaryColor,
+                                                    color:
+                                                        AppColors.primaryColor,
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             16),
@@ -235,8 +237,8 @@ class DashboardFragment extends StatelessWidget {
                                                             .selectedPhoto);
                                                       },
                                                       borderRadius:
-                                                          BorderRadius
-                                                              .circular(16),
+                                                          BorderRadius.circular(
+                                                              16),
                                                       child: Column(
                                                         mainAxisAlignment:
                                                             MainAxisAlignment
@@ -245,8 +247,7 @@ class DashboardFragment extends StatelessWidget {
                                                           Icon(
                                                             Icons
                                                                 .cloud_upload_outlined,
-                                                            color:
-                                                                Colors.white,
+                                                            color: Colors.white,
                                                             size: 28,
                                                           ),
                                                           const SizedBox(
@@ -257,8 +258,8 @@ class DashboardFragment extends StatelessWidget {
                                                                 CustomTextTheme
                                                                     .regular16
                                                                     .copyWith(
-                                                              color: Colors
-                                                                  .white,
+                                                              color:
+                                                                  Colors.white,
                                                             ),
                                                           ),
                                                         ],
@@ -294,13 +295,11 @@ class DashboardFragment extends StatelessWidget {
                                               onPressed: () {},
                                               style: TextButton.styleFrom(
                                                 padding: EdgeInsets.symmetric(
-                                                    horizontal: 8,
-                                                    vertical: 4),
+                                                    horizontal: 8, vertical: 4),
                                               ),
                                               child: Text(
                                                 Strings.photoGuidelines,
-                                                style: CustomTextTheme
-                                                    .regular14
+                                                style: CustomTextTheme.regular14
                                                     .copyWith(
                                                   color: AppColors.whiteColor,
                                                 ),

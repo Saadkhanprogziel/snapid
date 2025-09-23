@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:snapid/keys_urls/local_storage.dart';
 import 'package:snapid/models/user/user_model.dart';
+import 'package:snapid/repositories/auth/auth_respository.dart';
 
 class DashboardController extends GetxController {
-  final ScrollController scrollController = ScrollController();
+  ScrollController? scrollController;
 
   
   var showGreeting = true.obs;
@@ -14,15 +15,21 @@ class DashboardController extends GetxController {
   String get userName => user.value.firstName ?? 'User';
   int get credits => user.value.credits ?? 0;
 
-  @override
+
+
+@override
   void onInit() {
     super.onInit();
-    loadUser(); 
-    _setupScrollListener(); 
+    initScrollController();
+    loadUser();
   }
 
-  void _setupScrollListener() {
-    scrollController.addListener(_scrollListener);
+  void initScrollController() {
+    scrollController?.removeListener(_scrollListener);
+    scrollController?.dispose();
+
+    scrollController = ScrollController();
+    scrollController!.addListener(_scrollListener);
   }
 
   void _scrollListener() {
@@ -30,15 +37,15 @@ class DashboardController extends GetxController {
     const double toolbarHeight = 100;
     const double collapseThreshold = expandedHeight - toolbarHeight - 20;
 
-    bool shouldCollapse = scrollController.hasClients &&
-        scrollController.offset > collapseThreshold;
+    bool shouldCollapse = scrollController!.hasClients &&
+        scrollController!.offset > collapseThreshold;
 
     if (shouldCollapse != isCollapsed.value) {
       isCollapsed.value = shouldCollapse;
     }
   }
-
   void loadUser() {
+    
     final userData = LocalStorage.getUser();
     if (userData != null) {
       user.value = userData;
@@ -54,8 +61,8 @@ class DashboardController extends GetxController {
 
   @override
   void onClose() {
-    scrollController.removeListener(_scrollListener);
-    scrollController.dispose();
+    scrollController?.removeListener(_scrollListener);
+    scrollController?.dispose();
     super.onClose();
   }
 }

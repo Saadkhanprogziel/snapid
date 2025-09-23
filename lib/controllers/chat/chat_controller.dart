@@ -10,12 +10,12 @@ class ChatController extends GetxController {
   final chatRepository = ChatRepository();
 
   final RxList<ChatMessage> messages = <ChatMessage>[].obs;
-  final int _pageSize = 50;
-  bool _hasMore = true;
+  final int _pageSize = 20; // messages per page
+  int _currentPage = 1; // current page number for pagination
+  bool _hasMore = true; // whether more pages are available
   final RxBool isConnected = false.obs;
   final RxBool isTyping = false.obs;
   final RxBool isLoading = false.obs;
-  var roomId = 0.obs;
   final RxString connectionStatus = 'Disconnected'.obs;
 
   final TextEditingController messageController = TextEditingController();
@@ -31,9 +31,17 @@ class ChatController extends GetxController {
   void onInit() {
     super.onInit();
     _initializeTicketData();
-    // Listen to scroll events for pagination
-    scrollController.addListener(_onScroll);
     getAllMessages(isInitial: true);
+
+    // Scroll listener for pagination (load older messages)
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >=
+              scrollController.position.maxScrollExtent - 100 &&
+          !isLoading.value &&
+          _hasMore) {
+        getAllMessages();
+      }
+    });
   }
 
   @override
@@ -45,7 +53,6 @@ class ChatController extends GetxController {
 
   void sendMessage() {
     final trimmedMessage = messageController.text.trim();
-    print("message ${messageController.text}");
     if (trimmedMessage.isNotEmpty) {
       log("[sendMessage] Sending message: $trimmedMessage");
       appSocket.fireEvent('send_message', {
@@ -53,8 +60,13 @@ class ChatController extends GetxController {
         'content': trimmedMessage,
       });
       messageController.clear();
-      // Scroll to bottom after sending message
-      _scrollToBottom();
+
+      // Optional: scroll to bottom for new message
+      scrollController.animateTo(
+        0, // top of reversed list
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
     } else {
       log("[sendMessage] Text field is empty, no message sent");
     }
@@ -62,34 +74,44 @@ class ChatController extends GetxController {
 
   Future<void> getAllMessages({bool isInitial = false}) async {
     if (!_hasMore && !isInitial) return;
+
     isLoading.value = true;
-    final int offset = isInitial ? 0 : messages.length;
+
+    if (isInitial) {
+      _currentPage = 1;
+      _hasMore = true;
+    }
+
     await chatRepository
-        .fetchAllMessages(limit: _pageSize, chatId: chatId, offset: offset)
+        .fetchAllMessages(
+          page: _currentPage, // page number
+          chatId: chatId,
+          pageSize: _pageSize, // page size
+        )
         .then((response) {
       response.fold((error) {
         isLoading.value = false;
         Get.snackbar("Error", error, colorText: Colors.redAccent);
       }, (success) {
         isLoading.value = false;
+
+        // Order messages oldest → newest
+        final ordered = success.reversed.toList();
+
         if (isInitial) {
-          messages.value = success;
+          messages.value = ordered;
         } else {
-          messages.insertAll(0, success);
+          // append older messages at the end (reverse: true)
+          messages.addAll(ordered);
         }
-        // If less than page size, no more messages
+
         if (success.length < _pageSize) {
-          _hasMore = false;
+          _hasMore = false; // no more pages
+        } else {
+          _currentPage++; // next page
         }
       });
     });
-  }
-
-  void _onScroll() {
-    if (scrollController.hasClients && scrollController.position.pixels <= scrollController.position.minScrollExtent + 20) {
-      // At top, load more messages
-      getAllMessages();
-    }
   }
 
   void _initializeTicketData() {
@@ -99,7 +121,6 @@ class ChatController extends GetxController {
         arguments['ticketId']?.toString() ??
         arguments['ticket_id']?.toString() ??
         '';
-
     ticketSubject = arguments['subject'] ?? 'Support Ticket';
     ticketStatus = arguments['status'] ?? 'Open';
     ticketDate = arguments['date'] ?? 'Today';
@@ -123,10 +144,8 @@ class ChatController extends GetxController {
   }
 
   void listenEvents() {
-    log("[listenEvents] Listening to socket events");
     appSocket.listenToRecieveMessageEvent((data) {
       log("[listenEvents] Message received: $data");
-      print(data);
       try {
         final message = ChatMessage.fromJson(data);
         addNewMessage(message);
@@ -139,32 +158,12 @@ class ChatController extends GetxController {
   void addNewMessage(ChatMessage message) {
     log("[addNewMessage] Adding new message: ${message.content}");
 
-    // Check if message already exists to avoid duplicates
     bool messageExists = messages.any((msg) => msg.id == message.id);
 
     if (!messageExists) {
-      // Add the message to the list
-      messages.add(message);
-
-      // Sort messages by creation date to maintain chronological order
-      messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-
-      // Scroll to bottom to show the new message
-      _scrollToBottom();
+      messages.insert(0, message); // insert at start because list is reversed
     } else {
       log("[addNewMessage] Message already exists, skipping duplicate");
     }
-  }
-
-  void _scrollToBottom() {
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (scrollController.hasClients) {
-        scrollController.animateTo(
-          scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
-    });
   }
 }

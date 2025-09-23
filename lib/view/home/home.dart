@@ -73,30 +73,32 @@ class HomeScreen extends StatelessWidget {
                                 children: [
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
-                                    child: Image.network(
-                                      controller.user.value.profilePicture ??
-                                          'https://www.w3schools.com/howto/img_avatar2.png',
-                                      height: 50,
-                                      width: 50,
-                                      fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) {
-                                        return Container(
-                                          height: 50,
-                                          width: 50,
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey[300],
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                          child: Icon(
-                                            Icons.person,
-                                            color: Colors.grey[600],
-                                            size: 24,
-                                          ),
-                                        );
-                                      },
-                                    ),
+                                    child: Obx(() {
+                                      return Image.network(
+                                        controller.user.value.profilePicture ??
+                                            'https://www.w3schools.com/howto/img_avatar2.png',
+                                        height: 50,
+                                        width: 50,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Container(
+                                            height: 50,
+                                            width: 50,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[300],
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            child: Icon(
+                                              Icons.person,
+                                              color: Colors.grey[600],
+                                              size: 24,
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    }),
                                   ),
                                   SpaceW10(),
                                   if (isExpanded.value)
@@ -148,11 +150,8 @@ class HomeScreen extends StatelessWidget {
                                       'Assistant',
                                       2,
                                       isExpanded.value),
-                                  ExpandableNavItem(
-                                      'assets/icons/profile.svg',
-                                      'Profile',
-                                      3,
-                                      isExpanded.value),
+                                  ExpandableNavItem('assets/icons/profile.svg',
+                                      'Profile', 3, isExpanded.value),
                                 ],
                               ),
                             ),
@@ -161,7 +160,7 @@ class HomeScreen extends StatelessWidget {
                               onTap: () {
                                 var profileController =
                                     Get.find<ProfileController>();
-                      
+
                                 Get.dialog(
                                   BackdropFilter(
                                     filter: ImageFilter.blur(
@@ -190,8 +189,8 @@ class HomeScreen extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 height: 50,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 14),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 14),
                                 child: Row(
                                   children: [
                                     SvgPicture.asset(
@@ -207,13 +206,11 @@ class HomeScreen extends StatelessWidget {
                                       const SizedBox(width: 16),
                                       Expanded(
                                         child: AnimatedOpacity(
-                                          duration: const Duration(
-                                              milliseconds: 300),
-                                          opacity:
-                                              isExpanded.value ? 1.0 : 0.0,
+                                          duration:
+                                              const Duration(milliseconds: 300),
+                                          opacity: isExpanded.value ? 1.0 : 0.0,
                                           child: Text("Logout",
-                                              style:
-                                                  CustomTextTheme.regular12),
+                                              style: CustomTextTheme.regular12),
                                         ),
                                       ),
                                     ],
