@@ -41,7 +41,7 @@ class PhotoSessionScreen extends StatelessWidget {
             message:
                 "You haven't completed all steps. Are you sure you want to exit? Your progress may be lost.",
             onCancel: () => Get.back(),
-            onPressed: () => Get.offNamed(PrimaryRoute.home),
+            onPressed: () => Get.offAllNamed(PrimaryRoute.home),
             solidBtnLabel: "Exit Anyway",
             isActionPopUp: true,
             solidBtnBg: AppColors.red,
@@ -50,10 +50,21 @@ class PhotoSessionScreen extends StatelessWidget {
           if (fromHistory) {
             Get.back();
           } else {
-            controller.goToPreviousStep();
+            if (!controller.isProcessingLoading.value) {
+              controller.goToPreviousStep();
+            } else {
+              // Optional: show feedback to user
+              Get.snackbar(
+                "Please wait",
+                "Processing in progress. You can't go back right now.",
+                snackPosition: SnackPosition.TOP,
+                colorText: Colors.white,
+              );
+            }
           }
         }
       },
+    
       child: Scaffold(
         body: Stack(
           children: [

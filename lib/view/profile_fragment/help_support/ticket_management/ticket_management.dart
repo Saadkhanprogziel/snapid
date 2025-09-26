@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/colors.dart';
@@ -11,19 +10,21 @@ import 'package:snapid/utlis/custom_header.dart';
 import 'package:snapid/utlis/custom_outline_button.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
 import 'package:snapid/utlis/custom_tabbar.dart';
+import 'package:snapid/utlis/custom_text_field.dart';
 import 'package:snapid/utlis/screenBg.dart';
 
 class TicketManagement extends StatefulWidget {
-  TicketManagement({super.key});
+  const TicketManagement({super.key});
 
   @override
   State<TicketManagement> createState() => _TicketManagementState();
 }
 
-final TicketManagementController controller =
-    Get.put(TicketManagementController());
-
 class _TicketManagementState extends State<TicketManagement> {
+  // ✅ Attach controller
+  final TicketManagementController controller =
+      Get.put(TicketManagementController());
+
   void _handleCreateTicket() {
     _showCreateTicketDialog();
   }
@@ -41,7 +42,7 @@ class _TicketManagementState extends State<TicketManagement> {
               filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
               child: Container(
                 width: MediaQuery.of(context).size.width * 0.9,
-                constraints: BoxConstraints(maxWidth: 500),
+                constraints: const BoxConstraints(maxWidth: 500),
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   color: const Color.fromARGB(40, 255, 255, 255),
@@ -55,10 +56,10 @@ class _TicketManagementState extends State<TicketManagement> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Header
+                    /// Header
                     Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.confirmation_number_outlined,
                           color: Colors.white,
                           size: 28,
@@ -83,57 +84,32 @@ class _TicketManagementState extends State<TicketManagement> {
                     ),
                     const SizedBox(height: 24),
 
-                    // Subject field
+                    /// Subject field
                     Text(
                       "Subject",
-
                       style: CustomTextTheme.regular14.copyWith(
                         fontWeight: FontWeight.w600,
                         color: Colors.white.withOpacity(0.9),
                       ),
                     ),
                     const SizedBox(height: 8),
-                    TextField(
-                      cursorColor: Colors.white, // 👈 Add this
+                    CustomTextField(
+                      hintText: "Subject",
                       controller: controller.subjectController,
-                      style: CustomTextTheme.regular14.copyWith(
-                        color: Colors.white,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: "Enter ticket subject",
-                        hintStyle: TextStyle(
-                          color: Colors.white.withOpacity(0.5),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white.withOpacity(0.1),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide(
-                            color: Colors.white.withOpacity(0.3),
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide(
-                            color: Colors.white.withOpacity(0.3),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide(
-                            color: Colors.white.withOpacity(0.6),
-                            width: 2,
-                          ),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
+                      prefixIcon: Icons.subject,
+                      cursorColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(
+                          color: Colors.white.withOpacity(0.3),
                         ),
                       ),
+                      fillColor: Colors.white.withOpacity(0.1),
                     ),
+
                     const SizedBox(height: 20),
 
-                    // Description field
+                    /// Description field
                     Text(
                       "Description",
                       style: CustomTextTheme.regular14.copyWith(
@@ -142,64 +118,43 @@ class _TicketManagementState extends State<TicketManagement> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    TextField(
-                      cursorColor: Colors.white, // 👈 Add this
-
+                    CustomTextField(
+                      hintText: "Describe your issue or request...",
                       controller: controller.descriptionController,
+                      cursorColor: Colors.white,
                       maxLines: 4,
-                      style: CustomTextTheme.regular14.copyWith(
-                        color: Colors.white,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: "Describe your issue or request...",
-                        hintStyle: TextStyle(
-                          color: Colors.white.withOpacity(0.5),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white.withOpacity(0.1),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide(
-                            color: Colors.white.withOpacity(0.3),
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide(
-                            color: Colors.white.withOpacity(0.3),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide(
-                            color: Colors.white.withOpacity(0.6),
-                            width: 2,
-                          ),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
+                      maxLength: 250,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(
+                          color: Colors.white.withOpacity(0.3),
                         ),
                       ),
+                      fillColor: Colors.white.withOpacity(0.1),
                     ),
+
                     const SizedBox(height: 32),
 
-                    // Action buttons
+                    /// Action buttons
                     Row(
                       children: [
                         Expanded(
-                            child: CustomOutlineButton(
-                                onPressed: () {
-                                  Get.back();
-                                },
-                                label: "Cancel")),
+                          child: CustomOutlineButton(
+                            onPressed: () {
+                              Get.back();
+                            },
+                            label: "Cancel",
+                          ),
+                        ),
                         const SizedBox(width: 16),
                         Expanded(
-                            child: CustomElevatedButton(
-                                onPressed: () {
-                                  controller.createTicket();
-                                },
-                                text: "Create Ticket")),
+                          child: CustomElevatedButton(
+                            onPressed: () {
+                              controller.createTicket();
+                            },
+                            text: "Create Ticket",
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -223,7 +178,7 @@ class _TicketManagementState extends State<TicketManagement> {
         children: [
           buildBackground(),
           Padding(
-            padding: EdgeInsets.all(isWide ? 50.0 : 0),
+            padding: EdgeInsets.all(isWide ? 30.0 : 0),
             child: Column(
               children: [
                 SafeArea(
@@ -231,15 +186,21 @@ class _TicketManagementState extends State<TicketManagement> {
                 ),
                 _buildCustomTabBar(),
                 Expanded(
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SpaceH10(),
-                        _buildTicketsList(isWide),
-                      ],
+                  child: RefreshIndicator(
+                    onRefresh: () async {
+                    },
+                    color: AppColors.primaryColor,
+                    backgroundColor: Colors.white,
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SpaceH10(),
+                          _buildTicketsList(isWide),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -248,29 +209,24 @@ class _TicketManagementState extends State<TicketManagement> {
           ),
         ],
       ),
-      // FAB for mobile only
       floatingActionButton: !isWide ? _buildMobileFAB() : null,
     );
   }
 
   Widget _buildHeader(bool isWide) {
     if (isWide) {
-      // Custom header for web with add button
       return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: CustomHeader(
-            showBackButton: true,
-            title: "Ticket Management",
-            rightWidget: _buildWebAddButton(),
-          ));
-    } else {
-      // Original header for mobile
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
         child: CustomHeader(
-          title: "Ticket Management",
           showBackButton: true,
+          title: "Ticket Management",
+          rightWidget: _buildWebAddButton(),
         ),
+      );
+    } else {
+      return const CustomHeader(
+        title: "Ticket Management",
+        showBackButton: true,
       );
     }
   }
@@ -346,9 +302,9 @@ class _TicketManagementState extends State<TicketManagement> {
   Widget _buildTicketsList(bool isWide) {
     return Obx(() {
       if (controller.isLoading.value) {
-        return Center(
+        return const Center(
           child: Padding(
-            padding: const EdgeInsets.all(50.0),
+            padding: EdgeInsets.all(50.0),
             child: CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
             ),
@@ -370,7 +326,7 @@ class _TicketManagementState extends State<TicketManagement> {
                   size: 64,
                 ),
                 const SizedBox(height: 16),
-                Text(
+                const Text(
                   "No tickets found",
                   style: TextStyle(
                     color: Colors.white,
@@ -414,7 +370,7 @@ class _TicketManagementState extends State<TicketManagement> {
                   'status': ticket.status,
                   'date': displayUpdatedDate(ticket.closedAt, ticket.createdAt),
                   'ticketId': ticket.id,
-                  'chat_id': ticket.chat.id
+                  'chat_id': ticket.chat.id,
                 });
               },
               child: TicketCard(
@@ -437,10 +393,9 @@ class _TicketManagementState extends State<TicketManagement> {
                   Get.toNamed(PrimaryRoute.chat_screen, arguments: {
                     'subject': ticket.title,
                     'status': ticket.status,
-                    'date':
-                        displayUpdatedDate(ticket.closedAt, ticket.createdAt),
+                    'date': displayUpdatedDate(ticket.closedAt, ticket.createdAt),
                     'ticketId': ticket.id,
-                    'chat_id': ticket.chat.id
+                    'chat_id': ticket.chat.id,
                   });
                 },
                 child: TicketCard(
@@ -462,24 +417,7 @@ class _TicketManagementState extends State<TicketManagement> {
     if (isWide) {
       return _buildWebAddButton();
     }
-    return SizedBox.shrink();
-    // } else {
-    //   return ElevatedButton.icon(
-    //     onPressed: _handleCreateTicket,
-    //     icon: const Icon(Icons.add_rounded, color: Colors.white),
-    //     label: Text(
-    //       "Create Ticket",
-    //       style: TextStyle(color: Colors.white),
-    //     ),
-    //     style: ElevatedButton.styleFrom(
-    //       backgroundColor: Colors.white.withOpacity(0.2),
-    //       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-    //       shape: RoundedRectangleBorder(
-    //         borderRadius: BorderRadius.circular(25),
-    //       ),
-    //     ),
-    //   );
-    // }
+    return const SizedBox.shrink();
   }
 
   String displayUpdatedDate(DateTime? closedAt, DateTime createdAt) {
@@ -536,7 +474,6 @@ class TicketCard extends StatelessWidget {
     required this.description,
   }) : super(key: key);
 
-  // Helper function to map status → background color
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'open':
@@ -550,7 +487,6 @@ class TicketCard extends StatelessWidget {
     }
   }
 
-  // Helper function to map status → text color
   Color _getStatusTextColor(String status) {
     switch (status.toLowerCase()) {
       case 'open':
@@ -595,13 +531,13 @@ class TicketCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
                   decoration: BoxDecoration(
-                    color: _getStatusColor(status), // ✅ background
+                    color: _getStatusColor(status),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     status,
                     style: CustomTextTheme.regular12.copyWith(
-                      color: _getStatusTextColor(status), // ✅ text color
+                      color: _getStatusTextColor(status),
                       fontWeight: FontWeight.bold,
                     ),
                   ),

@@ -29,4 +29,10 @@ class HomeController extends GetxController {
     user.value = LocalStorage.getUser() ?? UserModel();
     update();
   }
+
+  @override
+  void onClose() {
+    // Dispose resources here if needed
+    super.onClose();
+  }
 }

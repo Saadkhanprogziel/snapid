@@ -23,7 +23,7 @@ class ProfileController extends GetxController {
         }, (success) {
          
         
-          Get.offNamed(PrimaryRoute.login);
+          Get.offAllNamed(PrimaryRoute.login);
         }));
   }
 

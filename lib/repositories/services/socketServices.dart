@@ -21,7 +21,6 @@ class SocketService {
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .enableAutoConnect()
-          // Change to setQuery if your server expects query params instead of auth
           .setAuth({'token': appStorage.read("token")})
           .build(),
     );
@@ -29,7 +28,7 @@ class SocketService {
     _socket.connect();
 
     _socket.onConnect((_) {
-      log("✅ Socket Connected");
+      log("Socket Connected");
     });
 
     _socket.onDisconnect((_) {
@@ -37,7 +36,7 @@ class SocketService {
     });
 
     _socket.onError((error) {
-      log("❌ Socket transport error: $error");
+      log(" Socket transport error: $error");
     });
 
     // Listen for custom error event from backend

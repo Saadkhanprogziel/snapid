@@ -72,13 +72,24 @@ class PhotoCreationRepository {
         'Authorization': 'Bearer $token',
       };
 
+      var url = '$apiUrl/session/start-session';
+      final guestId = appStorage.read("guest_id");
+      if (guestId != null && token.isEmpty) {
+        // headers['guestID'] = guestId;
+        url = '$apiUrl/session/start-guest-session/$guestId';
+      }
+
       final response = await _networkRepository.postMultipart(
-        url: '$apiUrl/session/start-session',
+        url: url,
         formData: formData,
         headers: headers,
       );
 
       if (response.success) {
+        
+          final id = response.data["data"]['id'];
+          print("session_ID $id");
+          appStorage.write("session_id", id);
         final photoCreationModel =
             PhotoCreationModel.fromJson(response.data['data']);
         return Right(photoCreationModel);
@@ -90,12 +101,85 @@ class PhotoCreationRepository {
     }
   }
 
+  Future<Either<String, String>> createPayment(
+    String paymentId,
+    String email,
+    String planID,
+
+  ) async {
+    try {
+      final sessionId = appStorage.read("session_id");
+      final guestId = appStorage.read("guest_id");
+      var url = '/credits/create-payment';
+      if (guestId != null) {
+        url = '/credits/create-web-payment/$guestId';
+        
+      }
+      final response = await _networkRepository.post(
+        url: url,
+        data: {
+          "paymentMethodID": paymentId,
+          "email": email,
+          "planID":  planID, 
+          "currency": "usd",
+          "photoSessionID": sessionId
+        },
+      );
+
+      if (response.success) {
+        var paymentData = response.data['paymentIntentId'];
+
+        return Right(paymentData);
+      } else {
+        return Left(response.message);
+      }
+    } catch (e) {
+      return Left('Error downloading image: ${e.toString()}');
+    }
+  }
+
+  Future<Either<String, String>> confirmPayment(
+    String paymentIntentId,
+    String email,
+  ) async {
+    try {
+      final sessionId = appStorage.read("session_id");
+      final response = await _networkRepository.post(
+        url: '/credits/confirm-web-payment',
+        data: {
+          "paymentIntentId": paymentIntentId,
+          "email": email,
+          "currency": "usd",
+          "photoSessionID": sessionId
+        },
+      );
+
+      if (response.success) {
+        var paymentData = response.data['transactionId'];
+
+        return Right(paymentData);
+      } else {
+        return Left(response.message);
+      }
+    } catch (e) {
+      return Left('Error downloading image: ${e.toString()}');
+    }
+  }
+
   Future<Either<String, PhotoCreationModel>> downloadImage({
     required String id,
   }) async {
     try {
+      var url = '$apiUrl/session/download-photo';
+      final token = appStorage.read("token") ?? "";
+     
+      final guestId = appStorage.read("guest_id");
+      if (guestId != null && token.isEmpty) {
+        // headers['guestID'] = guestId;
+        url = '$apiUrl/session/download-web-photo/$id/$guestId';
+      }
       final response = await _networkRepository.post(
-        url: '/session/download-photo',
+        url: url,
         data: {'sessionID': id},
       );
 

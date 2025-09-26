@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:snapid/constant/colors.dart';
@@ -8,12 +9,16 @@ class PopularCountryCard extends StatelessWidget {
   final String countryName;
   final String flagAsset;
   final String passportSize;
+  final String? visaSize;
+  final String? drivingLicense;
 
   const PopularCountryCard({
     super.key,
     required this.countryName,
     required this.flagAsset,
     required this.passportSize,
+    this.visaSize,
+    this.drivingLicense,
   });
 
   @override
@@ -24,18 +29,26 @@ class PopularCountryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-      child: Center( // ✅ centers the Row inside the card
+      child: Center(
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.center, // ✅ center horizontally
-          crossAxisAlignment: CrossAxisAlignment.center, // ✅ center vertically
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
               width: 130,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center, // ✅ vertical center
-                crossAxisAlignment: CrossAxisAlignment.center, // ✅ horizontal center
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SvgPicture.asset(flagAsset, height: 40, width: 40),
+
+                 flagAsset.isNotEmpty ? CachedNetworkImage(imageUrl: flagAsset) : Container(
+                    width: 60,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                   SpaceH15(),
                   Text(
                     countryName,
@@ -51,16 +64,15 @@ class PopularCountryCard extends StatelessWidget {
             SpaceW12(),
             Expanded(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center, // ✅ center vertically
-                crossAxisAlignment: CrossAxisAlignment.center, // ✅ center horizontally
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   _infoRow('Passport:', passportSize),
                   const SizedBox(height: 12),
-                  _infoRow('Visa:', passportSize),
+                  _infoRow('Visa:', visaSize ?? passportSize),
                   const SizedBox(height: 12),
-                  _infoRow('Driving License:', passportSize),
+                  _infoRow('Driving License:', drivingLicense ?? passportSize),
                   const SizedBox(height: 12),
-                  _infoRow('8G Color:', passportSize),
                 ],
               ),
             )
@@ -69,6 +81,8 @@ class PopularCountryCard extends StatelessWidget {
       ),
     );
   }
+
+ 
 
   Widget _infoRow(String label, String value) {
     return Row(

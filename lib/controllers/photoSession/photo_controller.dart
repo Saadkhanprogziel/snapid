@@ -16,6 +16,7 @@ import 'package:snapid/routes/routes.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
 import 'package:snapid/utlis/custom_outline_button.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
+import 'package:crypto/crypto.dart'; // Add this dependency to pubspec.yaml
 
 enum DocumentType { passport, visa, drivingLicense, manually }
 
@@ -31,6 +32,8 @@ class PhotoController extends GetxController {
   var selectedCountry = Rxn<Country>();
   final canDownload = false.obs;
 
+  var selectedPackage = "".obs;
+
   final isLoading = false.obs;
   var photoCreationModelData = Rxn<PhotoCreationModel>();
   var processedWatermarkedUrl = ''.obs;
@@ -40,23 +43,52 @@ class PhotoController extends GetxController {
   TextEditingController widthController = TextEditingController();
   TextEditingController heightController = TextEditingController();
 
-  /// ✅ Updated: Use XFile for cross-platform
+  /// Updated: Use XFile for cross-platform
   final selectedPhotos = <ImageProvider>[].obs;
   final capturedPhotos = <XFile>[].obs;
+  
+  // NEW: Set to store image hashes for duplicate detection
+  final _imageHashes = <String>{};
+  
   final ImagePicker _picker = ImagePicker();
   final isCapturingPhotos = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    // ✅ NEW: Handle URL parameters on web
+    // NEW: Handle URL parameters on web
     if (kIsWeb) {
       _handleUrlParameters();
       _loadSavedImages();
     }
   }
 
-  /// ✅ NEW: Handle URL parameters and set step accordingly
+  /// NEW: Generate hash for image content to detect duplicates
+  Future<String> _generateImageHash(XFile imageFile) async {
+    try {
+      final bytes = await imageFile.readAsBytes();
+      final digest = sha256.convert(bytes);
+      return digest.toString();
+    } catch (e) {
+      print('Error generating image hash: $e');
+      // Fallback to file path or name if hashing fails
+      return imageFile.path.isNotEmpty ? imageFile.path : imageFile.name;
+    }
+  }
+
+  /// NEW: Check if image is duplicate
+  Future<bool> _isDuplicateImage(XFile imageFile) async {
+    final hash = await _generateImageHash(imageFile);
+    return _imageHashes.contains(hash);
+  }
+
+  /// NEW: Add image hash to tracking set
+  Future<void> _addImageHash(XFile imageFile) async {
+    final hash = await _generateImageHash(imageFile);
+    _imageHashes.add(hash);
+  }
+
+  /// NEW: Handle URL parameters and set step accordingly
   void _handleUrlParameters() {
     if (!kIsWeb) return;
 
@@ -68,9 +100,9 @@ class PhotoController extends GetxController {
         int? step = int.tryParse(stepParam);
         if (step != null && step >= 1 && step <= 4) {
           currentStep.value = step;
-          print('✅ Set current step to $step from URL parameter');
+          print('Set current step to $step from URL parameter');
 
-          // ✅ Load session data if we're on step 2 or higher
+          // Load session data if we're on step 2 or higher
           if (step > 1) {
             _loadSessionDataFromStorage();
           }
@@ -99,7 +131,7 @@ class PhotoController extends GetxController {
           print('Loaded country code: $countryCode');
         }
 
-        print('✅ Loaded session data from storage');
+        print('Loaded session data from storage');
       }
     } catch (e) {
       print('❌ Error loading session data: $e');
@@ -172,6 +204,7 @@ class PhotoController extends GetxController {
 
         selectedPhotos.clear();
         capturedPhotos.clear();
+        _imageHashes.clear(); // Clear hash tracking
 
         for (String base64String in savedImages) {
           Uint8List bytes = base64Decode(base64String);
@@ -185,9 +218,12 @@ class PhotoController extends GetxController {
 
           capturedPhotos.add(webFile);
           selectedPhotos.add(MemoryImage(bytes));
+          
+          // Add hash for loaded images
+          await _addImageHash(webFile);
         }
 
-        print('✅ Loaded ${savedImages.length} images from localStorage');
+        print('Loaded ${savedImages.length} images from localStorage');
       }
     } catch (e) {
       print('❌ Error loading saved images: $e');
@@ -217,7 +253,7 @@ class PhotoController extends GetxController {
       return;
     }
 
-    // ✅ Save images to localStorage on web
+    // Save images to localStorage on web
     if (kIsWeb) {
       await _saveImagesToStorage();
     }
@@ -240,7 +276,7 @@ class PhotoController extends GetxController {
       }
     }
 
-    // ✅ Handle URL parameters even when initializing
+    // Handle URL parameters even when initializing
     if (kIsWeb) {
       _handleUrlParameters();
     }
@@ -253,10 +289,10 @@ class PhotoController extends GetxController {
             update();
           },
           (success) {
-
             if (success.credits != 0) {
               canDownload.value = true;
-              DashboardController dashboardController = Get.find<DashboardController>();
+              DashboardController dashboardController =
+                  Get.find<DashboardController>();
               dashboardController.refreshUser();
             }
           },
@@ -266,7 +302,7 @@ class PhotoController extends GetxController {
   void selectCountry(Country country) {
     selectedCountry.value = country;
 
-    // ✅ Save country selection to storage for web
+    // Save country selection to storage for web
     if (kIsWeb) {
       appStorage.write('selectedCountryCode', country.code);
       appStorage.write('selectedCountryName', country.name);
@@ -278,7 +314,7 @@ class PhotoController extends GetxController {
   void changeType(DocumentType type) {
     selectedType.value = type;
 
-    // ✅ Save document type to storage for web
+    // Save document type to storage for web
     if (kIsWeb) {
       appStorage.write('selectedDocumentType', type.toString());
     }
@@ -291,7 +327,7 @@ class PhotoController extends GetxController {
   void setStep(int step) {
     currentStep.value = step;
 
-    // ✅ Update URL on web
+    // Update URL on web
     if (kIsWeb) {
       navigateToStep(step);
     }
@@ -326,6 +362,28 @@ class PhotoController extends GetxController {
         if (token.isNotEmpty) {
           bool success = await createSession();
           if (!success) return;
+        } else {
+          final guestId = appStorage.read("guest_id");
+          print(guestId);
+          if (guestId == null) {
+            await authRespository.createGuestUser().then((response) {
+              response.fold((error) {
+                Get.snackbar(
+                  'Error',
+                  'Could not create guest user: $error',
+                  backgroundColor: AppColors.red,
+                  colorText: AppColors.whiteColor,
+                );
+                return;
+              }, (success) {
+
+              });
+            });
+          }
+          
+          bool success = await createSession();
+          if (!success) return;
+
         }
         print(
             "Reviewing photos... ${photoCreationModelData.value?.processedWatermarkedUrl}");
@@ -347,8 +405,6 @@ class PhotoController extends GetxController {
       navigateToStep(currentStep.value + 1);
     }
   }
-
-  
 
   void goToPreviousStep() {
     if (currentStep.value > 1) {
@@ -373,7 +429,9 @@ class PhotoController extends GetxController {
         photoCreationModelData.value = photoCreationModel;
         appStorage.write("processed_img", photoCreationModel.processedImageUrl);
         _storeSessionData(photoCreationModel);
-         getUserDetails();
+        
+       
+        getUserDetails();
         Get.toNamed(PrimaryRoute.photo_preview);
       });
     });
@@ -386,9 +444,19 @@ class PhotoController extends GetxController {
       // Pick multiple images
       final List<XFile>? pickedFiles = await _picker.pickMultiImage();
       if (pickedFiles != null && pickedFiles.isNotEmpty) {
+        int duplicatesSkipped = 0;
+        
         for (final file in pickedFiles) {
           if (capturedPhotos.length >= 5) break; // cap at 5
+          
+          // Check for duplicate before adding
+          if (await _isDuplicateImage(file)) {
+            duplicatesSkipped++;
+            continue;
+          }
+          
           capturedPhotos.add(file);
+          await _addImageHash(file); // Track the hash
 
           if (kIsWeb) {
             Uint8List bytes = await file.readAsBytes();
@@ -397,12 +465,36 @@ class PhotoController extends GetxController {
             selectedPhotos.add(Image.file(File(file.path)).image);
           }
         }
+        
+        // Show message if duplicates were found
+        if (duplicatesSkipped > 0) {
+          Get.snackbar(
+            'Duplicate Images Skipped',
+            '$duplicatesSkipped duplicate image${duplicatesSkipped > 1 ? 's were' : ' was'} skipped.',
+            backgroundColor: AppColors.orange,
+            colorText: AppColors.whiteColor,
+            duration: Duration(seconds: 3),
+          );
+        }
       }
     } else {
       // Pick a single image
       final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
       if (pickedFile != null) {
+        // Check for duplicate before adding
+        if (await _isDuplicateImage(pickedFile)) {
+          Get.snackbar(
+            'Duplicate Image',
+            'This image has already been selected.',
+            backgroundColor: AppColors.orange,
+            colorText: AppColors.whiteColor,
+            duration: Duration(seconds: 2),
+          );
+          return;
+        }
+        
         capturedPhotos.add(pickedFile);
+        await _addImageHash(pickedFile); // Track the hash
 
         if (kIsWeb) {
           Uint8List bytes = await pickedFile.readAsBytes();
@@ -419,6 +511,7 @@ class PhotoController extends GetxController {
       isCapturingPhotos.value = true;
       capturedPhotos.clear();
       selectedPhotos.clear();
+      _imageHashes.clear(); // Clear hash tracking when starting fresh
 
       int photoCount = 0;
       bool shouldContinue = true;
@@ -431,7 +524,20 @@ class PhotoController extends GetxController {
         );
 
         if (pickedFile != null) {
+          // Check for duplicate (though unlikely with camera captures)
+          if (await _isDuplicateImage(pickedFile)) {
+            Get.snackbar(
+              'Duplicate Photo',
+              'This photo appears to be identical to a previous one. Please take a different photo.',
+              backgroundColor: AppColors.orange,
+              colorText: AppColors.whiteColor,
+              duration: Duration(seconds: 3),
+            );
+            continue; // Don't increment photoCount, try again
+          }
+          
           capturedPhotos.add(pickedFile);
+          await _addImageHash(pickedFile); // Track the hash
 
           if (kIsWeb) {
             Uint8List bytes = await pickedFile.readAsBytes();
@@ -519,15 +625,7 @@ class PhotoController extends GetxController {
           return false;
         },
         (photoCreationModel) {
-          
-
-          // print("Photo session created: ${photoCreationModel.id}");
-          Get.snackbar(
-            'Success',
-            'Photos uploaded successfully!',
-            colorText: AppColors.whiteColor,
-            duration: Duration(seconds: 3),
-          );
+         
           photoCreationModelData.value = photoCreationModel;
           processedWatermarkedUrl.value =
               photoCreationModel.processedWatermarkedUrl;
@@ -634,14 +732,28 @@ class PhotoController extends GetxController {
   }
 
   void removePhoto(int index) {
-    selectedPhotos.removeAt(index);
     if (index < capturedPhotos.length) {
+      // Remove hash tracking when photo is removed
+      _removeImageHash(capturedPhotos[index]);
       capturedPhotos.removeAt(index);
+    }
+    
+    selectedPhotos.removeAt(index);
+  }
+
+  /// NEW: Remove image hash when photo is deleted
+  Future<void> _removeImageHash(XFile imageFile) async {
+    try {
+      final hash = await _generateImageHash(imageFile);
+      _imageHashes.remove(hash);
+    } catch (e) {
+      print('Error removing image hash: $e');
     }
   }
 
   void clearAllPhotos() {
     selectedPhotos.clear();
     capturedPhotos.clear();
+    _imageHashes.clear(); // Clear hash tracking
   }
 }

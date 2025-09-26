@@ -292,7 +292,26 @@ class DashboardFragment extends StatelessWidget {
                                               ),
                                             ),
                                             TextButton(
-                                              onPressed: () {},
+                                              onPressed: () {
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (BuildContext context) {
+                                                    return Dialog(
+                                                      backgroundColor:
+                                                                     const Color.fromARGB(208, 33, 33, 33),
+
+
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(20),
+                                                      ),
+                                                      child: Container(
+                                                        width: 400,
+                                                        child: _photoGuideline(cardHeight),
+                                                      ),
+                                                    );
+                                                  },
+                                                );
+                                              },
                                               style: TextButton.styleFrom(
                                                 padding: EdgeInsets.symmetric(
                                                     horizontal: 8, vertical: 4),
@@ -314,93 +333,7 @@ class DashboardFragment extends StatelessWidget {
                               ),
                             ),
                           ),
-                          if (kIsWeb && !isDesktop)
-                            Expanded(
-                              child: SizedBox(
-                                height: cardHeight,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(25),
-                                  child: Container(
-                                    padding: const EdgeInsets.all(25),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.cardColor,
-                                      borderRadius: BorderRadius.circular(25),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Center(
-                                          child: Text(
-                                            "Photo Guidelines",
-                                            textAlign: TextAlign.center,
-                                            style: CustomTextTheme.regular16
-                                                .copyWith(
-                                              color: AppColors.whiteColor,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(height: 20),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            ImageWithIcon(
-                                              imagePath:
-                                                  'assets/images/correct_image_1.jpg',
-                                              icon: Icons.check_circle,
-                                              iconColor: Colors.green,
-                                            ),
-                                            const SizedBox(width: 12),
-                                            ImageWithIcon(
-                                              imagePath:
-                                                  'assets/images/correct_image_2.jpg',
-                                              icon: Icons.check_circle,
-                                              iconColor: Colors.green,
-                                            ),
-                                            const SizedBox(width: 12),
-                                            ImageWithIcon(
-                                              imagePath:
-                                                  'assets/images/correct_image_3.jpg',
-                                              icon: Icons.check_circle,
-                                              iconColor: Colors.green,
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 20),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            ImageWithIcon(
-                                              imagePath:
-                                                  'assets/images/incorrect_image_1.jpg',
-                                              icon: Icons.close,
-                                              iconColor: Colors.redAccent,
-                                            ),
-                                            const SizedBox(width: 12),
-                                            ImageWithIcon(
-                                              imagePath:
-                                                  'assets/images/incorrect_image_2.jpg',
-                                              icon: Icons.close,
-                                              iconColor: Colors.redAccent,
-                                            ),
-                                            const SizedBox(width: 12),
-                                            ImageWithIcon(
-                                              imagePath:
-                                                  'assets/images/incorrect_image_3.jpg',
-                                              icon: Icons.close,
-                                              iconColor: Colors.redAccent,
-                                            ),
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
+                          if (kIsWeb && !isDesktop) _photoGuideline(cardHeight),
                         ],
                       ),
                     );
@@ -445,57 +378,36 @@ class DashboardFragment extends StatelessWidget {
               ),
               SliverToBoxAdapter(
                 child: Container(
-                  height: 220,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    physics: AlwaysScrollableScrollPhysics(),
-                    padding: EdgeInsets.only(left: 20),
-                    children: const [
-                      CountryCard(
-                        countryName: Strings.unitedStates,
-                        flagAsset: 'assets/flags/us.svg',
-                        passportSize: Strings.passportSizeUS,
-                      ),
-                      SizedBox(width: 16),
-                      CountryCard(
-                        countryName: Strings.unitedArabEmirates,
-                        flagAsset: 'assets/flags/ae.svg',
-                        passportSize: Strings.passportSizeUAE,
-                      ),
-                      SizedBox(width: 16),
-                      CountryCard(
-                        countryName: "Antigua & Barbuda",
-                        flagAsset: 'assets/flags/ag.svg',
-                        passportSize: Strings.passportSizeUAE,
-                      ),
-                      SizedBox(width: 16),
-                      CountryCard(
-                        countryName: "South Sudan",
-                        flagAsset: 'assets/flags/ss.svg',
-                        passportSize: Strings.passportSizeUAE,
-                      ),
-                      SizedBox(width: 16),
-                      CountryCard(
-                        countryName: "Sint Maarten",
-                        flagAsset: 'assets/flags/sx.svg',
-                        passportSize: Strings.passportSizeUAE,
-                      ),
-                      SizedBox(width: 16),
-                      CountryCard(
-                        countryName: "British Virgin Islands",
-                        flagAsset: 'assets/flags/vg.svg',
-                        passportSize: Strings.passportSizeUAE,
-                      ),
-                      SizedBox(width: 16),
-                      CountryCard(
-                        countryName: "United States",
-                        flagAsset: 'assets/flags/us.svg',
-                        passportSize: Strings.passportSizeUS,
-                      ),
-                      SizedBox(width: 20),
-                    ],
-                  ),
-                ),
+                    height: 220,
+                    child: Obx(() {
+                      if (controller.countries.isEmpty) {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primaryColor,
+                          ),
+                        );
+                      }
+                      return ListView.builder(
+                          itemCount: controller.countries.length,
+                          scrollDirection: Axis.horizontal,
+                          physics: AlwaysScrollableScrollPhysics(),
+                          padding: EdgeInsets.only(left: 20),
+                          itemBuilder: (context, index) {
+                            var country = controller.countries[index];
+                            return Row(
+                              children: [
+                                CountryCard(
+                                  countryName: country.name,
+                                  flagAsset: country.flag,
+                                  passportSize: country.passportSize,
+                                  drivingLicense: country.drivingLicense,
+                                  visaSize: country.visaSize,
+                                ),
+                                SizedBox(width: 16),
+                              ],
+                            );
+                          });
+                    })),
               ),
               SliverPadding(
                 padding: EdgeInsets.only(
@@ -648,6 +560,90 @@ class DashboardFragment extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _photoGuideline(cardHeight) {
+    return Expanded(
+      child: SizedBox(
+        height: cardHeight,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(25),
+          child: Container(
+            padding: const EdgeInsets.all(25),
+            decoration: BoxDecoration(
+              color: AppColors.cardColor,
+              borderRadius: BorderRadius.circular(25),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Text(
+                    "Photo Guidelines",
+                    textAlign: TextAlign.center,
+                    style: CustomTextTheme.regular16.copyWith(
+                      color: AppColors.whiteColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ImageWithIcon(
+                      imagePath: 'assets/images/correct_image_1.jpg',
+                      icon: Icons.check_circle,
+                      iconColor: Colors.green,
+                    ),
+                    const SizedBox(width: 12),
+                    ImageWithIcon(
+                      imagePath: 'assets/images/correct_image_2.jpg',
+                      icon: Icons.check_circle,
+                      iconColor: Colors.green,
+                    ),
+                    if(kIsWeb) ...[
+
+                    const SizedBox(width: 12),
+                    ImageWithIcon(
+                      imagePath: 'assets/images/correct_image_3.jpg',
+                      icon: Icons.check_circle,
+                      iconColor: Colors.green,
+                    ),
+                    ]
+                  ],
+                ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ImageWithIcon(
+                      imagePath: 'assets/images/incorrect_image_1.jpg',
+                      icon: Icons.close,
+                      iconColor: Colors.redAccent,
+                    ),
+                    const SizedBox(width: 12),
+                    ImageWithIcon(
+                      imagePath: 'assets/images/incorrect_image_2.jpg',
+                      icon: Icons.close,
+                      iconColor: Colors.redAccent,
+                    ),
+                     if(kIsWeb) ...[
+                    const SizedBox(width: 12),
+                    ImageWithIcon(
+                      imagePath: 'assets/images/incorrect_image_3.jpg',
+                      icon: Icons.close,
+                      iconColor: Colors.redAccent,
+                    ),
+                     ]
+                  ],
+                )
+              ],
+            ),
+          ),
         ),
       ),
     );

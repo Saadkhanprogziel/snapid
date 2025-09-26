@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:network_info_plus/network_info_plus.dart';
 import 'dart:typed_data';
 
 import 'package:dartz/dartz.dart';
@@ -60,6 +61,23 @@ class AuthRespository {
 
     return left(response.message);
   }
+
+  
+   Future<Either<String, bool>> createGuestUser() async {
+    final response =
+        await networkRepository.post(url: "/auth/create-web-guest-user", data: {
+          "guestID": null
+    });
+    if (!response.failed) {
+         final id = response.data["data"]['id'];
+         print("Guest User ID: $id"); 
+               appStorage.write("guest_id", id);
+
+      return right(true);
+    }
+    return left(response.message);
+  }
+   
 
   Future<Either<String, bool>> forgotPassword(String email) async {
     final response =

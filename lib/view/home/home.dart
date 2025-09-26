@@ -18,6 +18,7 @@ import 'package:snapid/view/dashboard_fragment/dashboard_fragment.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:snapid/view/history_fragment/history_fragment.dart';
 import 'package:snapid/view/profile_fragment/profile_fragment.dart';
+import 'dart:io';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
@@ -32,234 +33,284 @@ class HomeScreen extends StatelessWidget {
     ProfileFragment(),
   ];
 
+  // Handle back button press logic
+  Future<void> _handleBackPress() async {
+    if (controller.selectedIndex.value > 0) {
+      // If not on first screen, go back to first screen
+      controller.setIndex(0);
+      return;
+    } else {
+      // If on first screen, show exit dialog
+      Get.dialog(
+        BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+          child: CustomDialogPop(
+            solidBtnLabel: "Exit",
+            title: "Exit App?",
+            message: "Do you really want to exit Snapid?",
+            svgPath: Assets.logout,
+            isActionPopUp: true,
+            backgroundColor: AppColors.cardColor,
+            onCancel: () => Get.back(),
+            onPressed: () {
+              Get.back(); // close dialog first
+              // Exit the app
+              Future.delayed(const Duration(milliseconds: 200), () {
+                exit(0); // For mobile apps
+              });
+            },
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final double deviceWidth = MediaQuery.of(context).size.width;
     final bool isMobile = deviceWidth <= 800;
 
-    if (!isMobile) {
-      return Scaffold(
-        body: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(Assets.appBg),
-                  fit: BoxFit.cover,
-                ),
+    // Wrap the entire widget with PopScope for both mobile and desktop
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        await _handleBackPress();
+      },
+      child: isMobile ? _buildMobileLayout() : _buildDesktopLayout(),
+    );
+  }
+
+  Widget _buildDesktopLayout() {
+    return Scaffold(
+      body: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(Assets.appBg),
+                fit: BoxFit.cover,
               ),
             ),
-            Row(
-              children: [
-                Obx(
-                  () => ClipRRect(
-                    child: AnimatedSize(
-                      alignment: Alignment.topLeft,
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.linear,
-                      child: Container(
-                        width: isExpanded.value ? 250 : 80,
-                        color: AppColors.cardColor,
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 30),
-                            Padding(
-                              padding: EdgeInsets.all(10.0),
-                              child: Row(
-                                mainAxisAlignment: isExpanded.value
-                                    ? MainAxisAlignment.start
-                                    : MainAxisAlignment.center,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Obx(() {
-                                      return Image.network(
-                                        controller.user.value.profilePicture ??
-                                            'https://www.w3schools.com/howto/img_avatar2.png',
-                                        height: 50,
-                                        width: 50,
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return Container(
-                                            height: 50,
-                                            width: 50,
-                                            decoration: BoxDecoration(
-                                              color: Colors.grey[300],
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                            ),
-                                            child: Icon(
-                                              Icons.person,
-                                              color: Colors.grey[600],
-                                              size: 24,
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    }),
-                                  ),
-                                  SpaceW10(),
-                                  if (isExpanded.value)
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            controller.user.value.firstName ??
-                                                'User',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          const SizedBox(height: 2),
-                                          Text(
-                                            controller.user.value.email ??
-                                                'user@example.com',
-                                            style: TextStyle(
-                                              color: Colors.white70,
-                                              fontSize: 12,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            Expanded(
-                              child: ListView(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8),
-                                children: [
-                                  ExpandableNavItem('assets/icons/home.svg',
-                                      'Home', 0, isExpanded.value),
-                                  ExpandableNavItem('assets/icons/clock.svg',
-                                      'History', 1, isExpanded.value),
-                                  ExpandableNavItem(
-                                      'assets/icons/assistant.svg',
-                                      'Assistant',
-                                      2,
-                                      isExpanded.value),
-                                  ExpandableNavItem('assets/icons/profile.svg',
-                                      'Profile', 3, isExpanded.value),
-                                ],
-                              ),
-                            ),
-                            Spacer(),
-                            InkWell(
-                              onTap: () {
-                                var profileController =
-                                    Get.find<ProfileController>();
-
-                                Get.dialog(
-                                  BackdropFilter(
-                                    filter: ImageFilter.blur(
-                                        sigmaX: 15, sigmaY: 15),
-                                    child: CustomDialogPop(
-                                      solidBtnLabel: "Logout",
-                                      title: "Log Out ?",
-                                      message:
-                                          "Are you sure you want to log out of your Snapid account?",
-                                      svgPath: Assets.logout,
-                                      isActionPopUp: true,
-                                      backgroundColor: AppColors.cardColor,
-                                      onCancel: () => Get.back(),
-                                      onPressed: () {
-                                        profileController.logout();
-                                      },
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                margin: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: AppColors.backBtnColor,
+          ),
+          Row(
+            children: [
+              Obx(
+                () => ClipRRect(
+                  child: AnimatedSize(
+                    alignment: Alignment.topLeft,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.linear,
+                    child: Container(
+                      width: isExpanded.value ? 250 : 80,
+                      color: AppColors.cardColor,
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 30),
+                          Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: Row(
+                              mainAxisAlignment: isExpanded.value
+                                  ? MainAxisAlignment.start
+                                  : MainAxisAlignment.center,
+                              children: [
+                                ClipRRect(
                                   borderRadius: BorderRadius.circular(12),
+                                  child: Obx(() {
+                                    return Image.network(
+                                      controller
+                                              .user.value.profilePicture ??
+                                          'https://www.w3schools.com/howto/img_avatar2.png',
+                                      height: 50,
+                                      width: 50,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Container(
+                                          height: 50,
+                                          width: 50,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[300],
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
+                                          child: Icon(
+                                            Icons.person,
+                                            color: Colors.grey[600],
+                                            size: 24,
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  }),
                                 ),
-                                height: 50,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 14),
-                                child: Row(
-                                  children: [
-                                    SvgPicture.asset(
-                                      Assets.logout,
-                                      height: 20,
-                                      width: 20,
-                                      colorFilter: ColorFilter.mode(
-                                        Colors.white,
-                                        BlendMode.srcIn,
+                                SpaceW10(),
+                                if (isExpanded.value)
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          controller.user.value.firstName ??
+                                              'User',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          controller.user.value.email ??
+                                              'user@example.com',
+                                          style: TextStyle(
+                                            color: Colors.white70,
+                                            fontSize: 12,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Expanded(
+                            child: ListView(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8),
+                              children: [
+                                ExpandableNavItem('assets/icons/home.svg',
+                                    'Home', 0, isExpanded.value),
+                                ExpandableNavItem('assets/icons/clock.svg',
+                                    'History', 1, isExpanded.value),
+                                ExpandableNavItem(
+                                    'assets/icons/assistant.svg',
+                                    'Assistant',
+                                    2,
+                                    isExpanded.value),
+                                ExpandableNavItem(
+                                    'assets/icons/profile.svg',
+                                    'Profile',
+                                    3,
+                                    isExpanded.value),
+                              ],
+                            ),
+                          ),
+                          Spacer(),
+                          InkWell(
+                            onTap: () {
+                              var profileController =
+                                  Get.find<ProfileController>();
+
+                              Get.dialog(
+                                BackdropFilter(
+                                  filter: ImageFilter.blur(
+                                      sigmaX: 15, sigmaY: 15),
+                                  child: CustomDialogPop(
+                                    solidBtnLabel: "Logout",
+                                    title: "Log Out ?",
+                                    message:
+                                        "Are you sure you want to log out of your Snapid account?",
+                                    svgPath: Assets.logout,
+                                    isActionPopUp: true,
+                                    backgroundColor: AppColors.cardColor,
+                                    onCancel: () => Get.back(),
+                                    onPressed: () {
+                                      profileController.logout();
+                                    },
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: AppColors.backBtnColor,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              height: 50,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 14),
+                              child: Row(
+                                children: [
+                                  SvgPicture.asset(
+                                    Assets.logout,
+                                    height: 20,
+                                    width: 20,
+                                    colorFilter: ColorFilter.mode(
+                                      Colors.white,
+                                      BlendMode.srcIn,
+                                    ),
+                                  ),
+                                  if (isExpanded.value) ...[
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: AnimatedOpacity(
+                                        duration: const Duration(
+                                            milliseconds: 300),
+                                        opacity:
+                                            isExpanded.value ? 1.0 : 0.0,
+                                        child: Text("Logout",
+                                            style:
+                                                CustomTextTheme.regular12),
                                       ),
                                     ),
-                                    if (isExpanded.value) ...[
-                                      const SizedBox(width: 16),
-                                      Expanded(
-                                        child: AnimatedOpacity(
-                                          duration:
-                                              const Duration(milliseconds: 300),
-                                          opacity: isExpanded.value ? 1.0 : 0.0,
-                                          child: Text("Logout",
-                                              style: CustomTextTheme.regular12),
-                                        ),
-                                      ),
-                                    ],
                                   ],
-                                ),
+                                ],
                               ),
                             ),
-                            SpaceH20()
-                          ],
-                        ),
+                          ),
+                          SpaceH20()
+                        ],
                       ),
                     ),
                   ),
                 ),
-                Expanded(
-                  child: Obx(() => _screens[controller.selectedIndex.value]),
+              ),
+              Expanded(
+                child: Obx(() => _screens[controller.selectedIndex.value]),
+              ),
+            ],
+          ),
+          Obx(
+            () => AnimatedPositioned(
+              duration: const Duration(milliseconds: 300),
+              left: (isExpanded.value ? 250 : 85) - 20,
+              top: 50,
+              child: Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.primaryColor,
                 ),
-              ],
-            ),
-            Obx(
-              () => AnimatedPositioned(
-                duration: const Duration(milliseconds: 300),
-                left: (isExpanded.value ? 250 : 85) - 20,
-                top: 50,
-                child: Container(
-                  width: 30,
-                  height: 30,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.primaryColor,
-                  ),
-                  child: IconButton(
-                    onPressed: () => isExpanded.toggle(),
-                    icon: Icon(
-                      isExpanded.value
-                          ? Icons.arrow_back_ios_rounded
-                          : Icons.arrow_forward_ios_rounded,
-                      color: Colors.white,
-                      size: 14,
-                    ),
+                child: IconButton(
+                  onPressed: () => isExpanded.toggle(),
+                  icon: Icon(
+                    isExpanded.value
+                        ? Icons.arrow_back_ios_rounded
+                        : Icons.arrow_forward_ios_rounded,
+                    color: Colors.white,
+                    size: 14,
                   ),
                 ),
               ),
             ),
-          ],
-        ),
-      );
-    }
+          ),
+        ],
+      ),
+    );
+  }
 
+  Widget _buildMobileLayout() {
     return Scaffold(
       extendBody: true,
       body: Stack(

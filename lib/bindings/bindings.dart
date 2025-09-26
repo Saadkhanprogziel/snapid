@@ -24,7 +24,7 @@ class ControllerBindings extends Bindings {
     Get.lazyPut(() => ForgotPasswordController());
     Get.lazyPut(() => SecuritySettingController());
     Get.lazyPut(() => ProfileController());
-    Get.lazyPut(() => HistoryController(), fenix: true);
+    Get.lazyPut(() => HistoryController(), fenix: false);
     Get.lazyPut<DashboardController>(() => DashboardController());
     Get.lazyPut<LoginController>(() => LoginController(), fenix: true);
 

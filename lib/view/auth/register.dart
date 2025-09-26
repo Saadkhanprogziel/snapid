@@ -11,6 +11,7 @@ import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/countries.dart';
 import 'package:snapid/utlis/country_model.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
+import 'package:snapid/utlis/custom_header.dart';
 import 'package:snapid/utlis/custom_text_field.dart';
 
 class RegisterScreen extends StatelessWidget {
@@ -94,7 +95,12 @@ class RegisterScreen extends StatelessWidget {
                     // ✅ Mobile Layout
                     return Column(
                       children: [
-                        const Spacer(flex: 1),
+                        SafeArea(
+                          child: CustomHeader(
+                            title: Strings.register,
+                            showBackButton: true,
+                          ),
+                        ),
                         Column(
                           children: [
                             Text(
@@ -342,11 +348,14 @@ class RegisterScreen extends StatelessWidget {
                         flex: 5,
                         child: CustomTextField(
                           onChanged: (value) {
-                            controller.register.phone = value;
+                            if (value.length <= 10) {
+                              controller.register.phone = value;
+                            }
                           },
                           hintText: Strings.phoneNumber,
                           prefixIcon: Icons.phone,
                           keyboardType: TextInputType.phone,
+                          maxLength: 10,
                           validator: (value) => value == null || value.isEmpty
                               ? 'Phone number is required'
                               : (value.length < 10

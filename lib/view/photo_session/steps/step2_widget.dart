@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/photoSession/photo_controller.dart';
 import 'package:snapid/theme/text_theme.dart';
@@ -113,6 +113,10 @@ class Step2Widget extends StatelessWidget {
                               controller: controller.widthController,
                               hintText: 'Width',
                               keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                _MaxValueInputFormatter(1080),
+                              ],
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -127,6 +131,10 @@ class Step2Widget extends StatelessWidget {
                               controller: controller.heightController,
                               hintText: 'Height',
                               keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                _MaxValueInputFormatter(1080),
+                              ],
                             ),
                           ),
                         ],
@@ -165,34 +173,37 @@ class Step2Widget extends StatelessWidget {
                           style: CustomTextTheme.regular18
                               .copyWith(color: AppColors.whiteColor),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            controller.setStep(2);
-                          },
-                          child: SvgPicture.asset(
-                            Assets.edit_icon,
-                            width: 20,
-                          ),
-                        )
+                        // GestureDetector(
+                        //   onTap: () {
+                        //     controller.setStep(2);
+                        //   },
+                        //   child: SvgPicture.asset(
+                        //     Assets.edit_icon,
+                        //     width: 20,
+                        //   ),
+                        // )
                       ],
                     ),
                     SpaceH20(),
-                   Obx((){
-                        return _infoRow(
-                          "Country:",
-                          controller.selectedCountry.value?.name ??
-                              "Select Country",
-                          flagPath: controller.selectedCountry.value?.flag,
-                        );
+                    Obx(() {
+                      return _infoRow(
+                        "Country:",
+                        controller.selectedCountry.value?.name ??
+                            "Select Country",
+                        flagPath: controller.selectedCountry.value?.flag,
+                      );
+                    }),
+                    const Divider(color: Colors.white12),
+                    Obx(() {
+                      return _infoRow(
+                          "Document:", controller.selectedType.value.name);
+                    }),
+                    const Divider(color: Colors.white12),
+                    Obx(
+                      () {
+                        return _infoRow("Size:", "50x50 ${controller.selectedUnit.value.name}");
                       }
                     ),
-                    const Divider(color: Colors.white12),
-                   Obx((){
-                        return _infoRow("Document:", controller.selectedType.value.name);
-                      }
-                    ),
-                    const Divider(color: Colors.white12),
-                    _infoRow("Size:", "50x50 Cm"),
                   ],
                 ),
               ),
@@ -409,6 +420,7 @@ class Step2Widget extends StatelessWidget {
   void _showCountryBottomSheet(
       BuildContext context, PhotoController controller) {
     final searchController = TextEditingController();
+    
     final filteredCountries = allCountries.obs;
 
     showModalBottomSheet(
@@ -497,5 +509,26 @@ class Step2Widget extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class _MaxValueInputFormatter extends TextInputFormatter {
+  final int max;
+  _MaxValueInputFormatter(this.max);
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.text.isEmpty) return newValue;
+
+    final int? value = int.tryParse(newValue.text);
+    if (value == null) return oldValue;
+
+    if (value > max) {
+      return oldValue; // prevent going beyond 1080
+    }
+    return newValue;
   }
 }

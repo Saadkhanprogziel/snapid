@@ -20,23 +20,25 @@ class HelpSupport extends StatelessWidget {
     final List<Widget> items = [
       SettingItem(
         title: "Ticket Management",
-        icon: Icons.lock,
-         onTap: () {
+        icon: Icons.confirmation_number, // 🎟️ Ticket-like icon
+        onTap: () {
           Get.toNamed(PrimaryRoute.ticket_management);
         },
       ),
-
       SettingItem(
+        svgPath: Assets.bot,
         title: "Ask SnapBot",
-        icon: Icons.lock,
+        onTap: () {
+          // Add your SnapBot navigation or action here
+        },
       ),
       SettingItem(
         title: "Report a Bug",
-        icon: Icons.lock,
+        icon: Icons.bug_report, // 🐞 Bug icon
         onTap: () {
           Get.toNamed(PrimaryRoute.report_bug);
         },
-      )
+      ),
     ];
 
     return Scaffold(
@@ -51,7 +53,7 @@ class HelpSupport extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(isMobile  ? 8.0 : 50),
+            padding: EdgeInsets.all(isMobile ? 0 : 50),
             child: Column(
               children: [
                 SafeArea(
@@ -60,131 +62,121 @@ class HelpSupport extends StatelessWidget {
                     showBackButton: true,
                   ),
                 ),
-                // SpaceH20(),
                 Expanded(
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: Padding(
-                     padding:
-                          EdgeInsets.symmetric(horizontal: isMobile ? 0 : 20),
-                      child: Column(
-                        children: [
-                          GridView.builder(
-                            shrinkWrap: true,
-                            itemCount: items.length,
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: isMobile ? 1 : 2,
-                              crossAxisSpacing: 14,
-                              mainAxisSpacing: 14,
-                              mainAxisExtent: isMobile ? 100 : 80,
-                            ),
-                            itemBuilder: (context, index) {
-                              return SizedBox(
-                                height: isMobile ? 100 : 80,
-                                child: items[index],
-                              );
-                            },
+                  child: Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: isMobile ? 0 : 20),
+                    child: Column(
+                      children: [
+                        GridView.builder(
+                          shrinkWrap: true,
+                          itemCount: items.length,
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: isMobile ? 1 : 2,
+                            crossAxisSpacing: 14,
+                            mainAxisSpacing: 14,
+                            mainAxisExtent: isMobile ? 100 : 80,
                           ),
-                          SpaceH10(),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 14, vertical: 25),
-                            decoration: BoxDecoration(
-                              color: AppColors.cardColor,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 10),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 40,
-                                        height: 40,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(50),
-                                          color: AppColors.cardColor,
-                                        ),
-                                        child: Center(
-                                          child: Icon(Icons.email,
-                                              color: Colors.white70),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 16),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "Email",
-                                            style: CustomTextTheme.regular16
-                                                .copyWith(
-                                                    color:
-                                                        AppColors.whiteColor),
-                                          ),
-                                          Text(
-                                            "support@snapid.app!",
-                                            style: CustomTextTheme.regular12
-                                                .copyWith(
-                                                    color: AppColors.grey),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Divider(
-                                  color: AppColors.grey.withAlpha(50),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 10),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 40,
-                                        height: 40,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(50),
-                                          color: AppColors.cardColor,
-                                        ),
-                                        child: Center(
-                                          child: Icon(Icons.language,
-                                              color: Colors.white70),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 16),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "Help Center Website",
-                                            style: CustomTextTheme.regular16
-                                                .copyWith(
-                                                    color:
-                                                        AppColors.whiteColor),
-                                          ),
-                                          Text(
-                                            "www.snapid.com",
-                                            style: CustomTextTheme.regular12
-                                                .copyWith(
-                                                    color: AppColors.grey),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
+                          itemBuilder: (context, index) {
+                            return SizedBox(
+                              height: isMobile ? 100 : 80,
+                              child: items[index],
+                            );
+                          },
+                        ),
+                        SpaceH10(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 25),
+                          decoration: BoxDecoration(
+                            color: AppColors.cardColor,
+                            borderRadius: BorderRadius.circular(16),
                           ),
-                        ],
-                      ),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 10),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 40,
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(50),
+                                        color: AppColors.cardColor,
+                                      ),
+                                      child: Center(
+                                        child: Icon(Icons.email,
+                                            color: Colors.white70),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Email",
+                                          style: CustomTextTheme.regular16
+                                              .copyWith(
+                                                  color: AppColors.whiteColor),
+                                        ),
+                                        Text(
+                                          "support@snapid.app!",
+                                          style: CustomTextTheme.regular12
+                                              .copyWith(color: AppColors.grey),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Divider(
+                                color: AppColors.grey.withAlpha(50),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 10),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 40,
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(50),
+                                        color: AppColors.cardColor,
+                                      ),
+                                      child: Center(
+                                        child: Icon(Icons.language,
+                                            color: Colors.white70),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Help Center Website",
+                                          style: CustomTextTheme.regular16
+                                              .copyWith(
+                                                  color: AppColors.whiteColor),
+                                        ),
+                                        Text(
+                                          "www.snapid.com",
+                                          style: CustomTextTheme.regular12
+                                              .copyWith(color: AppColors.grey),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

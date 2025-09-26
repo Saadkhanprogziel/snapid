@@ -99,7 +99,7 @@ class SelectedPhotosScreen extends StatelessWidget {
                             } else {
                               return GestureDetector(
                                 onTap: () {
-                                  controller.pickImages();
+                                  controller.pickImages(allowMultiple: true);
                                 },
                                 child: Container(
                                   decoration: BoxDecoration(

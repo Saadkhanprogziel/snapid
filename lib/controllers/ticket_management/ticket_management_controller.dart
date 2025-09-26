@@ -64,6 +64,8 @@ class TicketManagementController extends GetxController {
             ),
             barrierDismissible: false,
           );
+          subjectController.clear();
+          descriptionController.clear();
           await Future.delayed(const Duration(milliseconds: 1300));
           Get.back();
           getTickets();
