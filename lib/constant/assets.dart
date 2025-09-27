@@ -6,6 +6,7 @@ class Assets {
   static const String welcomeBg = 'assets/images/welcome_bg.png';
   static const String appBg = 'assets/images/app_bg.png';
   static const String onboard3 = 'assets/images/intro.png';
+  static const String onboardItems = 'assets/images/onboardItems.png';
   static const String boardBg = 'assets/images/board_bg.png';
   static const String board1 = 'assets/images/board1.png';
   static const String board2 = 'assets/images/board2.png';
@@ -42,4 +43,10 @@ class Assets {
   static const String skin= 'assets/images/skin.png';
   static const String apple= 'assets/icons/apple.png';
   static const String google= 'assets/icons/google.png';
+  static const String login_image= 'assets/images/login_image.png';
+  static const String reset_password= 'assets/images/reset_password.png';
+  static const String otp_screen= 'assets/images/otp_screen.png';
+  static const String sign_up= 'assets/images/sign_up.png';
+  static const String verify_screen= 'assets/images/verify_screen.png';
+  static const String forgot_password= 'assets/images/forgot_password.png';
 }

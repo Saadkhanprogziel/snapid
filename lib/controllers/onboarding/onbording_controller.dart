@@ -37,7 +37,7 @@ class OnBoardingController extends GetxController {
 
   void userOnBoarded() {
     appStorage.write("onBoarded", true);
-    Get.offAllNamed(PrimaryRoute.login);
+    Get.toNamed(PrimaryRoute.login);
   }
 
   final List<Map<String, String>> pages = [

@@ -6,12 +6,13 @@ import 'package:snapid/theme/text_theme.dart';
 
 class BulletList extends StatelessWidget {
   final String bulletPath;
+  final FontWeight fontWeight;
   final double gap;
   final double fontSize;
   final double lineHeight;
   final List<String> items;
 
-  const BulletList({required this.items, super.key, this.bulletPath=Assets.bulletIcon, this.gap=10, this.lineHeight = 4,  this.fontSize=14});
+  const BulletList({required this.items, super.key, this.bulletPath=Assets.bulletIcon, this.gap=10, this.lineHeight = 4,  this.fontSize=14,this.fontWeight =FontWeight.w500});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +33,7 @@ class BulletList extends StatelessWidget {
               Expanded(
                 child: Text(
                   item,
-                  style: CustomTextTheme.regular16.copyWith(color: AppColors.whiteColor,fontSize: fontSize),
+                  style: CustomTextTheme.regular16.copyWith(color: AppColors.whiteColor,fontSize: fontSize,fontWeight: fontWeight),
                 ),
               ),
             ],

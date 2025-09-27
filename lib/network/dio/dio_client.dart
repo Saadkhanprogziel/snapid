@@ -35,7 +35,7 @@ class DioClient {
           retryEvaluator: (error) async {
             if (error.response?.statusCode != null &&
                 error.response!.statusCode! == 401) {
-              // Get.offAllNamed(PrimaryRoute.onBoard);
+              // Get.offNamed(PrimaryRoute.onBoard);
               // appStorage.erase();
               return false;
             }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 
@@ -127,22 +128,23 @@ class NetworkRepository {
         headers: headers,
       );
 
-  // Helper method to create FormData with files
+
+  // Helper method to create FormData with text fields + single/multiple files
   Future<FormData> createFormData({
     Map<String, dynamic>? fields,
     Map<String, File>? files,
-    Map<String, List<File>>? multipleFiles,
+    Map<String, dynamic>? multipleFiles, // 🔥 dynamic for Web/Mobile
   }) async {
     final formData = FormData();
 
-    // Add text fields
+    // ✅ Add text fields
     if (fields != null) {
       fields.forEach((key, value) {
         formData.fields.add(MapEntry(key, value.toString()));
       });
     }
 
-    // Add single files
+    // ✅ Add single files (always File)
     if (files != null) {
       for (final entry in files.entries) {
         formData.files.add(
@@ -157,19 +159,36 @@ class NetworkRepository {
       }
     }
 
-    // Add multiple files with same key
+    // ✅ Add multiple files (can be File or bytes depending on platform)
     if (multipleFiles != null) {
       for (final entry in multipleFiles.entries) {
-        for (final file in entry.value) {
-          formData.files.add(
-            MapEntry(
-              entry.key,
-              await MultipartFile.fromFile(
-                file.path,
-                filename: file.path.split('/').last,
+        final value = entry.value;
+
+        if (value is List<File>) {
+          // 📱 Mobile/desktop path
+          for (final file in value) {
+            formData.files.add(
+              MapEntry(
+                entry.key,
+                await MultipartFile.fromFile(
+                  file.path,
+                  filename: file.path.split('/').last,
+                ),
               ),
-            ),
-          );
+            );
+          }
+        } else if (value is List<Map<String, dynamic>>) {
+          // 🌐 Web path (bytes + filename)
+          for (final item in value) {
+            final bytes = item['bytes'] as Uint8List;
+            final filename = item['filename'] as String;
+            formData.files.add(
+              MapEntry(
+                entry.key,
+                MultipartFile.fromBytes(bytes, filename: filename),
+              ),
+            );
+          }
         }
       }
     }

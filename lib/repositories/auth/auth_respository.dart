@@ -1,8 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:network_info_plus/network_info_plus.dart';
+import 'dart:typed_data';
 
 import 'package:dartz/dartz.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:snapid/keys_urls/urls.dart';
 import 'package:snapid/main.dart';
 import 'package:snapid/models/register/register.dart';
 import 'package:snapid/models/user/user_model.dart';
@@ -38,7 +43,7 @@ class AuthRespository {
     });
 
     if (!response.failed) {
-      print("nahi hai");
+      
       final data = UserModel.fromJson(response.data["data"]["user"]);
       appStorage.write("user", jsonEncode(data.toJson()));
       await getUserDetails();
@@ -57,6 +62,23 @@ class AuthRespository {
     return left(response.message);
   }
 
+  
+   Future<Either<String, bool>> createGuestUser() async {
+    final response =
+        await networkRepository.post(url: "/auth/create-web-guest-user", data: {
+          "guestID": null
+    });
+    if (!response.failed) {
+         final id = response.data["data"]['id'];
+         print("Guest User ID: $id"); 
+               appStorage.write("guest_id", id);
+
+      return right(true);
+    }
+    return left(response.message);
+  }
+   
+
   Future<Either<String, bool>> forgotPassword(String email) async {
     final response =
         await networkRepository.post(url: "/auth/password-reset-link", data: {
@@ -67,56 +89,73 @@ class AuthRespository {
     }
     return left(response.message);
   }
+Future<Either<String, bool>> updateProfile({
+  required String firstName,
+  required String lastName,
+  required String email,
+  required String phone,
+  required List<XFile> file,
+}) async {
+  try {
+    print("Updating profile with ${file.length} file(s)");
 
-  Future<Either<String, bool>> updateProfile({
-    required String firstName,
-    required String lastName,
-    required String email,
-    required String phone,
-    String? gender,
-    String? password,
-    File? profileImage,
-  }) async {
-    try {
-      // Prepare fields
-      final fields = {
-        'firstName': firstName,
-        'lastName': lastName,
-        'email': email,
-        'phone': phone,
-        if (gender != null && gender.isNotEmpty) 'gender': gender,
-        if (password != null && password.isNotEmpty) 'password': password,
-      };
+    // Prepare fields
+    final fields = <String, dynamic>{
+      'firstName': firstName,
+      'lastName': lastName,
+      'email': email,
+      'phone': phone,
+    };
 
-      final files = <String, File>{};
-      if (profileImage != null && profileImage.existsSync()) {
-        files['profilePicLocalPath'] = profileImage;
+    // Prepare files differently for web vs mobile
+    final Map<String, dynamic> multipleFiles = {};
+
+    if (kIsWeb) {
+      final fileList = <Map<String, dynamic>>[];
+
+      for (final f in file) {
+        Uint8List bytes = await f.readAsBytes();
+        fileList.add({
+          'bytes': bytes,
+          'filename': f.name,
+        });
       }
 
-      // Use existing helper in NetworkRepository
-      final formData = await networkRepository.createFormData(
-        fields: fields,
-        files: files.isNotEmpty ? files : null,
-      );
-
-      // Call multipart post
-      final response = await networkRepository.postMultipart(
-        url: "/auth/update-user-profile",
-        formData: formData,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      );
-
-      if (!response.failed) {
-        await getUserDetails();
-        return right(true);
-      }
-      return left(response.message);
-    } catch (e) {
-      return left("Failed to update profile: ${e.toString()}");
+      multipleFiles['profilePicLocalPath'] = fileList;
+    } else {
+      final files = file.map((x) => File(x.path)).toList();
+      multipleFiles['profilePicLocalPath'] = files;
     }
+
+    // Prepare formData
+    final formData = await networkRepository.createFormData(
+      fields: fields,
+      multipleFiles: multipleFiles,
+    );
+
+    final token = appStorage.read("token") ?? "";
+    final headers = <String, String>{
+      'Content-Type': 'multipart/form-data',
+      'Authorization': 'Bearer $token',
+    };
+
+    // Send multipart request
+    final response = await networkRepository.postMultipart(
+      url: '${apiUrl}/auth/update-user-profile',
+      formData: formData,
+      headers: headers,
+    );
+
+    if (response.success) {
+      return const Right(true);
+    } else {
+      return Left(response.message);
+    }
+  } catch (e) {
+    return Left('Error updating profile: ${e.toString()}');
   }
+}
+
 
   // 
   Future<Either<String, bool>> verifyOtp({
@@ -209,7 +248,7 @@ Future<Either<String, bool>> changePassword({
     final response = await networkRepository.get(url: "/auth/logged-user");
     if (!response.failed) {
       final data = UserModel.fromJson(response.data["data"]);
-      // appStorage.write('user', data);
+    
       appStorage.write("user", jsonEncode(data.toJson()));
       return right(data);
     }

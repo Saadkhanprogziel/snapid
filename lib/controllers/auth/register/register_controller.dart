@@ -12,9 +12,7 @@ class RegisterController extends GetxController {
   var isLoading = false.obs;
   var agreeToTerms = false.obs;
 
-  // Removed selectedCountry since country is now set automatically via country code
-  var selectedCountryCode = Rxn<Country>(); // This will set both country code and country
-  
+  var selectedCountryCode = Rxn<Country>(); 
   final List<String> genderOptions = ['Male', 'Female', 'Other'];
 
   bool isPasswordObscured = true;
