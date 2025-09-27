@@ -39,6 +39,7 @@ class _PhotoPreviewState extends State<PhotoPreview> {
     final PhotoController controller = Get.find<PhotoController>();
     var proccessdIMG = appStorage.read("processed_img") ?? "";
     print(proccessdIMG);
+    final token = appStorage.read("token");
 
     return PopScope(
       canPop: false,
@@ -80,7 +81,13 @@ class _PhotoPreviewState extends State<PhotoPreview> {
                         right: 70,
                         child: GestureDetector(
                           onTap: () {
-                            Get.toNamed(PrimaryRoute.home);
+                            if (token == null || token == "") {
+                                    Get.offAllNamed(PrimaryRoute.login);
+                                  } else {
+                                    Get.offAllNamed(PrimaryRoute.home);                                    
+
+                                  }
+
                           },
                           child: Container(
                             padding: const EdgeInsets.all(4),
@@ -168,7 +175,11 @@ class _PhotoPreviewState extends State<PhotoPreview> {
                                 SpaceH20(),
                                 CustomElevatedButton(
                                   onPressed: () {
-                                    Get.offNamed(PrimaryRoute.home);
+                                    if (token == null || token == "") {
+                                      Get.offAllNamed(PrimaryRoute.login);
+                                    } else {
+                                      Get.offAllNamed(PrimaryRoute.home);
+                                    }
                                   },
                                   text: "Go to Dashboard",
                                   minHeight: 60,

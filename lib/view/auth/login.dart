@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
@@ -564,7 +565,8 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-      
+
+                if(kIsWeb)
                 // Apple sign in
                 OutlinedButton.icon(
                   onPressed: () {

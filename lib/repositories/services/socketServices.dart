@@ -17,7 +17,7 @@ class SocketService {
 
   void _initializeSocketService() {
     _socket = IO.io(
-      baseUrl,
+      baseSocketUrl,
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .enableAutoConnect()

@@ -5,6 +5,7 @@ import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/photoSession/photo_controller.dart';
 import 'package:snapid/controllers/photoSession/process_loading_screen.dart';
+import 'package:snapid/main.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_dialog_pop.dart';
@@ -22,6 +23,7 @@ class PhotoSessionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final token = appStorage.read('token');
     final args = (Get.arguments is Map)
         ? Map<String, dynamic>.from(Get.arguments)
         : <String, dynamic>{};
@@ -41,7 +43,11 @@ class PhotoSessionScreen extends StatelessWidget {
             message:
                 "You haven't completed all steps. Are you sure you want to exit? Your progress may be lost.",
             onCancel: () => Get.back(),
-            onPressed: () => Get.offAllNamed(PrimaryRoute.home),
+            onPressed: ()
+            {
+            
+             Get.offAllNamed(PrimaryRoute.home);
+            },
             solidBtnLabel: "Exit Anyway",
             isActionPopUp: true,
             solidBtnBg: AppColors.red,
@@ -119,8 +125,15 @@ class PhotoSessionScreen extends StatelessWidget {
                                 message:
                                     "You haven't completed all steps. Are you sure you want to exit? Your progress may be lost.",
                                 onCancel: () => Get.back(),
-                                onPressed: () =>
-                                    Get.offNamed(PrimaryRoute.home),
+                                onPressed: () {
+                                  if (token == null || token == "") {
+                                    Get.offAllNamed(PrimaryRoute.login);
+                                  } else {
+                                    Get.offAllNamed(PrimaryRoute.home);                                    
+
+                                  }
+
+                                },
                                 solidBtnLabel: "Exit Anyway",
                                 isActionPopUp: true,
                                 solidBtnBg: AppColors.red,

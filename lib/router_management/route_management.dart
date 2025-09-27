@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart'; // Add this import for kIsWeb
 import 'package:get/get.dart';
 import 'package:snapid/bindings/bindings.dart';
+import 'package:snapid/router_management/auth_middleware.dart';
 import 'package:snapid/view/photo_session/drag_and_drop.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/view/assistant_fragment/assistant.dart';
@@ -34,8 +36,8 @@ class Pages {
   static List<GetPage> getPages() {
     return [
       GetPage(
-          name: PrimaryRoute.splash,
-          page: () => const SplashView(),
+          name: PrimaryRoute.initialRoute,
+          page: () => kIsWeb ? LoginScreen() : const SplashView(),
           binding: ControllerBindings()),
       GetPage(
         name: PrimaryRoute.onBoard,
@@ -81,6 +83,7 @@ class Pages {
           transition: Transition.fadeIn),
       GetPage(
           name: PrimaryRoute.home,
+          middlewares: [AuthMiddleware()],
           page: () => HomeScreen(),
           binding: ControllerBindings(),
           transition: Transition.fadeIn),
@@ -91,37 +94,44 @@ class Pages {
           transition: Transition.cupertino),
       GetPage(
           name: PrimaryRoute.notification,
+          middlewares: [AuthMiddleware()],
           page: () => NotificationScreen(),
           binding: ControllerBindings(),
           transition: Transition.fadeIn),
       GetPage(
           name: PrimaryRoute.history,
           page: () => HistoryFragment(),
+          middlewares: [AuthMiddleware()],
           binding: ControllerBindings(),
           transition: Transition.fadeIn),
       GetPage(
           name: PrimaryRoute.securitySetting,
+          middlewares: [AuthMiddleware()],
           page: () => SecuritySetting(),
           binding: ControllerBindings(),
           transition: Transition.fadeIn),
       GetPage(
           name: PrimaryRoute.biometric,
           page: () => Biometric(),
+          middlewares: [AuthMiddleware()],
           binding: ControllerBindings(),
           transition: Transition.fadeIn),
       GetPage(
           name: PrimaryRoute.deleteAccount,
           page: () => DeleteAccount(),
+          middlewares: [AuthMiddleware()],
           binding: ControllerBindings(),
           transition: Transition.fadeIn),
       GetPage(
           name: PrimaryRoute.help_support,
           page: () => HelpSupport(),
+          middlewares: [AuthMiddleware()],
           binding: ControllerBindings(),
           transition: Transition.fadeIn),
       GetPage(
           name: PrimaryRoute.editProfile,
           page: () => EditProfile(),
+          middlewares: [AuthMiddleware()],
           binding: ControllerBindings(),
           transition: Transition.downToUp),
       GetPage(
@@ -136,6 +146,7 @@ class Pages {
       GetPage(
           name: PrimaryRoute.assistant,
           page: () => AssistantFragment(),
+          middlewares: [AuthMiddleware()],
           binding: ControllerBindings(),
           transition: Transition.cupertino),
       GetPage(
@@ -146,11 +157,13 @@ class Pages {
       GetPage(
           name: PrimaryRoute.payment_method,
           page: () => PaymentMethod(),
+          middlewares: [AuthMiddleware()],
           binding: ControllerBindings(),
           transition: Transition.cupertino),
       GetPage(
           name: PrimaryRoute.report_bug,
           page: () => ReportBug(),
+          middlewares: [AuthMiddleware()],
           binding: ControllerBindings(),
           transition: Transition.cupertino),
       GetPage(
@@ -162,10 +175,12 @@ class Pages {
           name: PrimaryRoute.ticket_management,
           page: () => TicketManagement(),
           binding: ControllerBindings(),
+          middlewares: [AuthMiddleware()],
           transition: Transition.cupertino),
       GetPage(
           name: PrimaryRoute.chat_screen,
           page: () => ChatScreen(),
+          middlewares: [AuthMiddleware()],
           binding: ControllerBindings(),
           transition: Transition.downToUp),
     ];

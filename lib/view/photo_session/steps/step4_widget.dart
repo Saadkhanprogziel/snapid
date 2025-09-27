@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:flutter_stripe_web/card_field.dart';
 // import 'package:flutter_stripe/flutter_stripe.dart';
 // import 'package:flutter_stripe_web/card_field.dart';
 // import 'package:flutter_stripe_web/card_field.dart';
@@ -10,6 +12,7 @@ import 'package:snapid/constant/colors.dart';
 import 'package:snapid/constant/strings.dart';
 import 'package:snapid/controllers/photoSession/photo_controller.dart';
 import 'package:snapid/controllers/stripe_controller/stripe_controller.dart';
+import 'package:snapid/main.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
@@ -36,6 +39,7 @@ class _Step4WidgetState extends State<Step4Widget> {
   final TextEditingController cvvController = TextEditingController();
   StripeController? stripeController;
   bool isStripeInitialized = false;
+  final token = appStorage.read("token");
 
   @override
   void initState() {
@@ -133,56 +137,58 @@ class _Step4WidgetState extends State<Step4Widget> {
                     text: "Proceed to Download",
                   ),
                 )
-              : Center(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        SubscriptionCard(
-                          id: "816814a8-fe33-4c4f-8432-3f29c8c14782",
-                          title: "Standard",
-                          photoCount: 1,
-                          price: "\$6.99",
-                          description: "Perfect for one time",
-                          isPopular: false,
-                          savings: "",
-                          controller: widget.controller, // Add this line
-                          onBuy: () {
-                            // Handle buy action for Standard package
-                          },
+              : token == null
+                  ? SizedBox.shrink()
+                  : Center(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            SubscriptionCard(
+                              id: "816814a8-fe33-4c4f-8432-3f29c8c14782",
+                              title: "Standard",
+                              photoCount: 1,
+                              price: "\$6.99",
+                              description: "Perfect for one time",
+                              isPopular: false,
+                              savings: "",
+                              controller: widget.controller, // Add this line
+                              onBuy: () {
+                                // Handle buy action for Standard package
+                              },
+                            ),
+                            SizedBox(width: 8),
+                            SubscriptionCard(
+                              id: "63e39c54-5d74-4afd-8c98-b1af702bf613",
+                              title: "Smart Pack",
+                              photoCount: 3,
+                              price: "\$14.99",
+                              description: "Perfect for three photos",
+                              isPopular: true,
+                              savings: "Save - 28 %",
+                              controller: widget.controller, // Add this line
+                              onBuy: () {
+                                // Handle buy action for Smart Pack
+                              },
+                            ),
+                            SizedBox(width: 8),
+                            SubscriptionCard(
+                              id: "d3ff3d1c-a0f4-4898-b741-ad21c6d32cca",
+                              title: "Family Pack",
+                              photoCount: 5,
+                              price: "\$19.99",
+                              description: "Ideal for families or agencies",
+                              isPopular: false,
+                              savings: "Save - 43 %",
+                              controller: widget.controller, // Add this line
+                              onBuy: () {
+                                // Handle buy action for Family Pack
+                              },
+                            ),
+                          ],
                         ),
-                        SizedBox(width: 8),
-                        SubscriptionCard(
-                          id:  "63e39c54-5d74-4afd-8c98-b1af702bf613",
-                          title: "Smart Pack",
-                          photoCount: 3,
-                          price: "\$14.99",
-                          description: "Perfect for three photos",
-                          isPopular: true,
-                          savings: "Save - 28 %",
-                          controller: widget.controller, // Add this line
-                          onBuy: () {
-                            // Handle buy action for Smart Pack
-                          },
-                        ),
-                        SizedBox(width: 8),
-                        SubscriptionCard(
-                          id: "d3ff3d1c-a0f4-4898-b741-ad21c6d32cca",
-                          title: "Family Pack",
-                          photoCount: 5,
-                          price: "\$19.99",
-                          description: "Ideal for families or agencies",
-                          isPopular: false,
-                          savings: "Save - 43 %",
-                          controller: widget.controller, // Add this line
-                          onBuy: () {
-                            // Handle buy action for Family Pack
-                          },
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
         ),
 
         if (!widget.controller.canDownload.value || kIsWeb)
@@ -266,75 +272,78 @@ class _Step4WidgetState extends State<Step4Widget> {
       ),
       child: Column(
         children: [
-          // Container(
-          //   margin: const EdgeInsets.all(12),
-          //   decoration: BoxDecoration(
-          //     color: Colors.white,
-          //     borderRadius: BorderRadius.circular(12),
-          //   ),
-          //   child: Column(
-          //     mainAxisAlignment: MainAxisAlignment.center,
-          //     children: [
-          //       Container(
-          //         margin:
-          //             EdgeInsets.only(top: 12, bottom: 15, left: 20, right: 20),
-          //         // height: 50,
-          //         child: WebCardField(
-          //           style: CardStyle(),
-          //           controller: stripeController!.cardEditController,
-          //         ),
-          //       ),
-          //       SpaceH10(),
-          //       TextFormField(
-          //         controller: stripeController!.email,
-          //         decoration: InputDecoration(
-          //           label: Text("Email"),
-          //           labelStyle: TextStyle(color: Colors.grey.shade500),
-          //           contentPadding:
-          //               EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-          //           enabledBorder: OutlineInputBorder(
-          //             borderSide:
-          //                 BorderSide(color: Colors.grey.shade300, width: 1),
-          //             borderRadius: BorderRadius.circular(8),
-          //           ),
-          //           focusedBorder: OutlineInputBorder(
-          //             borderSide:
-          //                 BorderSide(color: Colors.grey.shade300, width: 1),
-          //             borderRadius: BorderRadius.circular(8),
-          //           ),
-          //         ),
-          //         validator: (value) {
-          //           if (value == null || value.isEmpty) {
-          //             return 'Please enter your email or phone number';
-          //           }
-          //           if (GetUtils.isEmail(value)) {
-          //             return null;
-          //           }
-          //           return 'Enter a valid email or phone number';
-          //         },
-          //       ),
-          //     ],
-          //   ),
-          // ),
-          // SpaceH20(),
-          // Obx(
-          //   () => stripeController!.isStripeLoading.value
-          //       ? CircularProgressIndicator(color: Colors.white)
-          //       : SizedBox(
-          //           width: 200,
-          //           child: CustomElevatedButton(
-          //               onPressed: () {
-          //                 if(photocontroller.selectedPackage.value.isEmpty){
-          //                   Get.snackbar("Error", "Please select a subscription plan",
-          //                       backgroundColor: Colors.red,
-          //                       colorText: Colors.white);
-          //                   return;
-          //                 }
-          //                 stripeController?.createPaymentMethodWeb();
-          //               },
-          //               text: "Make Payment"),
-          //         ),
-          // ),
+          Container(
+            margin: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  margin:
+                      EdgeInsets.only(top: 12, bottom: 15, left: 20, right: 20),
+                  // height: 50,
+                  child: WebCardField(
+                    style: CardStyle(),
+                    controller: stripeController!.cardEditController,
+                  ),
+                ),
+                SpaceH10(),
+                TextFormField(
+                  controller: stripeController!.email,
+                  decoration: InputDecoration(
+                    label: Text("Email"),
+                    labelStyle: TextStyle(color: Colors.grey.shade500),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Colors.grey.shade300, width: 1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Colors.grey.shade300, width: 1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your email or phone number';
+                    }
+                    if (GetUtils.isEmail(value)) {
+                      return null;
+                    }
+                    return 'Enter a valid email or phone number';
+                  },
+                ),
+              ],
+            ),
+          ),
+          SpaceH20(),
+          Obx(
+            () => stripeController!.isStripeLoading.value
+                ? CircularProgressIndicator(color: Colors.white)
+                : SizedBox(
+                    width: 200,
+                    child: CustomElevatedButton(
+                        onPressed: () {
+                          if (token != null) if (photocontroller
+                              .selectedPackage.value.isEmpty) {
+                            Get.snackbar(
+                                "Error", "Please select a subscription plan",
+                                backgroundColor: Colors.red,
+                                colorText: Colors.white);
+                            return;
+                          }
+
+                          stripeController?.createPaymentMethodWeb();
+                        },
+                        text: "Make Payment"),
+                  ),
+          ),
         ],
       ),
     );

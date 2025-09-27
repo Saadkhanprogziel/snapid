@@ -306,7 +306,7 @@ class DashboardFragment extends StatelessWidget {
                                                       ),
                                                       child: Container(
                                                         width: 400,
-                                                        child: _photoGuideline(cardHeight),
+                                                        child: kIsWeb ? _photoGuideline(cardHeight) : _photoGuideline(cardHeight),
                                                       ),
                                                     );
                                                   },
@@ -606,7 +606,7 @@ class DashboardFragment extends StatelessWidget {
                       iconColor: Colors.green,
                     ),
                     if(kIsWeb) ...[
-
+      
                     const SizedBox(width: 12),
                     ImageWithIcon(
                       imagePath: 'assets/images/correct_image_3.jpg',
