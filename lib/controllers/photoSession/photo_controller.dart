@@ -519,8 +519,7 @@ class PhotoController extends GetxController {
       while (photoCount < 5 && shouldContinue) {
         final pickedFile = await _picker.pickImage(
           source: ImageSource.camera,
-          // imageQuality: 85,
-          preferredCameraDevice: CameraDevice.front,
+         
         );
 
         if (pickedFile != null) {

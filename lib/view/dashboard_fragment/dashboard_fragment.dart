@@ -295,18 +295,25 @@ class DashboardFragment extends StatelessWidget {
                                               onPressed: () {
                                                 showDialog(
                                                   context: context,
-                                                  builder: (BuildContext context) {
+                                                  builder:
+                                                      (BuildContext context) {
                                                     return Dialog(
                                                       backgroundColor:
-                                                                     const Color.fromARGB(208, 33, 33, 33),
-
-
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(20),
+                                                          const Color.fromARGB(
+                                                              208, 33, 33, 33),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(20),
                                                       ),
                                                       child: Container(
                                                         width: 400,
-                                                        child: kIsWeb ? _photoGuideline(cardHeight) : _photoGuideline(cardHeight),
+                                                        child: kIsWeb
+                                                            ? _photoGuideline(
+                                                                cardHeight)
+                                                            : _photoGuideline(
+                                                                cardHeight),
                                                       ),
                                                     );
                                                   },
@@ -566,86 +573,85 @@ class DashboardFragment extends StatelessWidget {
   }
 
   Widget _photoGuideline(cardHeight) {
-    return Expanded(
-      child: SizedBox(
-        height: cardHeight,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(25),
-          child: Container(
-            padding: const EdgeInsets.all(25),
-            decoration: BoxDecoration(
-              color: AppColors.cardColor,
-              borderRadius: BorderRadius.circular(25),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Text(
-                    "Photo Guidelines",
-                    textAlign: TextAlign.center,
-                    style: CustomTextTheme.regular16.copyWith(
-                      color: AppColors.whiteColor,
-                      fontWeight: FontWeight.w600,
-                    ),
+    Widget content = SizedBox(
+      height: cardHeight,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(25),
+        child: Container(
+          padding: const EdgeInsets.all(25),
+          decoration: BoxDecoration(
+            color: AppColors.cardColor,
+            borderRadius: BorderRadius.circular(25),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Text(
+                  "Photo Guidelines",
+                  textAlign: TextAlign.center,
+                  style: CustomTextTheme.regular16.copyWith(
+                    color: AppColors.whiteColor,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ImageWithIcon(
-                      imagePath: 'assets/images/correct_image_1.jpg',
-                      icon: Icons.check_circle,
-                      iconColor: Colors.green,
-                    ),
-                    const SizedBox(width: 12),
-                    ImageWithIcon(
-                      imagePath: 'assets/images/correct_image_2.jpg',
-                      icon: Icons.check_circle,
-                      iconColor: Colors.green,
-                    ),
-                    if(kIsWeb) ...[
-      
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ImageWithIcon(
+                    imagePath: 'assets/images/correct_image_1.jpg',
+                    icon: Icons.check_circle,
+                    iconColor: Colors.green,
+                  ),
+                  const SizedBox(width: 12),
+                  ImageWithIcon(
+                    imagePath: 'assets/images/correct_image_2.jpg',
+                    icon: Icons.check_circle,
+                    iconColor: Colors.green,
+                  ),
+                  if (kIsWeb) ...[
                     const SizedBox(width: 12),
                     ImageWithIcon(
                       imagePath: 'assets/images/correct_image_3.jpg',
                       icon: Icons.check_circle,
                       iconColor: Colors.green,
                     ),
-                    ]
-                  ],
-                ),
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ImageWithIcon(
-                      imagePath: 'assets/images/incorrect_image_1.jpg',
-                      icon: Icons.close,
-                      iconColor: Colors.redAccent,
-                    ),
-                    const SizedBox(width: 12),
-                    ImageWithIcon(
-                      imagePath: 'assets/images/incorrect_image_2.jpg',
-                      icon: Icons.close,
-                      iconColor: Colors.redAccent,
-                    ),
-                     if(kIsWeb) ...[
+                  ]
+                ],
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ImageWithIcon(
+                    imagePath: 'assets/images/incorrect_image_1.jpg',
+                    icon: Icons.close,
+                    iconColor: Colors.redAccent,
+                  ),
+                  const SizedBox(width: 12),
+                  ImageWithIcon(
+                    imagePath: 'assets/images/incorrect_image_2.jpg',
+                    icon: Icons.close,
+                    iconColor: Colors.redAccent,
+                  ),
+                  if (kIsWeb) ...[
                     const SizedBox(width: 12),
                     ImageWithIcon(
                       imagePath: 'assets/images/incorrect_image_3.jpg',
                       icon: Icons.close,
                       iconColor: Colors.redAccent,
                     ),
-                     ]
-                  ],
-                )
-              ],
-            ),
+                  ]
+                ],
+              )
+            ],
           ),
         ),
       ),
     );
+
+    return kIsWeb ? Expanded(child: content) : content;
   }
 }

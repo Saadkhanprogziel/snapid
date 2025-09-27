@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+
     <base href="$FLUTTER_BASE_HREF">
     <meta charset="UTF-8">
     <meta content="IE=Edge" http-equiv="X-UA-Compatible">
@@ -17,55 +18,9 @@
 
     <title>SnapID</title>
     <link rel="manifest" href="manifest.json">
-
-    <!-- Loader CSS -->
-    <style>
-      .loader {
-        width: 60px;
-        height: 60px;
-        display: grid;
-        margin: auto;
-        position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
-      }
-      .loader:before,
-      .loader:after {
-        content: "";
-        grid-area: 1/1; 
-        background: #6042FF;
-        clip-path: polygon(
-          0 0,100% 0,100% 100%,75% 25%,0 0,
-          0 100%,100% 100%,25% 75%,0 0
-        );
-        animation: l20 1.5s infinite linear;
-      }
-      .loader:after {
-        clip-path: polygon(0 0,76% 24%,100% 100%,24% 76%);
-        --s: 0;
-      }
-      @keyframes l20 {
-        0%      {transform: perspective(100px) rotate3d(1,var(--s,1),0,0)} 
-        25%     {transform: perspective(100px) rotate3d(1,var(--s,1),0,-90deg)}
-        25.01%  {transform: perspective(100px) rotate3d(1,var(--s,1),0,-90deg)} 
-        40%,60% {transform: perspective(100px) rotate3d(1,var(--s,1),0,-180deg)} 
-        75%     {transform: perspective(100px) rotate3d(1,var(--s,1),0,-270deg)}
-        75.01%  {transform: perspective(100px) rotate3d(1,var(--s,1),0,-270deg)} 
-        90%,100%{transform: perspective(100px) rotate3d(1,var(--s,1),0,-360deg)}
-      }
-    </style>
   </head>
   <body>
-    <!-- Loader -->
-    <div id="loader" class="loader"></div>
-
-    <!-- Flutter App -->
     <script src="flutter_bootstrap.js" async></script>
-
-    <!-- Remove loader when Flutter is ready -->
-    <script>
-      window.addEventListener('flutter-first-frame', function () {
-        document.getElementById('loader')?.remove();
-      });
-    </script>
   </body>
+  
 </html>

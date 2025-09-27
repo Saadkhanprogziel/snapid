@@ -567,6 +567,7 @@ class LoginScreen extends StatelessWidget {
                 const SizedBox(height: 12),
 
                 if(kIsWeb)
+                
                 // Apple sign in
                 OutlinedButton.icon(
                   onPressed: () {
