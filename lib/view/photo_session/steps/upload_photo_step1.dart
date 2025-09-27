@@ -16,9 +16,13 @@ class UploadPhotoStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(controller.currentStep);
+
+     final double deviceWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = deviceWidth <= 800;
+
+    // print(controller.currentStep);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 70.0, vertical: 20),
+      padding:  EdgeInsets.symmetric(horizontal: isMobile ? 70.0 : 20, vertical: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -62,11 +66,11 @@ class UploadPhotoStep extends StatelessWidget {
           ),
           SpaceH20(),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
                 padding:
-                    EdgeInsets.only(left: 12, right: 12, top: 30, bottom: 10),
+                    EdgeInsets.only(left: 8, right: 8, top: 30, bottom: 10),
                 decoration: BoxDecoration(
                   color: Color.fromARGB(100, 21, 168, 31),
                   borderRadius: BorderRadius.circular(20),
@@ -98,9 +102,10 @@ class UploadPhotoStep extends StatelessWidget {
                   ],
                 ),
               ),
+              SpaceW15(),
               Container(
                 padding:
-                    EdgeInsets.only(left: 12, right: 12, top: 30, bottom: 10),
+                    EdgeInsets.only(left: 8, right: 8, top: 30, bottom: 10),
                 decoration: BoxDecoration(
                   color: Color.fromARGB(100, 159, 25, 25),
                   borderRadius: BorderRadius.circular(20),

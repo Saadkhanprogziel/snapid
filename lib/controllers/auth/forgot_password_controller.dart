@@ -8,13 +8,18 @@ class ForgotPasswordController extends GetxController {
  AuthRespository authRepository = AuthRespository();
      TextEditingController emailOrPassController = TextEditingController();
 
+ @override
+  void onClose() {
+    emailOrPassController.dispose();
+    super.onClose();
+  }
 
 
 
   var email = ''.obs;
   var isLoading = false.obs;
 
-  Future<void> sendResetCode() async {
+  Future<void> sendCode() async {
     if (email.value.isEmpty) {
       Get.snackbar('Error', 'Please enter your email');
       return;
@@ -37,3 +42,4 @@ class ForgotPasswordController extends GetxController {
     );
   }
 }
+ 

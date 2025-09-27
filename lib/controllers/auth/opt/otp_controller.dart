@@ -87,7 +87,7 @@ class OtpController extends GetxController {
                       Get.back();
 
                     
-                Get.offAllNamed(PrimaryRoute.login);
+                Get.offNamed(PrimaryRoute.login);
               }
             },
           ),

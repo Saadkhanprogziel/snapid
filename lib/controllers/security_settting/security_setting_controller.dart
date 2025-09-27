@@ -92,7 +92,7 @@ class SecuritySettingController extends GetxController {
             barrierDismissible: false,
           );
           await Future.delayed(const Duration(seconds: 2), () {
-           Get.offAllNamed(PrimaryRoute.login);
+           Get.offNamed(PrimaryRoute.login);
           });
           // Get.back();
         })

@@ -21,196 +21,181 @@ import 'package:snapid/controllers/photoSession/photo_controller.dart';
 
 class HistoryCustomCard extends StatelessWidget {
   final PhotoCreationModel photoCreationModel;
-
   final GestureTapDownCallback? onMoreTapDown;
   final HistoryController controller;
-
-  /// Callback when delete is confirmed
   final VoidCallback? onDelete;
 
   const HistoryCustomCard({
     super.key,
-   
     this.onMoreTapDown,
     this.onDelete,
-
-    required this.controller, required this.photoCreationModel,
+    required this.controller,
+    required this.photoCreationModel,
   });
+@override
+Widget build(BuildContext context) {
+  final screenWidth = MediaQuery.of(context).size.width;
+  final isMobile = screenWidth <= 800;
 
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(25),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-          decoration: BoxDecoration(
-            color: AppColors.cardColor,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
+  final imageSize = isMobile ? 130.0 : 100.0;
+  final cardPadding = isMobile ? 15.0 : 14.0;
+  final titleStyle = isMobile
+      ? CustomTextTheme.regular22.copyWith(color: AppColors.whiteColor)
+      : CustomTextTheme.regular18.copyWith(color: AppColors.whiteColor);
+  final subtitleStyle = isMobile
+      ? CustomTextTheme.regular12.copyWith(color: AppColors.whiteColor)
+      : CustomTextTheme.regular10.copyWith(color: AppColors.whiteColor);
+  final statusTextStyle = isMobile
+      ? CustomTextTheme.regular14.copyWith(color: AppColors.whiteColor)
+      : CustomTextTheme.regular12.copyWith(color: AppColors.whiteColor);
+
+  return ClipRRect(
+    borderRadius: BorderRadius.circular(25),
+    child: Container(
+      padding: EdgeInsets.symmetric(horizontal: cardPadding, vertical: cardPadding),
+      constraints: BoxConstraints(minHeight: isMobile ? 220 : 170),
+      decoration: BoxDecoration(
+        color: AppColors.cardColor,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Left: Image
-                  Container(
-                    width: 130,
-                    height: 130,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: CustomCachedImage(imageUrl: photoCreationModel.processedImageUrl ??
-                          photoCreationModel.processedWatermarkedUrl),
-                    ),
+              
+              Container(
+                width: imageSize,
+                height: imageSize,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: CustomCachedImage(
+                    imageUrl: photoCreationModel.processedImageUrl ??
+                        photoCreationModel.processedWatermarkedUrl,
                   ),
-
-                  const SizedBox(width: 12),
-
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                ),
+              ),
+    
+              const SizedBox(width: 12),
+    
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(photoCreationModel.countryName, style: titleStyle),
+                    const SizedBox(height: 4),
+                    Row(
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              photoCreationModel.countryName,
-                              style: CustomTextTheme.regular22
-                                  .copyWith(color: AppColors.whiteColor),
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                Text(
-                                  "Created",
-                                  style: CustomTextTheme.regular12
-                                      .copyWith(color: AppColors.whiteColor),
-                                ),
-                                const SpaceW10(),
-                                Text(
-                                  formatDate(photoCreationModel.createdAt , pattern: 'dd MMM, yyyy'),
-                                  style: CustomTextTheme.regular12
-                                      .copyWith(color: AppColors.whiteColor),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SpaceH20(),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: photoCreationModel.status == "CREDITED"
-                                    ? Colors.green.withValues(alpha: 0.5)
-                                    : Colors.orange.withValues(alpha: 0.6),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                photoCreationModel.status,
-                                style: CustomTextTheme.regular14
-                                    .copyWith(color: AppColors.whiteColor),
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            if (photoCreationModel.status != "CREDITED")
-                              Text(
-                                "Expire Within 7 days",
-                                style: CustomTextTheme.regular12
-                                    .copyWith(color: AppColors.whiteColor),
-                              ),
-                          ],
+                        Text("Created", style: subtitleStyle),
+                        const SpaceW10(),
+                        Text(
+                          formatDate(photoCreationModel.createdAt, pattern: 'dd MMM, yyyy'),
+                          style: subtitleStyle,
                         ),
                       ],
                     ),
-                  ),
-
-                  PopupMenuButton<String>(
-                    color: const Color.fromARGB(194, 46, 46, 46),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                    const SpaceH20(),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: photoCreationModel.status == "CREDITED"
+                                ? Colors.green.withValues(alpha: 0.5)
+                                : Colors.orange.withValues(alpha: 0.6),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(photoCreationModel.status, style: statusTextStyle),
+                        ),
+                        const SizedBox(height: 8),
+                        if (photoCreationModel.status != "CREDITED")
+                          Text(
+                            "Expire Within 7 days",
+                            style: subtitleStyle,
+                          ),
+                      ],
                     ),
-                    onSelected: (value) {
-                      if (value == 'delete') {
-                        _showDeleteDialog(context);
-                      } else if (value == 'redownload') {
-                        _handleDownload(controller);
-                      }
-                    },
-                    itemBuilder: (BuildContext context) =>
-                        <PopupMenuEntry<String>>[
-                      _buildMenuItem(Icons.file_download_outlined, 'Download',
-                          'redownload'),
-                      _buildDivider(),
-                      _buildMenuItem(Icons.delete, 'Delete', 'delete'),
-                    ],
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(159, 46, 46, 46),
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: const Icon(
-                        Icons.more_vert,
-                        color: Colors.white,
-                      ),
-                    ),
-                  )
-                ],
+                  ],
+                ),
               ),
-              const SpaceH20(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 5, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: const Color.fromARGB(20, 223, 222, 222),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: SvgPicture.asset(
-                          Assets.globeIcon,
-                          width: 15,
-                        ),
-                      ),
-                      const SpaceW10(),
-                      Text(
-                        photoCreationModel.documentType,
-                        style: CustomTextTheme.regular12
-                            .copyWith(color: AppColors.whiteColor),
-                      ),
-                    ],
-                  ),
+    
+              PopupMenuButton<String>(
+                color: const Color.fromARGB(194, 46, 46, 46),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                onSelected: (value) {
+                  if (value == 'delete') {
+                    _showDeleteDialog(context);
+                  } else if (value == 'redownload') {
+                    _handleDownload(controller);
+                  }
+                },
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                  _buildMenuItem(Icons.file_download_outlined, 'Download', 'redownload'),
+                  _buildDivider(),
+                  _buildMenuItem(Icons.delete, 'Delete', 'delete'),
                 ],
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(159, 46, 46, 46),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: const Icon(
+                    Icons.more_vert,
+                    color: Colors.white,
+                  ),
+                ),
               )
             ],
           ),
-        ),
+    
+          const SpaceH20(),
+    
+          
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(20, 223, 222, 222),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: SvgPicture.asset(
+                  Assets.globeIcon,
+                  width: 15,
+                ),
+              ),
+              const SpaceW10(),
+              Text(
+                photoCreationModel.documentType,
+                style: subtitleStyle,
+              ),
+            ],
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   String formatDate(String? dateString, {String pattern = 'yyyy-MM-dd'}) {
     if (dateString == null || dateString.isEmpty) return '';
-
     try {
       final dateTime = DateTime.parse(dateString);
       return DateFormat(pattern).format(dateTime);
     } catch (e) {
-      return dateString; // fallback in case parsing fails
+      return dateString; 
     }
   }
 
-  PopupMenuItem<String> _buildMenuItem(
-      IconData icon, String text, String value) {
+  PopupMenuItem<String> _buildMenuItem(IconData icon, String text, String value) {
     return PopupMenuItem<String>(
       value: value,
       child: Row(
@@ -227,32 +212,25 @@ class HistoryCustomCard extends StatelessWidget {
   }
 
   PopupMenuDivider _buildDivider() {
-    return const PopupMenuDivider(
-      height: 1,
-    );
+    return const PopupMenuDivider(height: 1);
   }
 
   void _handleDownload(HistoryController controller) async {
     if (photoCreationModel.status != "CREDITED") {
       _navigateToPaymentScreen();
     } else {
-      saveImageToGallery(photoCreationModel.processedImageUrl ??
-          photoCreationModel.processedWatermarkedUrl);
+      saveImageToGallery(
+        photoCreationModel.processedImageUrl ?? photoCreationModel.processedWatermarkedUrl,
+      );
     }
   }
 
   void _navigateToPaymentScreen() async {
     final PhotoController photoController = Get.find<PhotoController>();
-
     await photoController.getUserDetails();
-
-
-
     photoController.processedWatermarkedUrl.value = photoCreationModel.processedWatermarkedUrl;
     photoController.photoCreationModelData.value = photoCreationModel;
-
     photoController.sessionId.value = photoCreationModel.id;
-
     photoController.setStep(4);
 
     Get.toNamed(
@@ -298,8 +276,7 @@ class HistoryCustomCard extends StatelessWidget {
             throw Exception("Downloaded file not found");
           }
 
-          final success =
-              await GallerySaver.saveImage(filePath, albumName: "SnapID");
+          final success = await GallerySaver.saveImage(filePath, albumName: "SnapID");
 
           if (success == true) {
             Get.snackbar(
@@ -342,21 +319,18 @@ class HistoryCustomCard extends StatelessWidget {
             backgroundColor: AppColors.solidCardColor,
             title: Text(
               "Permission Required",
-              style: CustomTextTheme.regular16
-                  .copyWith(color: AppColors.whiteColor),
+              style: CustomTextTheme.regular16.copyWith(color: AppColors.whiteColor),
             ),
             content: Text(
               "Storage permission is permanently denied. Please enable it from app settings to save images.",
-              style: CustomTextTheme.regular14
-                  .copyWith(color: AppColors.whiteColor),
+              style: CustomTextTheme.regular14.copyWith(color: AppColors.whiteColor),
             ),
             actions: [
               TextButton(
                 onPressed: () => Get.back(),
                 child: Text(
                   "Cancel",
-                  style: CustomTextTheme.regular16
-                      .copyWith(color: AppColors.whiteColor),
+                  style: CustomTextTheme.regular16.copyWith(color: AppColors.whiteColor),
                 ),
               ),
               TextButton(
@@ -366,8 +340,7 @@ class HistoryCustomCard extends StatelessWidget {
                 },
                 child: Text(
                   "Settings",
-                  style:
-                      CustomTextTheme.regular16.copyWith(color: AppColors.red),
+                  style: CustomTextTheme.regular16.copyWith(color: AppColors.red),
                 ),
               ),
             ],
@@ -393,29 +366,29 @@ class HistoryCustomCard extends StatelessWidget {
         backgroundColor: AppColors.solidCardColor,
         title: Text(
           "Delete Item",
-          style:
-              CustomTextTheme.regular16.copyWith(color: AppColors.whiteColor),
+          style: CustomTextTheme.regular16.copyWith(color: AppColors.whiteColor),
         ),
         content: Text(
           "Are you sure you want to delete this item?",
-          style:
-              CustomTextTheme.regular14.copyWith(color: AppColors.whiteColor),
+          style: CustomTextTheme.regular14.copyWith(color: AppColors.whiteColor),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context), // cancel
-            child: Text("Cancel",
-                style: CustomTextTheme.regular16
-                    .copyWith(color: AppColors.whiteColor)),
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              "Cancel",
+              style: CustomTextTheme.regular16.copyWith(color: AppColors.whiteColor),
+            ),
           ),
           TextButton(
             onPressed: () {
-              Get.back(); // close dialog
-              onDelete?.call(); // notify parent
+              Get.back();
+              onDelete?.call();
             },
-            child: Text("Delete",
-                style:
-                    CustomTextTheme.regular16.copyWith(color: AppColors.red)),
+            child: Text(
+              "Delete",
+              style: CustomTextTheme.regular16.copyWith(color: AppColors.red),
+            ),
           ),
         ],
       ),

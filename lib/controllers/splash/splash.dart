@@ -25,7 +25,7 @@ class SplashController extends GetxController {
     if (token.isNotEmpty) {
       if (biometricEnabled) {
         // Navigate to login where biometric auth will be handled
-        Get.offAllNamed(PrimaryRoute.login, arguments: {"biometric": true});
+        Get.offNamed(PrimaryRoute.login, arguments: {"biometric": true});
       } else {
         // Normal flow → fetch user details and go home
         await authRespository.getUserDetails().then((response) => response.fold(
@@ -35,18 +35,19 @@ class SplashController extends GetxController {
               },
               (success) {
                 
-                Get.offAllNamed(PrimaryRoute.home, arguments: {'index': 0});
+                Get.offNamed(PrimaryRoute.home, arguments: {'index': 0});
               },
             ));
-        // Get.offAllNamed(PrimaryRoute.login,);
+        // Get.offNamed(PrimaryRoute.login,);
       }
     } else {
       final onBoarded = appStorage.read("onBoarded") ?? false;
       if (onBoarded) {
-        Get.offAllNamed(PrimaryRoute.login);
+        Get.offNamed(PrimaryRoute.login);
       } else {
-        Get.offAllNamed(PrimaryRoute.onBoard);
+        Get.offNamed(PrimaryRoute.onBoard);
       }
     }
   }
 }
+

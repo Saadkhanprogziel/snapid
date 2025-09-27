@@ -46,7 +46,7 @@ class NetworkInterceptor extends dio.Interceptor {
     appStorage.remove('token');
     appStorage.remove('refreshToken');
     
-    // Get.offAllNamed(PrimaryRoute.login);
+    // Get.offNamed(PrimaryRoute.login);
     
     
     Get.snackbar(

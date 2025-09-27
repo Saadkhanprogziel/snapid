@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
@@ -15,6 +16,13 @@ class CustomTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final ValueChanged<String>? onChanged;
   final FormFieldValidator<String>? validator;
+  final List<TextInputFormatter>? inputFormatters;
+  final int? maxLength;
+  final int? maxLines;
+  final Color? cursorColor;
+  final Color? fillColor; 
+  final InputBorder? border;
+
 
   const CustomTextField({
     super.key,
@@ -29,16 +37,19 @@ class CustomTextField extends StatelessWidget {
     this.onChanged,
     this.validator,
     this.label = '',
+    this.inputFormatters,
+    this.maxLength = 50,
+    this.cursorColor,
+    this.fillColor,  this.border, this.maxLines = 1, // ✅ just accept it as nullable
   });
 
   @override
   Widget build(BuildContext context) {
-    // Pick color depending on enabled state
     final Color textColor = enabled ? Colors.white : Colors.grey;
     final Color hintColor = enabled ? Colors.white70 : Colors.grey.shade500;
     final Color iconColor = enabled ? Colors.white70 : Colors.grey.shade600;
-    final Color fillColor =
-        enabled ? AppColors.cardColor : Colors.grey.shade800;
+    final Color effectiveFillColor =
+        fillColor ?? (enabled ? AppColors.cardColor : Colors.grey.shade800); // ✅ resolve here
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,22 +65,26 @@ class CustomTextField extends StatelessWidget {
           enabled: enabled,
           controller: controller,
           obscureText: obscureText,
+          maxLength: maxLength,
+          cursorColor: cursorColor ?? Colors.white,
           keyboardType: keyboardType,
           style: TextStyle(color: textColor),
           onChanged: onChanged,
+          inputFormatters: inputFormatters ?? [],
           validator: validator,
+          maxLines: maxLines,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           decoration: InputDecoration(
             counterText: '',
             hintText: hintText,
             hintStyle: TextStyle(color: hintColor),
             filled: true,
-            fillColor: fillColor,
+            fillColor: effectiveFillColor, // ✅ use resolved value
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 22,
             ),
-            border: OutlineInputBorder(
+            border: border ?? OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),

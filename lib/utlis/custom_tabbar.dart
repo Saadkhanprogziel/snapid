@@ -64,7 +64,7 @@ class TabBarWidget extends StatelessWidget {
   }
 }
 
-// Alternative Solution 1: Flexible tabs that adapt to available space
+
 class TabBarWidgetFlexible extends StatelessWidget {
   final List<String> tabs;
   final ValueChanged<int>? onTabSelected;

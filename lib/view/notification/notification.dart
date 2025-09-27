@@ -34,7 +34,6 @@ class _NotificationScreenState extends State<NotificationScreen>
       }
     });
 
-    // Keep TabController in sync with controller
     controller.selectedTab.listen((index) {
       if (_tabController.index != index) {
         _tabController.animateTo(index);
@@ -67,13 +66,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                 CustomHeader(
                   title: "Notifications",
                   showBackButton: true,
-                    rightWidget: _buildPopupMenu(), // This replaces the SVG icon
-
-                  // rightIconPath: Assets.more_vert,
-                  // onRightIconTap: () {
-                  //   // print("object");
-                  //   // _buildPopupMenu();
-                  // },
+                  rightWidget: _buildPopupMenu(),
                 ),
                 const SpaceH10(),
                 _buildCustomTabBar(),
@@ -96,23 +89,20 @@ class _NotificationScreenState extends State<NotificationScreen>
           Flexible(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(25),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(20, 223, 222, 222),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Obx(
-                    () => TabBarWidget(
-                      tabs: ['All ', 'Success', 'Reminders'],
-                      selectedIndex: controller.selectedTab.value,
-                      onTabSelected: (index) {
-                        controller.onTabChanged(index);
-                      },
-                    ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(20, 223, 222, 222),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Obx(
+                  () => TabBarWidgetFlexible(
+                    tabs: ['All ', 'Read', 'Unread'],
+                    selectedIndex: controller.selectedTab.value,
+                    onTabSelected: (index) {
+                      controller.onTabChanged(index);
+                    },
                   ),
                 ),
               ),
@@ -137,34 +127,72 @@ class _NotificationScreenState extends State<NotificationScreen>
   }
 
   Widget _buildAllTab() {
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      children: [
-        NotificationCard(
-          icon: Icons.check,
-          imagePath: Assets.tick,
-          iconBackgroundColor: const Color.fromRGBO(0, 143, 0, 1),
-          glowColor: const Color.fromRGBO(20, 162, 20, 0.709),
-          title: "Success",
-          message:
-              "Your photo for “US Passport” has been processed and is ready to download.",
-          onPressed: () {},
+    return Obx(() {
+      // Check if notifications list is empty
+      if (controller.allNotifications.isEmpty) {
+        return _buildEmptyNotificationsWidget();
+      }
+      
+      return ListView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        itemCount: controller.allNotifications.length,
+        itemBuilder: (context, index) {
+          final notification = controller.allNotifications[index];
+          return Column(
+            children: [
+              NotificationCard(
+                endDate: notification.endDate,
+                isReminder: notification.isReminder,
+                icon: notification.icon,
+                imagePath: notification.imagePath,
+                iconBackgroundColor: notification.iconBackgroundColor,
+                glowColor: notification.glowColor,
+                title: notification.title,
+                daysLeft: notification.daysLeft,
+                message: notification.message,
+                onPressed: () {},
+              ),
+              if (index < controller.allNotifications.length - 1) SpaceH12(),
+            ],
+          );
+        },
+      );
+    });
+  }
+
+  Widget _buildEmptyNotificationsWidget() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.notifications_off_outlined,
+              size: 80,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: 20),
+            Text(
+              "No Notifications",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[600],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              "You're all caught up! We'll notify you when your photos are processed or about to expire.",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[500],
+              ),
+            ),
+          ],
         ),
-        SpaceH12(),
-        NotificationCard(
-          endDate: "Aug 30, 2025",
-          isReminder: true,
-          icon: Icons.check,
-          imagePath: Assets.reminder,
-          iconBackgroundColor: const Color.fromARGB(201, 213, 114, 33),
-          glowColor: const Color.fromARGB(255, 208, 93, 0),
-          title: "Reminder",
-          daysLeft: "2 Days Left",
-          message:
-              "Your photo order will expire in 2 days. Be sure to download it.",
-          onPressed: () {},
-        )
-      ],
+      ),
     );
   }
 
@@ -173,7 +201,7 @@ class _NotificationScreenState extends State<NotificationScreen>
       imagePath: Assets.historIcon,
       title: "You are all caught up!",
       subtitle:
-          "We’ll notify you when your photos are processed or about to expire!",
+          "We'll notify you when your photos are processed or about to expire!",
       buttonTitle: "Start a new photo",
       onPressed: () {},
     );
