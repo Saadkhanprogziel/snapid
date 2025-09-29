@@ -181,6 +181,7 @@ class _Step4WidgetState extends State<Step4Widget> {
                       ),
                     ),
         ),
+        
 
         if ((!widget.controller.canDownload.value || kIsWeb) &&
             (widget.controller.canDownload.value))
