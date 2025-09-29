@@ -116,7 +116,7 @@ void _updateManualSize() {
     try {
       countryLoads.value = true;
       final result = await countriesRepository.getCountries(
-          page: 1, pageSize: 5, searchQuery: searchQuery.value);
+          page: 1, pageSize: 20, searchQuery: searchQuery.value);
 
       result.fold(
         (error) {
