@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:get/get.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/profile/report_bug/report_bug_controller.dart';
@@ -183,12 +184,31 @@ class ReportBug extends StatelessWidget {
                                   children: [
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(8),
-                                      child: Image.file(
-                                        controller.selectedImage.value!,
-                                        width: double.infinity,
-                                        height: 200,
-                                        fit: BoxFit.cover,
-                                      ),
+                                      child: kIsWeb
+                                          ? Image.network(
+                                              controller.selectedImage.value!.path,
+                                              width: double.infinity,
+                                              height: 200,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context, error, stackTrace) {
+                                                return Container(
+                                                  color: const Color(0xFF2A2A3A),
+                                                  child: const Center(
+                                                    child: Icon(
+                                                      Icons.image,
+                                                      color: Color(0xFF8A8A9A),
+                                                      size: 48,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            )
+                                          : Image.file(
+                                              controller.selectedImage.value!,
+                                              width: double.infinity,
+                                              height: 200,
+                                              fit: BoxFit.cover,
+                                            ),
                                     ),
                                     Positioned(
                                       top: 8,
@@ -302,32 +322,33 @@ class ReportBug extends StatelessWidget {
           ),
 
           /// Button pinned at bottom inside stack
-         Positioned(
-  left: 20,
-  right: 20,
-  bottom: 20,
-  child: SafeArea(
-    child: CustomElevatedButton(
-      onPressed: () {
-        if (!controller.isLoading.value) {
-          controller.sendReport();
-        }
-      },
-      text: "Send Report",
-      minHeight: 60,
-    ),
-  ),
-),
+          Positioned(
+            left: 20,
+            right: 20,
+            bottom: 20,
+            child: SafeArea(
+              child: CustomElevatedButton(
+                onPressed: () {
+                  if (!controller.isLoading.value) {
+                    controller.sendReport();
+                  }
+                },
+                text: "Send Report",
+                minHeight: 60,
+              ),
+            ),
+          ),
+          
 
-/// Loader overlay at center
-Obx(() => controller.isLoading.value
-    ? Container(
-        color: Colors.black54,
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
-      )
-    : const SizedBox.shrink()),
+          /// Loader overlay at center
+          Obx(() => controller.isLoading.value
+              ? Container(
+                  color: Colors.black54,
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : const SizedBox.shrink()),
         ],
       ),
     );

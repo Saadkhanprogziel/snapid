@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:snapid/keys_urls/urls.dart';
@@ -12,8 +13,11 @@ class ReportBugController extends GetxController {
   var selectedCategory = ''.obs;
   final TextEditingController descriptionController = TextEditingController();
 
-  // Observable for selected image
-  var selectedImage = Rx<File?>(null);
+  // Observable for selected image (File for mobile, XFile for web)
+  var selectedImage = Rx<dynamic>(null);
+  
+  // Store XFile separately for web compatibility
+  var selectedXFile = Rx<XFile?>(null);
 
   final List<String> categories = [
     'Bug Report',
@@ -37,9 +41,15 @@ class ReportBugController extends GetxController {
       );
 
       if (image != null) {
-        selectedImage.value = File(image.path);
-
-       
+        selectedXFile.value = image;
+        
+        if (kIsWeb) {
+          // On web, store XFile directly
+          selectedImage.value = image;
+        } else {
+          // On mobile, convert to File
+          selectedImage.value = File(image.path);
+        }
       }
     } catch (e) {
       Get.snackbar(
@@ -55,6 +65,7 @@ class ReportBugController extends GetxController {
 
   void removePhoto() {
     selectedImage.value = null;
+    selectedXFile.value = null;
   }
 
   Future<void> sendReport() async {
@@ -90,12 +101,39 @@ class ReportBugController extends GetxController {
         'bugDescription': descriptionController.text.trim(),
       };
 
-      final formData = await networkRepository.createFormData(
-        fields: fields,
-        multipleFiles: {
-          'bugImages': selectedImage.value != null ? [selectedImage.value!] : []
-        },
-      );
+      dynamic formData;
+      
+      if (kIsWeb) {
+        // Web-specific handling
+        if (selectedXFile.value != null) {
+          final bytes = await selectedXFile.value!.readAsBytes();
+          formData = await networkRepository.createFormData(
+            fields: fields,
+            multipleFiles: {
+              'bugImages': [
+                {
+                  'bytes': bytes,
+                  'filename': selectedXFile.value!.name,
+                }
+              ]
+            },
+          );
+        } else {
+          formData = await networkRepository.createFormData(
+            fields: fields,
+          );
+        }
+      } else {
+        // Mobile-specific handling
+        formData = await networkRepository.createFormData(
+          fields: fields,
+          multipleFiles: {
+            'bugImages': selectedImage.value != null 
+                ? [selectedImage.value as File] 
+                : []
+          },
+        );
+      }
 
       final response = await networkRepository.postMultipart(
         url: "$apiUrl/report/create-bug",
@@ -107,13 +145,11 @@ class ReportBugController extends GetxController {
       print("data: ${response.data}");
 
       if (response.success == true) {
-     
         Get.back(); // Go back to previous screen
         Get.snackbar(
           "Success",
           "Report submitted successfully",
           snackPosition: SnackPosition.BOTTOM,
-         
           colorText: Colors.white,
         );
       } else {
@@ -127,7 +163,6 @@ class ReportBugController extends GetxController {
         );
       }
     } catch (e) {
-      // ✅ Added proper error handling
       print("Error sending report: $e");
       Get.snackbar(
         "Error",
