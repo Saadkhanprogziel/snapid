@@ -8,6 +8,7 @@ import 'package:snapid/utlis/custom_elevated_button.dart';
 import 'package:snapid/utlis/custom_outline_button.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
 import 'package:snapid/view/photo_session/cached_image.dart';
+import 'package:snapid/view/photo_session/steps/selected_details_widget.dart';
 
 class Step3Widget extends StatelessWidget {
   final PhotoController controller;
@@ -55,48 +56,8 @@ class Step3Widget extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white12),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SpaceH10(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Selected Format:",
-                            style: CustomTextTheme.regular18
-                                .copyWith(color: AppColors.whiteColor),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              controller.setStep(2);
-                            },
-                            child: SvgPicture.asset(
-                              Assets.edit_icon,
-                              width: 20,
-                            ),
-                          )
-                        ],
-                      ),
-                      SpaceH20(),
-                      _infoRow(
-                        "Country:",
-                        "${controller.selectedCountry.value?.name ?? 'Select Country'}",
-                        flagPath: controller.selectedCountry.value?.flag ?? '',
-                      ),
-                      const Divider(color: Colors.white12),
-                      _infoRow("Document:", controller.selectedType.value.name),
-                      const Divider(color: Colors.white12),
-                      _infoRow("Size:", "50x50 Cm"),
-                    ],
-                  ),
-                ),
+                            SelectedDetailsWidget(controller: controller),
+
                 SpaceH20(),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -140,39 +101,4 @@ class Step3Widget extends StatelessWidget {
     );
   }
 
-  Widget _infoRow(String label, String value, {String? flagPath}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: CustomTextTheme.regular14.copyWith(
-              color: AppColors.whiteColor,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          Row(
-            children: [
-              if (flagPath != null && flagPath.isNotEmpty) ...[
-                SvgPicture.asset(
-                  flagPath,
-                  width: 30,
-                ),
-                SpaceW12(),
-              ],
-              Text(
-                value,
-                style: CustomTextTheme.regular14.copyWith(
-                  color: AppColors.whiteColor,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 }

@@ -23,6 +23,7 @@ import 'package:snapid/view/photo_session/cached_image.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:snapid/utlis/image_utlis/download_helper.dart';
+import 'package:snapid/view/photo_session/steps/selected_details_widget.dart';
 
 class PhotoPreview extends StatefulWidget {
   const PhotoPreview({super.key});
@@ -82,12 +83,10 @@ class _PhotoPreviewState extends State<PhotoPreview> {
                         child: GestureDetector(
                           onTap: () {
                             if (token == null || token == "") {
-                                    Get.offAllNamed(PrimaryRoute.login);
-                                  } else {
-                                    Get.offAllNamed(PrimaryRoute.home);                                    
-
-                                  }
-
+                              Get.offAllNamed(PrimaryRoute.login);
+                            } else {
+                              Get.offAllNamed(PrimaryRoute.home);
+                            }
                           },
                           child: Container(
                             padding: const EdgeInsets.all(4),
@@ -171,7 +170,7 @@ class _PhotoPreviewState extends State<PhotoPreview> {
                                   ),
                                 ),
                                 SpaceH20(),
-                                _buildInfoContainer(controller),
+                                SelectedDetailsWidget(controller: controller),
                                 SpaceH20(),
                                 CustomElevatedButton(
                                   onPressed: () {
@@ -268,7 +267,7 @@ class _PhotoPreviewState extends State<PhotoPreview> {
                         ),
                       ),
                       SpaceH20(),
-                      _buildInfoContainer(controller),
+                      SelectedDetailsWidget(controller: controller),
                       SpaceH20(),
                       CustomElevatedButton(
                         onPressed: () {
@@ -347,51 +346,6 @@ class _PhotoPreviewState extends State<PhotoPreview> {
         ],
       );
     }
-  }
-
-  Widget _buildInfoContainer(PhotoController controller) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.white12),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SpaceH10(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Selected Format:",
-                style: CustomTextTheme.regular18
-                    .copyWith(color: AppColors.whiteColor),
-              ),
-              GestureDetector(
-                onTap: () {
-                  controller.setStep(2);
-                },
-                child: SvgPicture.asset(
-                  Assets.edit_icon,
-                  width: 20,
-                ),
-              )
-            ],
-          ),
-          SpaceH20(),
-          infoRow(
-            "Country:",
-            "${controller.selectedCountry.value?.name ?? 'Select Country'}",
-            flagPath: controller.selectedCountry.value?.flag ?? '',
-          ),
-          const Divider(color: Colors.white12),
-          infoRow("Document:", controller.selectedType.value.name),
-          const Divider(color: Colors.white12),
-          infoRow("Size:", "50x50 Cm"),
-        ],
-      ),
-    );
   }
 
   Future<void> saveImageToGallery(String url) async {
@@ -512,41 +466,5 @@ class _PhotoPreviewState extends State<PhotoPreview> {
           colorText: Colors.white,
           snackPosition: SnackPosition.TOP);
     }
-  }
-
-  Widget infoRow(String label, String value, {String? flagPath}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: CustomTextTheme.regular14.copyWith(
-              color: AppColors.whiteColor,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          Row(
-            children: [
-              if (flagPath != null && flagPath.isNotEmpty) ...[
-                SvgPicture.asset(
-                  flagPath,
-                  width: 30,
-                ),
-                SpaceW12(),
-              ],
-              Text(
-                value,
-                style: CustomTextTheme.regular14.copyWith(
-                  color: AppColors.whiteColor,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
   }
 }

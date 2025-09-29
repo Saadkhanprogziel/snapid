@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -8,10 +9,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/dashboard/dashboard_controller.dart';
 import 'package:snapid/main.dart';
+import 'package:snapid/models/countries/countries.dart';
 import 'package:snapid/models/photo_creation/photo_creation_model.dart';
 import 'package:snapid/repositories/auth/auth_respository.dart';
+import 'package:snapid/repositories/countries/countries_repository.dart';
 import 'package:snapid/repositories/photo_creation_repository/photo_creation_repository.dart';
-import 'package:snapid/utlis/country_model.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
 import 'package:snapid/utlis/custom_outline_button.dart';
@@ -25,16 +27,22 @@ enum Unit { cm, inch }
 class PhotoController extends GetxController {
   PhotoCreationRepository photoCreationRepository = PhotoCreationRepository();
   AuthRespository authRespository = AuthRespository();
+  TextEditingController searchController = TextEditingController();
+  Timer? _debounceTimer;
+
+  final CountriesRepository countriesRepository = CountriesRepository();
 
   RxInt currentStep = 1.obs;
   var selectedUnit = Unit.cm.obs;
   var selectedType = DocumentType.visa.obs;
   var selectedCountry = Rxn<Country>();
   final canDownload = false.obs;
+  var countries = <Country>[].obs;
 
   var selectedPackage = "".obs;
 
   final isLoading = false.obs;
+  final countryLoads = false.obs;
   var photoCreationModelData = Rxn<PhotoCreationModel>();
   var processedWatermarkedUrl = ''.obs;
   var sessionId = ''.obs;
@@ -46,12 +54,15 @@ class PhotoController extends GetxController {
   /// Updated: Use XFile for cross-platform
   final selectedPhotos = <ImageProvider>[].obs;
   final capturedPhotos = <XFile>[].obs;
-  
+  var searchQuery = ''.obs;
+
   // NEW: Set to store image hashes for duplicate detection
   final _imageHashes = <String>{};
-  
+
   final ImagePicker _picker = ImagePicker();
   final isCapturingPhotos = false.obs;
+  var manualSize = "".obs;
+
 
   @override
   void onInit() {
@@ -60,6 +71,67 @@ class PhotoController extends GetxController {
     if (kIsWeb) {
       _handleUrlParameters();
       _loadSavedImages();
+    }
+    initSearchListener();
+  widthController.addListener(_updateManualSize);
+  heightController.addListener(_updateManualSize);
+}
+
+void _updateManualSize() {
+  manualSize.value = "${widthController.text} X ${heightController.text}";
+}
+  void initSearchListener() {
+    searchController.addListener(() {
+      _onSearchChanged(searchController.text);
+    });
+  }
+
+  void _onSearchChanged(String query) {
+    // Cancel previous timer
+    if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
+
+    // Start new timer
+    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+      if (searchQuery.value != query) {
+        searchQuery.value = query;
+        _performSearch();
+      }
+    });
+  }
+
+  void _performSearch() {
+    countries.clear();
+    fetchCountries();
+  }
+
+  void clearSearch() {
+    searchController.clear();
+    searchQuery.value = '';
+    _performSearch();
+  }
+
+  Future<void> fetchCountries({bool isRefresh = false}) async {
+  
+
+    try {
+      countryLoads.value = true;
+      final result = await countriesRepository.getCountries(
+          page: 1, pageSize: 5, searchQuery: searchQuery.value);
+
+      result.fold(
+        (error) {
+          Get.snackbar("Error", error,
+              backgroundColor: Colors.redAccent, colorText: Colors.white);
+        },
+        (success) {
+          countries.value =success.countries;
+        },
+      );
+    } catch (e) {
+      Get.snackbar("Error", "Failed to fetch countries",
+          backgroundColor: Colors.redAccent, colorText: Colors.white);
+    } finally {
+      countryLoads.value = false;
     }
   }
 
@@ -218,7 +290,7 @@ class PhotoController extends GetxController {
 
           capturedPhotos.add(webFile);
           selectedPhotos.add(MemoryImage(bytes));
-          
+
           // Add hash for loaded images
           await _addImageHash(webFile);
         }
@@ -375,15 +447,12 @@ class PhotoController extends GetxController {
                   colorText: AppColors.whiteColor,
                 );
                 return;
-              }, (success) {
-
-              });
+              }, (success) {});
             });
           }
-          
+
           bool success = await createSession();
           if (!success) return;
-
         }
         print(
             "Reviewing photos... ${photoCreationModelData.value?.processedWatermarkedUrl}");
@@ -416,6 +485,8 @@ class PhotoController extends GetxController {
     isLoading.value = true;
 
     await photoCreationRepository.downloadImage(id: id).then((response) {
+      final token = appStorage.read("token");
+
       response.fold((error) {
         Get.snackbar(
           'Error',
@@ -429,9 +500,10 @@ class PhotoController extends GetxController {
         photoCreationModelData.value = photoCreationModel;
         appStorage.write("processed_img", photoCreationModel.processedImageUrl);
         _storeSessionData(photoCreationModel);
-        
-       
-        getUserDetails();
+
+        if (token != null) {
+          getUserDetails();
+        }
         Get.toNamed(PrimaryRoute.photo_preview);
       });
     });
@@ -445,16 +517,16 @@ class PhotoController extends GetxController {
       final List<XFile>? pickedFiles = await _picker.pickMultiImage();
       if (pickedFiles != null && pickedFiles.isNotEmpty) {
         int duplicatesSkipped = 0;
-        
+
         for (final file in pickedFiles) {
           if (capturedPhotos.length >= 5) break; // cap at 5
-          
+
           // Check for duplicate before adding
           if (await _isDuplicateImage(file)) {
             duplicatesSkipped++;
             continue;
           }
-          
+
           capturedPhotos.add(file);
           await _addImageHash(file); // Track the hash
 
@@ -465,7 +537,7 @@ class PhotoController extends GetxController {
             selectedPhotos.add(Image.file(File(file.path)).image);
           }
         }
-        
+
         // Show message if duplicates were found
         if (duplicatesSkipped > 0) {
           Get.snackbar(
@@ -492,7 +564,7 @@ class PhotoController extends GetxController {
           );
           return;
         }
-        
+
         capturedPhotos.add(pickedFile);
         await _addImageHash(pickedFile); // Track the hash
 
@@ -519,7 +591,6 @@ class PhotoController extends GetxController {
       while (photoCount < 5 && shouldContinue) {
         final pickedFile = await _picker.pickImage(
           source: ImageSource.camera,
-         
         );
 
         if (pickedFile != null) {
@@ -534,7 +605,7 @@ class PhotoController extends GetxController {
             );
             continue; // Don't increment photoCount, try again
           }
-          
+
           capturedPhotos.add(pickedFile);
           await _addImageHash(pickedFile); // Track the hash
 
@@ -624,7 +695,6 @@ class PhotoController extends GetxController {
           return false;
         },
         (photoCreationModel) {
-         
           photoCreationModelData.value = photoCreationModel;
           processedWatermarkedUrl.value =
               photoCreationModel.processedWatermarkedUrl;
@@ -736,7 +806,7 @@ class PhotoController extends GetxController {
       _removeImageHash(capturedPhotos[index]);
       capturedPhotos.removeAt(index);
     }
-    
+
     selectedPhotos.removeAt(index);
   }
 

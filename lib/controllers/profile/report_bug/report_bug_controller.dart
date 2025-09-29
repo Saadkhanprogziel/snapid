@@ -55,7 +55,6 @@ class ReportBugController extends GetxController {
       Get.snackbar(
         "Error",
         "Failed to pick image: $e",
-        snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
         duration: const Duration(seconds: 3),
@@ -73,7 +72,6 @@ class ReportBugController extends GetxController {
       Get.snackbar(
         "Error",
         "Please select a category",
-        snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
         duration: const Duration(seconds: 3),
@@ -85,7 +83,6 @@ class ReportBugController extends GetxController {
       Get.snackbar(
         "Error",
         "Please provide a description",
-        snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
         duration: const Duration(seconds: 3),
@@ -149,14 +146,12 @@ class ReportBugController extends GetxController {
         Get.snackbar(
           "Success",
           "Report submitted successfully",
-          snackPosition: SnackPosition.BOTTOM,
           colorText: Colors.white,
         );
       } else {
         Get.snackbar(
           "Error",
           response.message,
-          snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red,
           colorText: Colors.white,
           duration: const Duration(seconds: 3),
@@ -167,7 +162,6 @@ class ReportBugController extends GetxController {
       Get.snackbar(
         "Error",
         "Failed to submit report: ${e.toString()}",
-        snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
         duration: const Duration(seconds: 3),

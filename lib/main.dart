@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-// import 'package:flutter_stripe/flutter_stripe.dart';
-// import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:responsive_framework/responsive_framework.dart';
@@ -22,8 +22,8 @@ void main() async {
   
 
   //   // setUrlStrategy(PathUrlStrategy());
-  //   Stripe.publishableKey = "pk_test_51OjVE5Hmu5zQwGp1jvLH3Cd3Bcn0F325a2E0UCTyU5zDeEjU1Wozkkj8bl5cJIf8sdC5EGpHMFX7hQkXxU64MZ0G00vs5RNzB2";
-  // await Stripe.instance.applySettings();
+    Stripe.publishableKey = "pk_test_51OjVE5Hmu5zQwGp1jvLH3Cd3Bcn0F325a2E0UCTyU5zDeEjU1Wozkkj8bl5cJIf8sdC5EGpHMFX7hQkXxU64MZ0G00vs5RNzB2";
+  await Stripe.instance.applySettings();
   
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init(); // required!

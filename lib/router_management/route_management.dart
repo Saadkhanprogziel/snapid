@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart'; // Add this import for kIsWeb
 import 'package:get/get.dart';
 import 'package:snapid/bindings/bindings.dart';
+import 'package:snapid/main.dart';
 import 'package:snapid/router_management/auth_middleware.dart';
 import 'package:snapid/view/photo_session/drag_and_drop.dart';
 import 'package:snapid/routes/routes.dart';
@@ -34,11 +35,19 @@ import 'package:snapid/view/splash/splash.dart';
 
 class Pages {
   static List<GetPage> getPages() {
+    final token = appStorage.read("token");
     return [
       GetPage(
-          name: PrimaryRoute.initialRoute,
-          page: () => kIsWeb ? LoginScreen() : const SplashView(),
-          binding: ControllerBindings()),
+        name: PrimaryRoute.initialRoute,
+        page: () {
+          if (token != null && token.toString().isNotEmpty) {
+            return HomeScreen();
+          } else {
+            return kIsWeb ? LoginScreen() : const SplashView();
+          }
+        },
+        binding: ControllerBindings(),
+      ),
       GetPage(
         name: PrimaryRoute.onBoard,
         page: () => const OnBoardingView(),
@@ -53,7 +62,12 @@ class Pages {
       ),
       GetPage(
           name: PrimaryRoute.login,
-          page: () => LoginScreen(),
+          page: () {
+            if (token != null && token.toString().isNotEmpty) {
+              return HomeScreen();
+            }
+            return LoginScreen();
+          },
           binding: ControllerBindings(),
           transition: Transition.cupertino),
       GetPage(

@@ -77,9 +77,9 @@ class DashboardController extends GetxController {
   }
 
   @override
-  void onClose() {
+  void dispose() {
     scrollController?.removeListener(_scrollListener);
     scrollController?.dispose();
-    super.onClose();
+    super.dispose();
   }
 }
