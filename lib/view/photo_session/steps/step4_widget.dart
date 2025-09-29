@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:flutter_stripe_web/card_field.dart';
+// import 'package:flutter_stripe/flutter_stripe.dart';
+// import 'package:flutter_stripe_web/card_field.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/controllers/photoSession/photo_controller.dart';
@@ -13,7 +13,6 @@ import 'package:snapid/utlis/custom_spaces.dart';
 import 'package:snapid/utlis/subscription_card.dart';
 import 'package:snapid/view/photo_session/cached_image.dart';
 import 'package:snapid/constant/colors.dart';
-import 'package:snapid/constant/strings.dart';
 
 class Step4Widget extends StatefulWidget {
   final PhotoController controller;
@@ -146,7 +145,7 @@ class _Step4WidgetState extends State<Step4Widget> {
                               description: "Perfect for one time",
                               isPopular: false,
                               savings: "",
-                              controller: widget.controller, // Add this line
+                              controller: widget.controller,
                               onBuy: () {
                                 // Handle buy action for Standard package
                               },
@@ -160,7 +159,7 @@ class _Step4WidgetState extends State<Step4Widget> {
                               description: "Perfect for three photos",
                               isPopular: true,
                               savings: "Save - 28 %",
-                              controller: widget.controller, // Add this line
+                              controller: widget.controller,
                               onBuy: () {
                                 // Handle buy action for Smart Pack
                               },
@@ -174,9 +173,8 @@ class _Step4WidgetState extends State<Step4Widget> {
                               description: "Ideal for families or agencies",
                               isPopular: false,
                               savings: "Save - 43 %",
-                              controller: widget.controller, // Add this line
+                              controller: widget.controller,
                               onBuy: () {
-                                // Handle buy action for Family Pack
                               },
                             ),
                           ],
@@ -185,177 +183,179 @@ class _Step4WidgetState extends State<Step4Widget> {
                     ),
         ),
 
-        if (!widget.controller.canDownload.value || kIsWeb)
-          _buildPaymentMethodSection(widget.controller),
+        // if (!widget.controller.canDownload.value || kIsWeb)
+        //   _buildPaymentMethodSection(widget.controller),
+
+        
       ],
     );
   }
 
-  Widget _buildPaymentMethodSection(PhotoController photocontroller) {
-    if (!kIsWeb) {
-      // For non-web platforms, return a different payment UI or empty container
-      return Container(
-        margin: const EdgeInsets.all(12),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.cardColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          "Payment processing is only available on web platform",
-          style: TextStyle(color: Colors.white),
-          textAlign: TextAlign.center,
-        ),
-      );
-    }
+  // Widget _buildPaymentMethodSection(PhotoController photocontroller) {
+  //   if (!kIsWeb) {
+  //     // For non-web platforms, return a different payment UI or empty container
+  //     return Container(
+  //       margin: const EdgeInsets.all(12),
+  //       padding: const EdgeInsets.all(16),
+  //       decoration: BoxDecoration(
+  //         color: AppColors.cardColor,
+  //         borderRadius: BorderRadius.circular(12),
+  //       ),
+  //       child: Text(
+  //         "Payment processing is only available on web platform",
+  //         style: TextStyle(color: Colors.white),
+  //         textAlign: TextAlign.center,
+  //       ),
+  //     );
+  //   }
 
-    if (!isStripeInitialized) {
-      return Container(
-        margin: const EdgeInsets.all(12),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.cardColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Center(
-          child: Column(
-            children: [
-              CircularProgressIndicator(color: Colors.white),
-              SizedBox(height: 8),
-              Text(
-                "Initializing payment system...",
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
+  //   if (!isStripeInitialized) {
+  //     return Container(
+  //       margin: const EdgeInsets.all(12),
+  //       padding: const EdgeInsets.all(16),
+  //       decoration: BoxDecoration(
+  //         color: AppColors.cardColor,
+  //         borderRadius: BorderRadius.circular(12),
+  //       ),
+  //       child: Center(
+  //         child: Column(
+  //           children: [
+  //             CircularProgressIndicator(color: Colors.white),
+  //             SizedBox(height: 8),
+  //             Text(
+  //               "Initializing payment system...",
+  //               style: TextStyle(color: Colors.white),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     );
+  //   }
 
-    if (stripeController == null) {
-      return Container(
-        margin: const EdgeInsets.all(12),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.cardColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          children: [
-            Text(
-              "Payment system failed to initialize",
-              style: TextStyle(color: Colors.red),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: _initializeStripe,
-              child: Text("Retry"),
-            ),
-          ],
-        ),
-      );
-    }
+  //   if (stripeController == null) {
+  //     return Container(
+  //       margin: const EdgeInsets.all(12),
+  //       padding: const EdgeInsets.all(16),
+  //       decoration: BoxDecoration(
+  //         color: AppColors.cardColor,
+  //         borderRadius: BorderRadius.circular(12),
+  //       ),
+  //       child: Column(
+  //         children: [
+  //           Text(
+  //             "Payment system failed to initialize",
+  //             style: TextStyle(color: Colors.red),
+  //             textAlign: TextAlign.center,
+  //           ),
+  //           SizedBox(height: 8),
+  //           ElevatedButton(
+  //             onPressed: _initializeStripe,
+  //             child: Text("Retry"),
+  //           ),
+  //         ],
+  //       ),
+  //     );
+  //   }
 
-    return Container(
-      padding: const EdgeInsets.all(10),
-      margin: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: AppColors.cardColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Container(
-            margin: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  margin:
-                      EdgeInsets.only(top: 12, bottom: 15, left: 20, right: 20),
-                  // height: 50,
-                  child: WebCardField(
-                    style: CardStyle(),
-                    controller: stripeController!.cardEditController,
-                  ),
-                ),
-                SpaceH10(),
-                TextFormField(
-                  controller: stripeController!.email,
-                  decoration: InputDecoration(
-                    label: Text("Email"),
-                    labelStyle: TextStyle(color: Colors.grey.shade500),
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: Colors.grey.shade300, width: 1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: Colors.grey.shade300, width: 1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email or phone number';
-                    }
-                    if (GetUtils.isEmail(value)) {
-                      return null;
-                    }
-                    return 'Enter a valid email or phone number';
-                  },
-                ),
-              ],
-            ),
-          ),
-          SpaceH20(),
-          Obx(
-            () => stripeController!.isStripeLoading.value
-                ? CircularProgressIndicator(color: Colors.white)
-                : SizedBox(
-                    width: 200,
-                    child: CustomElevatedButton(
-                        onPressed: () {
-                          if (token != null) if (photocontroller
-                              .selectedPackage.value.isEmpty) {
-                            Get.snackbar(
-                                "Error", "Please select a subscription plan",
-                                backgroundColor: Colors.red,
-                                colorText: Colors.white);
-                            return;
-                          }
+  //   return Container(
+  //     padding: const EdgeInsets.all(10),
+  //     margin: const EdgeInsets.all(15),
+  //     decoration: BoxDecoration(
+  //       color: AppColors.cardColor,
+  //       borderRadius: BorderRadius.circular(12),
+  //     ),
+  //     child: Column(
+  //       children: [
+  //         Container(
+  //           margin: const EdgeInsets.all(12),
+  //           decoration: BoxDecoration(
+  //             color: Colors.white,
+  //             borderRadius: BorderRadius.circular(12),
+  //           ),
+  //           child: Column(
+  //             mainAxisAlignment: MainAxisAlignment.center,
+  //             children: [
+  //               Container(
+  //                 margin:
+  //                     EdgeInsets.only(top: 12, bottom: 15, left: 20, right: 20),
+  //                 // height: 50,
+  //                 child: WebCardField(
+  //                   style: CardStyle(),
+  //                   controller: stripeController!.cardEditController,
+  //                 ),
+  //               ),
+  //               SpaceH10(),
+  //               TextFormField(
+  //                 controller: stripeController!.email,
+  //                 decoration: InputDecoration(
+  //                   label: Text("Email"),
+  //                   labelStyle: TextStyle(color: Colors.grey.shade500),
+  //                   contentPadding:
+  //                       EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+  //                   enabledBorder: OutlineInputBorder(
+  //                     borderSide:
+  //                         BorderSide(color: Colors.grey.shade300, width: 1),
+  //                     borderRadius: BorderRadius.circular(8),
+  //                   ),
+  //                   focusedBorder: OutlineInputBorder(
+  //                     borderSide:
+  //                         BorderSide(color: Colors.grey.shade300, width: 1),
+  //                     borderRadius: BorderRadius.circular(8),
+  //                   ),
+  //                 ),
+  //                 validator: (value) {
+  //                   if (value == null || value.isEmpty) {
+  //                     return 'Please enter your email or phone number';
+  //                   }
+  //                   if (GetUtils.isEmail(value)) {
+  //                     return null;
+  //                   }
+  //                   return 'Enter a valid email or phone number';
+  //                 },
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //         SpaceH20(),
+  //         Obx(
+  //           () => stripeController!.isStripeLoading.value
+  //               ? CircularProgressIndicator(color: Colors.white)
+  //               : SizedBox(
+  //                   width: 200,
+  //                   child: CustomElevatedButton(
+  //                       onPressed: () {
+  //                         if (token != null) if (photocontroller
+  //                             .selectedPackage.value.isEmpty) {
+  //                           Get.snackbar(
+  //                               "Error", "Please select a subscription plan",
+  //                               backgroundColor: Colors.red,
+  //                               colorText: Colors.white);
+  //                           return;
+  //                         }
 
-                          stripeController?.createPaymentMethodWeb();
-                        },
-                        text: "Make Payment"),
-                  ),
-          ),
-        ],
-      ),
-    );
-  }
+  //                         stripeController?.createPaymentMethodWeb();
+  //                       },
+  //                       text: "Make Payment"),
+  //                 ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
-  Widget _buildPaymentIcon(IconData icon, Color color) {
-    return Container(
-      width: 40,
-      height: 25,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Icon(
-        icon,
-        color: color,
-        size: 16,
-      ),
-    );
-  }
+  // Widget _buildPaymentIcon(IconData icon, Color color) {
+  //   return Container(
+  //     width: 40,
+  //     height: 25,
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(4),
+  //     ),
+  //     child: Icon(
+  //       icon,
+  //       color: color,
+  //       size: 16,
+  //     ),
+  //   );
+  // }
 }

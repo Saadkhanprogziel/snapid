@@ -10,7 +10,6 @@ import 'package:camera_web/camera_web.dart';
 import 'package:connectivity_plus/src/connectivity_plus_web.dart';
 import 'package:desktop_drop/desktop_drop_web.dart';
 import 'package:device_info_plus/src/device_info_plus_web.dart';
-import 'package:flutter_stripe_web/flutter_stripe_web.dart';
 import 'package:fluttertoast/fluttertoast_web.dart';
 import 'package:image_picker_for_web/image_picker_for_web.dart';
 import 'package:network_info_plus/src/network_info_plus_web.dart';
@@ -26,7 +25,6 @@ void registerPlugins([final Registrar? pluginRegistrar]) {
   ConnectivityPlusWebPlugin.registerWith(registrar);
   DesktopDropWeb.registerWith(registrar);
   DeviceInfoPlusWebPlugin.registerWith(registrar);
-  WebStripe.registerWith(registrar);
   FluttertoastWebPlugin.registerWith(registrar);
   ImagePickerPlugin.registerWith(registrar);
   NetworkInfoPlusWebPlugin.registerWith(registrar);
