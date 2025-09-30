@@ -388,6 +388,7 @@ class _Step4WidgetState extends State<Step4Widget> {
               controller: stripeController!.cardEditController,
             ),
           ),
+          
           const SpaceH10(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
