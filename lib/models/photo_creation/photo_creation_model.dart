@@ -10,9 +10,11 @@ class PhotoCreationModel {
   final double? customHeight;
   final int photos;
   final String processedWatermarkedUrl;
-  final String? processedImageUrl; // Nullable now
+  final String? processedImageUrl;
   final bool canDownloadImage;
   final String platform;
+  final String countryFlag;
+  final String size;
   final String createdAt;
 
   PhotoCreationModel({
@@ -28,6 +30,8 @@ class PhotoCreationModel {
     required this.photos,
     required this.processedWatermarkedUrl,
     this.processedImageUrl,
+    required this.countryFlag,
+    required this.size,
     required this.canDownloadImage,
     required this.platform,
     required this.createdAt,
@@ -35,25 +39,29 @@ class PhotoCreationModel {
 
   factory PhotoCreationModel.fromJson(Map<String, dynamic> json) {
     return PhotoCreationModel(
-      id: json["id"] ?? "",
-      userId: json["userId"] ?? "",
-      guestId: json["guestId"],
-      status: json["status"] ?? "",
-      countryCode: json["countryCode"] ?? "",
-      countryName: json["countryName"] ?? "",
-      documentType: json["documentType"] ?? "",
+      id: json["id"]?.toString() ?? "",
+      userId: json["userId"]?.toString() ?? "",
+      guestId: json["guestId"]?.toString(),
+      countryFlag: json['countryFlag']?.toString() ?? "",
+      status: json["status"]?.toString() ?? "",
+      size: json["size"]?.toString() ?? "",
+      countryCode: json["countryCode"]?.toString() ?? "",
+      countryName: json["countryName"]?.toString() ?? "",
+      documentType: json["documentType"]?.toString() ?? "",
       customWidth: json["customWidth"] != null
           ? double.tryParse(json["customWidth"].toString())
           : null,
       customHeight: json["customHeight"] != null
           ? double.tryParse(json["customHeight"].toString())
           : null,
-      photos: json["photos"] ?? 0,
-      processedWatermarkedUrl: json["processedWatermarkedUrl"] ?? "",
-      processedImageUrl: json["processedImageUrl"], // nullable
-      canDownloadImage: json["canDownloadImage"] ?? false,
-      platform: json["platform"] ?? "",
-      createdAt: json["createdAt"] ?? "",
+      photos: int.tryParse(json["photos"]?.toString() ?? "0") ?? 0,
+      processedWatermarkedUrl: json["processedWatermarkedUrl"]?.toString() ?? "",
+      processedImageUrl: json["processedImageUrl"]?.toString(),
+      canDownloadImage: json["canDownloadImage"] is bool
+          ? json["canDownloadImage"]
+          : json["canDownloadImage"]?.toString().toLowerCase() == "true",
+      platform: json["platform"]?.toString() ?? "",
+      createdAt: json["createdAt"]?.toString() ?? "",
     );
   }
 
@@ -69,11 +77,13 @@ class PhotoCreationModel {
       "customWidth": customWidth,
       "customHeight": customHeight,
       "photos": photos,
+      "countryFlag": countryFlag,
       "processedWatermarkedUrl": processedWatermarkedUrl,
       "processedImageUrl": processedImageUrl,
       "canDownloadImage": canDownloadImage,
       "platform": platform,
       "createdAt": createdAt,
+      "size": size,
     };
   }
 }

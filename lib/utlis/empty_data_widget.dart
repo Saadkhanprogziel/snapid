@@ -10,7 +10,6 @@ class EmptyDataWidget extends StatelessWidget {
   final String title;
   final String subtitle;
   final String buttonTitle;
-  final VoidCallback onPressed;
 
   const EmptyDataWidget({
     super.key,
@@ -18,7 +17,6 @@ class EmptyDataWidget extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.buttonTitle,
-    required this.onPressed,
   });
 
   @override
@@ -47,10 +45,7 @@ class EmptyDataWidget extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             SpaceH20(),
-            CustomElevatedButton(
-              onPressed: onPressed,
-              text: buttonTitle,
-            ),
+           
           ],
         ),
       ),

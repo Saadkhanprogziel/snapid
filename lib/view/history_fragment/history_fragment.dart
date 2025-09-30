@@ -119,9 +119,7 @@ class HistoryFragment extends StatelessWidget {
                         subtitle:
                             "Looks like you haven't started yet. Tap below to create your first photo — it's quick and easy!",
                         buttonTitle: "Upload or Capture",
-                        onPressed: () {
-                          Get.toNamed(PrimaryRoute.photo_creation);
-                        },
+                      
                       );
                     }
         

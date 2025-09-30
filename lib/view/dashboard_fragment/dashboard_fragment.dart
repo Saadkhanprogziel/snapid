@@ -284,53 +284,59 @@ class DashboardFragment extends StatelessWidget {
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: [
-                                            GestureDetector(
-                                              child: SvgPicture.asset(
-                                                Assets.hintIcon,
-                                                height: 14,
-                                                width: 14,
-                                              ),
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-                                                showDialog(
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return Dialog(
-                                                      backgroundColor:
-                                                          const Color.fromARGB(
-                                                              208, 33, 33, 33),
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(20),
-                                                      ),
-                                                      child: Container(
-                                                        width: 400,
-                                                        child: kIsWeb
-                                                            ? _photoGuideline(
-                                                                cardHeight)
-                                                            : _photoGuideline(
-                                                                cardHeight),
-                                                      ),
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                              style: TextButton.styleFrom(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 8, vertical: 4),
-                                              ),
-                                              child: Text(
-                                                Strings.photoGuidelines,
-                                                style: CustomTextTheme.regular14
-                                                    .copyWith(
-                                                  color: AppColors.whiteColor,
+                                            
+                                            if (isMobile) ...[
+                                              GestureDetector(
+                                                child: SvgPicture.asset(
+                                                  Assets.hintIcon,
+                                                  height: 14,
+                                                  width: 14,
                                                 ),
                                               ),
-                                            ),
+                                              TextButton(
+                                                onPressed: () {
+                                                  showDialog(
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return Dialog(
+                                                        backgroundColor:
+                                                            const Color
+                                                                .fromARGB(208,
+                                                                33, 33, 33),
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(20),
+                                                        ),
+                                                        child: Container(
+                                                          width: 400,
+                                                          child: kIsWeb
+                                                              ? _photoGuideline(
+                                                                  cardHeight)
+                                                              : _photoGuideline(
+                                                                  cardHeight),
+                                                        ),
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                                style: TextButton.styleFrom(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 4),
+                                                ),
+                                                child: Text(
+                                                  Strings.photoGuidelines,
+                                                  style: CustomTextTheme
+                                                      .regular14
+                                                      .copyWith(
+                                                    color: AppColors.whiteColor,
+                                                  ),
+                                                ),
+                                              ),
+                                            ]
                                           ],
                                         ),
                                       ],

@@ -3,12 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/photoSession/photo_controller.dart';
+import 'package:snapid/models/photo_creation/photo_creation_model.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
 
 class SelectedDetailsWidget extends StatelessWidget {
   final PhotoController controller;
-  const SelectedDetailsWidget({super.key, required this.controller});
+  final PhotoCreationModel? imageData;
+  final bool? isPreview; 
+
+  const SelectedDetailsWidget({super.key, required this.controller, this.imageData, this.isPreview = false});
 
   @override
   Widget build(BuildContext context) {
@@ -29,27 +33,15 @@ class SelectedDetailsWidget extends StatelessWidget {
                 "Selected Format:",
                 style: CustomTextTheme.regular18.copyWith(color: AppColors.whiteColor),
               ),
-              (controller.selectedCountry.value == null)
-                  ? SizedBox.shrink()
-                  : Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      width: 34,
-                      height: 20,
-                      child: CachedNetworkImage(
-                        imageUrl: controller.selectedCountry.value!.flag,
-                        fit: BoxFit.cover,
-                      ),
-                    )
+             
             ],
           ),
           SpaceH20(),
           Obx(() {
             return _infoRow(
               "Country:",
-              controller.selectedCountry.value?.name ?? "Select Country",
-              flagPath: controller.selectedCountry.value?.flag,
+              controller.selectedCountry.value?.name ?? imageData?.countryName ?? "Select Country",
+              flagPath: controller.selectedCountry.value?.flag  ?? imageData?.countryFlag,
             );
           }),
           const Divider(color: Colors.white12),
@@ -59,6 +51,13 @@ class SelectedDetailsWidget extends StatelessWidget {
                 formatDocumentName(controller.selectedType.value.name));
           }),
           const Divider(color: Colors.white12),
+          
+          if(isPreview == true)
+          _infoRow(
+                "Size:",
+                "${imageData?.size}"
+          ),
+           if(isPreview == false)
           Obx(() {
             return _infoRow(
                 "Size:",

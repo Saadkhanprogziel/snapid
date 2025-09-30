@@ -70,6 +70,7 @@ class Step2Widget extends StatelessWidget {
                 return OutlinedButton(
                   onPressed: () {
                     controller.fetchCountries();
+                    controller.searchController.clear();
                     _showCountryPicker(context, controller);
                   },
                   style: OutlinedButton.styleFrom(
@@ -268,7 +269,7 @@ class Step2Widget extends StatelessWidget {
                   ),
                   IconButton(
                     onPressed: () {
-                      // Get.back();
+                      Get.back();
                     },
                     icon: const Icon(Icons.close, color: Colors.white70),
                   ),

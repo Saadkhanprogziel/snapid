@@ -203,7 +203,6 @@ class _NotificationScreenState extends State<NotificationScreen>
       subtitle:
           "We'll notify you when your photos are processed or about to expire!",
       buttonTitle: "Start a new photo",
-      onPressed: () {},
     );
   }
 

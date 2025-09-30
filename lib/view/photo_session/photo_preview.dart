@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -6,13 +7,14 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:gallery_saver_plus/gallery_saver.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/photoSession/photo_controller.dart';
+import 'package:snapid/keys_urls/local_storage.dart';
 import 'package:snapid/main.dart';
+import 'package:snapid/models/photo_creation/photo_creation_model.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
@@ -20,8 +22,6 @@ import 'package:snapid/utlis/custom_outline_button.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
 import 'package:snapid/utlis/screenBg.dart';
 import 'package:snapid/view/photo_session/cached_image.dart';
-
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:snapid/utlis/image_utlis/download_helper.dart';
 import 'package:snapid/view/photo_session/steps/selected_details_widget.dart';
 
@@ -38,8 +38,9 @@ class _PhotoPreviewState extends State<PhotoPreview> {
   @override
   Widget build(BuildContext context) {
     final PhotoController controller = Get.find<PhotoController>();
-    var proccessdIMG = appStorage.read("processed_img") ?? "";
-    print(proccessdIMG);
+    var processedIMG = appStorage.read("photoSession");
+    var imageData = PhotoCreationModel.fromJson(processedIMG);
+
     final token = appStorage.read("token");
 
     return PopScope(
@@ -65,7 +66,6 @@ class _PhotoPreviewState extends State<PhotoPreview> {
                           constraints: const BoxConstraints(maxWidth: 600),
                           margin: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 30),
-                          // padding: const EdgeInsets.only(top: 50),
                           decoration: BoxDecoration(
                             borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(30),
@@ -73,8 +73,8 @@ class _PhotoPreviewState extends State<PhotoPreview> {
                             ),
                             color: AppColors.cardColor,
                           ),
-                          child: _buildMainContent(
-                              controller, width, proccessdIMG),
+                          child:
+                              _buildMainContent(controller, width, imageData),
                         ),
                       ),
                       Positioned(
@@ -106,15 +106,16 @@ class _PhotoPreviewState extends State<PhotoPreview> {
                   );
                 } else {
                   // Mobile layout
+                  // Mobile layout
                   return SafeArea(
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          SpaceH40(),
+                          SpaceH20(),
                           Center(
                             child: Container(
-                              width: 280,
-                              height: 300,
+                              // width: 400,
+                              height: 280, // slightly taller
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -123,28 +124,82 @@ class _PhotoPreviewState extends State<PhotoPreview> {
                                         .photoCreationModelData
                                         .value
                                         ?.processedImageUrl ??
-                                    proccessdIMG ??
+                                    imageData.processedImageUrl ??
                                     "";
+
                                 if (imageUrl.isEmpty) {
                                   return Center(
-                                    child: Container(
-                                      width: 350,
-                                      height: 250,
-                                      child: Image.asset(Assets.demoResult2),
+                                    child: Image.asset(
+                                      Assets.demoResult2,
+                                      width: 280,
+                                      height: 200,
+                                      fit: BoxFit.cover,
                                     ),
                                   );
                                 } else {
-                                  return Center(
-                                    child: Container(
-                                      width: 230,
-                                      height: 300,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
+                                  return Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // Left: Big image
+                                      Container(
+                                        width: 200,
+                                        height: 240,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        clipBehavior: Clip.hardEdge,
+                                        child: CustomCachedImage(
+                                          imageUrl: imageUrl,
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
-                                      child: CustomCachedImage(
-                                        imageUrl: imageUrl,
+                                      const SizedBox(width: 10),
+                                      // Right: 4 images in 2x2 grid
+                                      Container(
+                                        width: 200, // larger than before
+                                        height: 240,
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 15, horizontal: 15),
+                                        decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(10)),
+                                        child: GridView.builder(
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          gridDelegate:
+                                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: 2,
+                                            crossAxisSpacing: 8,
+                                            mainAxisSpacing: 8,
+                                            childAspectRatio:
+                                                0.8, // taller thumbnails
+                                          ),
+                                          itemCount: 4,
+                                          itemBuilder: (context, index) {
+                                            return Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                border: Border.all(
+                                                    color: Colors.black26,
+                                                    width: 2),
+                                              ),
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(
+                                                    8), // same radius as the border
+                                                child: CustomCachedImage(
+                                                  imageUrl: imageUrl,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   );
                                 }
                               }),
@@ -152,14 +207,14 @@ class _PhotoPreviewState extends State<PhotoPreview> {
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 40),
+                                horizontal: 20, vertical: 30),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 _buildActionButtons(
                                     controller,
                                     MediaQuery.of(context).size.width,
-                                    proccessdIMG),
+                                    imageData),
                                 SpaceH20(),
                                 Text(
                                   "You can download this Image",
@@ -170,7 +225,11 @@ class _PhotoPreviewState extends State<PhotoPreview> {
                                   ),
                                 ),
                                 SpaceH20(),
-                                SelectedDetailsWidget(controller: controller),
+                                SelectedDetailsWidget(
+                                  isPreview: true,
+                                  controller: controller,
+                                  imageData: imageData,
+                                ),
                                 SpaceH20(),
                                 CustomElevatedButton(
                                   onPressed: () {
@@ -201,7 +260,7 @@ class _PhotoPreviewState extends State<PhotoPreview> {
   }
 
   Widget _buildMainContent(
-      PhotoController controller, double width, String proccessdIMG) {
+      PhotoController controller, double width, PhotoCreationModel imageData) {
     return Column(
       children: [
         Expanded(
@@ -212,19 +271,20 @@ class _PhotoPreviewState extends State<PhotoPreview> {
                 SpaceH20(),
                 Center(
                   child: Container(
-                    width: 350,
-                    height: 250,
+                    width: 500,
+                    height: 300, // total height for both sides
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Obx(() {
                       final imageUrl = controller.photoCreationModelData.value
                               ?.processedImageUrl ??
-                          proccessdIMG ??
+                          imageData.processedImageUrl ??
                           "";
+
                       if (imageUrl.isEmpty) {
                         return Center(
-                          child: Container(
+                          child: SizedBox(
                             width: 350,
                             height: 200,
                             child: Image.asset(
@@ -234,17 +294,60 @@ class _PhotoPreviewState extends State<PhotoPreview> {
                           ),
                         );
                       } else {
-                        return Center(
-                          child: Container(
-                            width: 230,
-                            height: 300,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Left: Big image
+                            Container(
+                              width: 240,
+                              height: 290,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              clipBehavior: Clip.hardEdge,
+                              child: CustomCachedImage(
+                                imageUrl: imageUrl,
+                              ),
                             ),
-                            child: CustomCachedImage(
-                              imageUrl: imageUrl,
+                            const SizedBox(width: 12),
+                            // Right: 4 images in 2x2 grid
+                            Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10)),
+                              width: 230,
+                              height: 290,
+                              child: GridView.builder(
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 8,
+                                  mainAxisSpacing: 8,
+                                  childAspectRatio: 0.79,
+                                  // < 1 makes cells taller, so the grid fills height
+                                ),
+                                itemCount: 4,
+                                itemBuilder: (context, index) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                          color: Colors.black26, width: 2),
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(
+                                          8), // same radius as the border
+                                      child: CustomCachedImage(
+                                        imageUrl: imageUrl,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
-                          ),
+                          ],
                         );
                       }
                     }),
@@ -256,7 +359,7 @@ class _PhotoPreviewState extends State<PhotoPreview> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildActionButtons(controller, width, proccessdIMG),
+                      _buildActionButtons(controller, width, imageData),
                       SpaceH20(),
                       Text(
                         "You can download this Image",
@@ -267,7 +370,11 @@ class _PhotoPreviewState extends State<PhotoPreview> {
                         ),
                       ),
                       SpaceH20(),
-                      SelectedDetailsWidget(controller: controller),
+                      SelectedDetailsWidget(
+                        isPreview: true,
+                        controller: controller,
+                        imageData: imageData,
+                      ),
                       SpaceH20(),
                       CustomElevatedButton(
                         onPressed: () {
@@ -289,7 +396,7 @@ class _PhotoPreviewState extends State<PhotoPreview> {
   }
 
   Widget _buildActionButtons(
-      PhotoController controller, double width, String proccessdIMG) {
+      PhotoController controller, double width, PhotoCreationModel imageData) {
     final isWide = width >= 800;
 
     final downloadButton = _isSaving
@@ -303,7 +410,7 @@ class _PhotoPreviewState extends State<PhotoPreview> {
               if (_isSaving) return;
               final url =
                   controller.photoCreationModelData.value?.processedImageUrl ??
-                      proccessdIMG ??
+                      imageData.processedImageUrl ??
                       "";
               if (url.isNotEmpty) {
                 setState(() => _isSaving = true);
@@ -316,33 +423,37 @@ class _PhotoPreviewState extends State<PhotoPreview> {
             minHeight: 60,
           );
 
-    final shareButton = CustomOutlineButton(
-      onPressed: () async {
-        final url =
-            controller.photoCreationModelData.value?.processedImageUrl ?? "";
-        if (url.isNotEmpty) {
-          await shareImage(url);
-        }
-      },
-      label: "Share",
-      minHeight: 60,
-    );
+    // Only show Share button when running on Web
+    final shareButton = !kIsWeb
+        ? CustomOutlineButton(
+            onPressed: () async {
+              final url =
+                  controller.photoCreationModelData.value?.processedImageUrl ??
+                      "";
+              if (url.isNotEmpty) {
+                await shareImage(url);
+              }
+            },
+            label: "Share",
+            minHeight: 60,
+          )
+        : const SizedBox.shrink();
 
     if (isWide) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Expanded(child: downloadButton),
-          const SizedBox(width: 20),
-          Expanded(child: shareButton),
+          if (kIsWeb) const SizedBox(width: 20),
+          if (!kIsWeb) Expanded(child: shareButton),
         ],
       );
     } else {
       return Column(
         children: [
           downloadButton,
-          const SizedBox(height: 20),
-          shareButton,
+          if (kIsWeb) const SizedBox(height: 20),
+          if (!kIsWeb) shareButton,
         ],
       );
     }
@@ -380,8 +491,6 @@ class _PhotoPreviewState extends State<PhotoPreview> {
 
       if (status.isGranted || status.isLimited) {
         final now = DateTime.now();
-        // final formattedDate =
-        //     "${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}";
         final fileName = "snapid_image_${now.millisecondsSinceEpoch}.jpg";
 
         final tempDir = await getTemporaryDirectory();
@@ -431,7 +540,6 @@ class _PhotoPreviewState extends State<PhotoPreview> {
         );
       }
     } catch (e) {
-      print("Error saving image: $e");
       Get.snackbar(
         "Error",
         "Error saving image: $e",

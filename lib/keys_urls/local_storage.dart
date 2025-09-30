@@ -8,7 +8,7 @@ import 'package:snapid/models/user/user_model.dart';
 class LocalStorage {
 
   String getBearerToken() {
-    final token = appStorage.read('userToken');
+    final token = appStorage.read('token');
     return token != null ? '$token' : '';
   }
 
@@ -35,4 +35,7 @@ class LocalStorage {
     }
     return null;
   }
+  
+  
+
 }

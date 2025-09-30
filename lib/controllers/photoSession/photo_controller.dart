@@ -18,68 +18,89 @@ import 'package:snapid/routes/routes.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
 import 'package:snapid/utlis/custom_outline_button.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
-import 'package:crypto/crypto.dart'; // Add this dependency to pubspec.yaml
+import 'package:crypto/crypto.dart';
 
 enum DocumentType { passport, visa, drivingLicense, manually }
 
 enum Unit { cm, inch }
 
 class PhotoController extends GetxController {
-  PhotoCreationRepository photoCreationRepository = PhotoCreationRepository();
-  AuthRespository authRespository = AuthRespository();
-  TextEditingController searchController = TextEditingController();
+  final PhotoCreationRepository photoCreationRepository =
+      PhotoCreationRepository();
+  final AuthRespository authRespository = AuthRespository();
+  final CountriesRepository countriesRepository = CountriesRepository();
+  final ImagePicker _picker = ImagePicker();
+
+  final TextEditingController searchController = TextEditingController();
+  final TextEditingController widthController = TextEditingController();
+  final TextEditingController heightController = TextEditingController();
+
   Timer? _debounceTimer;
 
-  final CountriesRepository countriesRepository = CountriesRepository();
+  // Reactive variables
+  final RxInt currentStep = 1.obs;
+  final Rx<Unit> selectedUnit = Unit.cm.obs;
+  final Rx<DocumentType> selectedType = DocumentType.visa.obs;
+  final Rxn<Country> selectedCountry = Rxn<Country>();
+  final RxBool canDownload = false.obs;
+  final RxList<Country> countries = <Country>[].obs;
+  final RxString selectedPackage = "".obs;
+  final RxBool isLoading = false.obs;
+  final RxBool isUserLoading = false.obs;
+  final RxBool countryLoads = false.obs;
+  final Rxn<PhotoCreationModel> photoCreationModelData =
+      Rxn<PhotoCreationModel>();
+  final RxString processedWatermarkedUrl = ''.obs;
+  final RxString sessionId = ''.obs;
+  final RxBool isProcessingLoading = false.obs;
+  final RxList<ImageProvider> selectedPhotos = <ImageProvider>[].obs;
+  final RxList<XFile> capturedPhotos = <XFile>[].obs;
+  final RxString searchQuery = ''.obs;
+  final RxBool isCapturingPhotos = false.obs;
+  final RxString manualSize = "".obs;
 
-  RxInt currentStep = 1.obs;
-  var selectedUnit = Unit.cm.obs;
-  var selectedType = DocumentType.visa.obs;
-  var selectedCountry = Rxn<Country>();
-  final canDownload = false.obs;
-  var countries = <Country>[].obs;
-
-  var selectedPackage = "".obs;
-
-  final isLoading = false.obs;
-  final countryLoads = false.obs;
-  var photoCreationModelData = Rxn<PhotoCreationModel>();
-  var processedWatermarkedUrl = ''.obs;
-  var sessionId = ''.obs;
-
-  final isProcessingLoading = false.obs;
-  TextEditingController widthController = TextEditingController();
-  TextEditingController heightController = TextEditingController();
-
-  /// Updated: Use XFile for cross-platform
-  final selectedPhotos = <ImageProvider>[].obs;
-  final capturedPhotos = <XFile>[].obs;
-  var searchQuery = ''.obs;
-
-  // NEW: Set to store image hashes for duplicate detection
-  final _imageHashes = <String>{};
-
-  final ImagePicker _picker = ImagePicker();
-  final isCapturingPhotos = false.obs;
-  var manualSize = "".obs;
-
+  // Image hash tracking for duplicate detection
+  final Set<String> _imageHashes = <String>{};
+  final token = appStorage.read("token");
 
   @override
   void onInit() {
     super.onInit();
-    // NEW: Handle URL parameters on web
+
     if (kIsWeb) {
+      if (token != null) {
+        getUserDetails();
+      }
       _handleUrlParameters();
       _loadSavedImages();
     }
-    initSearchListener();
-  widthController.addListener(_updateManualSize);
-  heightController.addListener(_updateManualSize);
-}
 
-void _updateManualSize() {
-  manualSize.value = "${widthController.text} X ${heightController.text}";
-}
+    initSearchListener();
+    widthController.addListener(_updateManualSize);
+    heightController.addListener(_updateManualSize);
+  }
+
+  @override
+  void dispose() {
+    // Proper cleanup to prevent memory leaks
+    _debounceTimer?.cancel();
+    // searchController.dispose();
+    widthController.dispose();
+    heightController.dispose();
+    super.dispose();
+  }
+
+  void _updateManualSize() {
+    final width = widthController.text.trim();
+    final height = heightController.text.trim();
+
+    if (width.isNotEmpty && height.isNotEmpty) {
+      manualSize.value = "$width X $height";
+    } else {
+      manualSize.value = "";
+    }
+  }
+
   void initSearchListener() {
     searchController.addListener(() {
       _onSearchChanged(searchController.text);
@@ -87,10 +108,8 @@ void _updateManualSize() {
   }
 
   void _onSearchChanged(String query) {
-    // Cancel previous timer
-    if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
+    _debounceTimer?.cancel();
 
-    // Start new timer
     _debounceTimer = Timer(const Duration(milliseconds: 500), () {
       if (searchQuery.value != query) {
         searchQuery.value = query;
@@ -111,11 +130,9 @@ void _updateManualSize() {
   }
 
   Future<void> fetchCountries({bool isRefresh = false}) async {
-  
-  
-
     try {
       countryLoads.value = true;
+
       final result = await countriesRepository.getCountries(
           page: 1, pageSize: 20, searchQuery: searchQuery.value);
 
@@ -125,74 +142,86 @@ void _updateManualSize() {
               backgroundColor: Colors.redAccent, colorText: Colors.white);
         },
         (success) {
-          countries.value =success.countries;
+          countries.value = success.countries;
         },
       );
     } catch (e) {
-      Get.snackbar("Error", "Failed to fetch countries",
+      Get.snackbar("Error", "Failed to fetch countries: ${e.toString()}",
           backgroundColor: Colors.redAccent, colorText: Colors.white);
     } finally {
       countryLoads.value = false;
     }
   }
 
-  /// NEW: Generate hash for image content to detect duplicates
+  /// Generate hash for image content to detect duplicates
   Future<String> _generateImageHash(XFile imageFile) async {
     try {
       final bytes = await imageFile.readAsBytes();
       final digest = sha256.convert(bytes);
       return digest.toString();
     } catch (e) {
-      print('Error generating image hash: $e');
-      // Fallback to file path or name if hashing fails
-      return imageFile.path.isNotEmpty ? imageFile.path : imageFile.name;
+      debugPrint('Error generating image hash: $e');
+      // Fallback to timestamp-based identifier
+      return '${imageFile.name}_${DateTime.now().millisecondsSinceEpoch}';
     }
   }
 
-  /// NEW: Check if image is duplicate
+  /// Check if image is duplicate
   Future<bool> _isDuplicateImage(XFile imageFile) async {
     final hash = await _generateImageHash(imageFile);
     return _imageHashes.contains(hash);
   }
 
-  /// NEW: Add image hash to tracking set
+  /// Add image hash to tracking set
   Future<void> _addImageHash(XFile imageFile) async {
     final hash = await _generateImageHash(imageFile);
     _imageHashes.add(hash);
   }
 
-  /// NEW: Handle URL parameters and set step accordingly
+  /// Remove image hash when photo is deleted
+  Future<void> _removeImageHash(XFile imageFile) async {
+    try {
+      final hash = await _generateImageHash(imageFile);
+      _imageHashes.remove(hash);
+    } catch (e) {
+      debugPrint('Error removing image hash: $e');
+    }
+  }
+
+  /// Handle URL parameters and set step accordingly
   void _handleUrlParameters() {
     if (!kIsWeb) return;
 
     try {
-      // Get step parameter from URL
       String? stepParam = Get.parameters['step'];
 
       if (stepParam != null) {
         int? step = int.tryParse(stepParam);
         if (step != null && step >= 1 && step <= 4) {
           currentStep.value = step;
-          print('Set current step to $step from URL parameter');
+          debugPrint('Set current step to $step from URL parameter');
 
-          // Load session data if we're on step 2 or higher
           if (step > 1) {
             _loadSessionDataFromStorage();
           }
         } else {
-          print('⚠️ Invalid step parameter: $stepParam, defaulting to step 1');
+          debugPrint(
+              '⚠️ Invalid step parameter: $stepParam, defaulting to step 1');
           currentStep.value = 1;
         }
       }
     } catch (e) {
-      print('❌ Error handling URL parameters: $e');
+      debugPrint('❌ Error handling URL parameters: $e');
       currentStep.value = 1;
     }
   }
 
   void _loadSessionDataFromStorage() {
+    if (!kIsWeb) return;
+
     try {
       Map<String, dynamic>? sessionData = appStorage.read('photoSession');
+
       if (sessionData != null) {
         photoCreationModelData.value = PhotoCreationModel.fromJson(sessionData);
         processedWatermarkedUrl.value =
@@ -201,13 +230,13 @@ void _updateManualSize() {
 
         String? countryCode = appStorage.read('selectedCountryCode');
         if (countryCode != null) {
-          print('Loaded country code: $countryCode');
+          debugPrint('Loaded country code: $countryCode');
         }
 
-        print('Loaded session data from storage');
+        debugPrint('✅ Loaded session data from storage');
       }
     } catch (e) {
-      print('❌ Error loading session data: $e');
+      debugPrint('❌ Error loading session data: $e');
     }
   }
 
@@ -222,9 +251,7 @@ void _updateManualSize() {
         parameters: {"step": "$step"},
       );
     } else {
-      Get.toNamed(
-        PrimaryRoute.photo_creation,
-      );
+      Get.toNamed(PrimaryRoute.photo_creation);
     }
   }
 
@@ -240,20 +267,20 @@ void _updateManualSize() {
         imageDataList.add(base64String);
       }
 
-      // Save to appStorage
       await appStorage.write('saved_images', imageDataList);
       await appStorage.write(
           'images_timestamp', DateTime.now().millisecondsSinceEpoch);
 
-      print('Saved ${imageDataList.length} images to localStorage');
+      debugPrint('✅ Saved ${imageDataList.length} images to localStorage');
     } catch (e) {
-      print('Error saving images to localStorage: $e');
+      debugPrint('❌ Error saving images to localStorage: $e');
+
       Get.snackbar(
         'Storage Warning',
         'Could not save images locally. They will be lost if you refresh the page.',
         backgroundColor: AppColors.orange,
         colorText: AppColors.whiteColor,
-        duration: Duration(seconds: 3),
+        duration: const Duration(seconds: 3),
       );
     }
   }
@@ -266,40 +293,44 @@ void _updateManualSize() {
       int? timestamp = appStorage.read('images_timestamp');
 
       if (savedImages != null && timestamp != null) {
-        // Check if images are less than 1 hour old (optional expiry)
-        int hoursSinceStored =
-            DateTime.now().millisecondsSinceEpoch - timestamp;
-        if (hoursSinceStored > 3600000) {
-          // 1 hour in milliseconds
+        // Check if images are less than 1 hour old
+        int timeDiff = DateTime.now().millisecondsSinceEpoch - timestamp;
+
+        if (timeDiff > 3600000) {
           await _clearStoredImages();
           return;
         }
 
         selectedPhotos.clear();
         capturedPhotos.clear();
-        _imageHashes.clear(); // Clear hash tracking
+        _imageHashes.clear();
 
-        for (String base64String in savedImages) {
-          Uint8List bytes = base64Decode(base64String);
+        for (var item in savedImages) {
+          if (item is! String) continue;
 
-          // Create XFile from bytes (web-compatible)
-          XFile webFile = XFile.fromData(
-            bytes,
-            name: 'saved_image_${DateTime.now().millisecondsSinceEpoch}.jpg',
-            mimeType: 'image/jpeg',
-          );
+          try {
+            Uint8List bytes = base64Decode(item);
 
-          capturedPhotos.add(webFile);
-          selectedPhotos.add(MemoryImage(bytes));
+            XFile webFile = XFile.fromData(
+              bytes,
+              name: 'saved_image_${DateTime.now().millisecondsSinceEpoch}.jpg',
+              mimeType: 'image/jpeg',
+            );
 
-          // Add hash for loaded images
-          await _addImageHash(webFile);
+            capturedPhotos.add(webFile);
+            selectedPhotos.add(MemoryImage(bytes));
+            await _addImageHash(webFile);
+          } catch (e) {
+            debugPrint('Error loading individual image: $e');
+            continue;
+          }
         }
 
-        print('Loaded ${savedImages.length} images from localStorage');
+        debugPrint(
+            '✅ Loaded ${capturedPhotos.length} images from localStorage');
       }
     } catch (e) {
-      print('❌ Error loading saved images: $e');
+      debugPrint('❌ Error loading saved images: $e');
       await _clearStoredImages();
     }
   }
@@ -307,9 +338,13 @@ void _updateManualSize() {
   Future<void> _clearStoredImages() async {
     if (!kIsWeb) return;
 
-    await appStorage.remove('saved_images');
-    await appStorage.remove('images_timestamp');
-    print('🗑️ Cleared stored images from localStorage');
+    try {
+      await appStorage.remove('saved_images');
+      await appStorage.remove('images_timestamp');
+      debugPrint('🗑️ Cleared stored images from localStorage');
+    } catch (e) {
+      debugPrint('Error clearing stored images: $e');
+    }
   }
 
   Future<void> onContinuePressed() async {
@@ -326,7 +361,6 @@ void _updateManualSize() {
       return;
     }
 
-    // Save images to localStorage on web
     if (kIsWeb) {
       await _saveImagesToStorage();
     }
@@ -343,39 +377,50 @@ void _updateManualSize() {
       processedWatermarkedUrl.value = '';
       sessionId.value = '';
 
-      // Clear stored images when starting fresh
       if (kIsWeb) {
         _clearStoredImages();
       }
     }
 
-    // Handle URL parameters even when initializing
     if (kIsWeb) {
       _handleUrlParameters();
     }
   }
 
   Future<void> getUserDetails() async {
-    await authRespository.getUserDetails().then((response) => response.fold(
-          (error) {
-            Get.snackbar("Error", error);
-            update();
-          },
-          (success) {
-            if (success.credits != 0) {
-              canDownload.value = true;
-              DashboardController dashboardController =
-                  Get.find<DashboardController>();
+    try {
+      isUserLoading.value = true;
+      final response = await authRespository.getUserDetails();
+
+      response.fold(
+        (error) {
+          Get.snackbar("Error", error);
+          isUserLoading.value = false;
+        },
+        (success) {
+          if (success.credits != 0) {
+            canDownload.value = true;
+            isUserLoading.value = false;
+
+            try {
+              final dashboardController = Get.find<DashboardController>();
               dashboardController.refreshUser();
+            } catch (e) {
+              debugPrint('DashboardController not found: $e');
             }
-          },
-        ));
+          }
+        },
+      );
+    } catch (e) {
+      debugPrint('Error getting user details: $e');
+    } finally {
+      isUserLoading.value = false;
+    }
   }
 
   void selectCountry(Country country) {
     selectedCountry.value = country;
 
-    // Save country selection to storage for web
     if (kIsWeb) {
       appStorage.write('selectedCountryCode', country.code);
       appStorage.write('selectedCountryName', country.name);
@@ -387,7 +432,6 @@ void _updateManualSize() {
   void changeType(DocumentType type) {
     selectedType.value = type;
 
-    // Save document type to storage for web
     if (kIsWeb) {
       appStorage.write('selectedDocumentType', type.toString());
     }
@@ -398,9 +442,10 @@ void _updateManualSize() {
   }
 
   void setStep(int step) {
+    if (step < 1 || step > 4) return;
+
     currentStep.value = step;
 
-    // Update URL on web
     if (kIsWeb) {
       navigateToStep(step);
     }
@@ -409,8 +454,11 @@ void _updateManualSize() {
   Future<void> goToNextStep() async {
     final token = appStorage.read("token")?.toString() ?? "";
 
-    if (currentStep.value < 4) {
-      if (currentStep.value == 2 && selectedCountry.value == null) {
+    if (currentStep.value >= 4) return;
+
+    // Step 2 validation
+    if (currentStep.value == 2) {
+      if (selectedCountry.value == null) {
         Get.snackbar(
           'Missing Information',
           'Please select a country before proceeding.',
@@ -420,60 +468,65 @@ void _updateManualSize() {
         return;
       }
 
-      if (currentStep.value == 2 && selectedCountry.value != null) {
-        if (capturedPhotos.isEmpty) {
-          Get.snackbar(
-            'Missing Photos',
-            'Please capture some photos before proceeding.',
-            backgroundColor: AppColors.red,
-            colorText: AppColors.whiteColor,
-          );
-          return;
-        }
-        print("Creating photo session...");
-
-        if (token.isNotEmpty) {
-          bool success = await createSession();
-          if (!success) return;
-        } else {
-          final guestId = appStorage.read("guest_id");
-          print(guestId);
-          if (guestId == null) {
-            await authRespository.createGuestUser().then((response) {
-              response.fold((error) {
-                Get.snackbar(
-                  'Error',
-                  'Could not create guest user: $error',
-                  backgroundColor: AppColors.red,
-                  colorText: AppColors.whiteColor,
-                );
-                return;
-              }, (success) {});
-            });
-          }
-
-          bool success = await createSession();
-          if (!success) return;
-        }
-        print(
-            "Reviewing photos... ${photoCreationModelData.value?.processedWatermarkedUrl}");
-
-        navigateToStep(3);
+      if (capturedPhotos.isEmpty) {
+        Get.snackbar(
+          'Missing Photos',
+          'Please capture some photos before proceeding.',
+          backgroundColor: AppColors.red,
+          colorText: AppColors.whiteColor,
+        );
         return;
       }
 
-      if (currentStep.value == 3) {
-        if (photoCreationModelData.value?.canDownloadImage == true) {
-          await downloadImageById(photoCreationModelData.value!.id);
-          return; // stop here
-        } else {
-          navigateToStep(4);
-          return;
+      debugPrint("Creating photo session...");
+
+      if (token.isNotEmpty) {
+        bool success = await createSession();
+        if (!success) return;
+      } else {
+        final guestId = appStorage.read("guest_id");
+
+        if (guestId == null) {
+          final guestResponse = await authRespository.createGuestUser();
+
+          bool guestCreated = false;
+          guestResponse.fold((error) {
+            Get.snackbar(
+              'Error',
+              'Could not create guest user: $error',
+              backgroundColor: AppColors.red,
+              colorText: AppColors.whiteColor,
+            );
+          }, (success) {
+            guestCreated = true;
+          });
+
+          if (!guestCreated) return;
         }
+
+        bool success = await createSession();
+        if (!success) return;
       }
 
-      navigateToStep(currentStep.value + 1);
+      navigateToStep(3);
+      return;
     }
+
+    // Step 3 handling
+    if (currentStep.value == 3) {
+      if (photoCreationModelData.value?.canDownloadImage == true) {
+        final id = photoCreationModelData.value?.id;
+        if (id != null && id.isNotEmpty) {
+          await downloadImageById(id);
+        }
+        return;
+      } else {
+        navigateToStep(4);
+        return;
+      }
+    }
+
+    navigateToStep(currentStep.value + 1);
   }
 
   void goToPreviousStep() {
@@ -483,9 +536,20 @@ void _updateManualSize() {
   }
 
   Future<void> downloadImageById(String id) async {
-    isLoading.value = true;
+    if (id.isEmpty) {
+      Get.snackbar(
+        'Error',
+        'Invalid image ID',
+        backgroundColor: AppColors.red,
+        colorText: AppColors.whiteColor,
+      );
+      return;
+    }
 
-    await photoCreationRepository.downloadImage(id: id).then((response) {
+    try {
+      isLoading.value = true;
+
+      final response = await photoCreationRepository.downloadImage(id: id);
       final token = appStorage.read("token");
 
       response.fold((error) {
@@ -495,87 +559,123 @@ void _updateManualSize() {
           backgroundColor: AppColors.red,
           colorText: AppColors.whiteColor,
         );
-        isLoading.value = false;
       }, (photoCreationModel) {
-        isLoading.value = false;
         photoCreationModelData.value = photoCreationModel;
-        appStorage.write("processed_img", photoCreationModel.processedImageUrl);
+        appStorage.write("processed_img", photoCreationModel);
         _storeSessionData(photoCreationModel);
 
         if (token != null) {
           getUserDetails();
         }
+
         Get.toNamed(PrimaryRoute.photo_preview);
       });
-    });
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to download image: ${e.toString()}',
+        backgroundColor: AppColors.red,
+        colorText: AppColors.whiteColor,
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   Future<void> pickImages({bool allowMultiple = false}) async {
-    if (selectedPhotos.length >= 5) return;
+    if (selectedPhotos.length >= 5) {
+      Get.snackbar(
+        'Limit Reached',
+        'You can only select up to 5 photos.',
+        backgroundColor: AppColors.orange,
+        colorText: AppColors.whiteColor,
+      );
+      return;
+    }
 
-    if (allowMultiple) {
-      // Pick multiple images
-      final List<XFile>? pickedFiles = await _picker.pickMultiImage();
-      if (pickedFiles != null && pickedFiles.isNotEmpty) {
-        int duplicatesSkipped = 0;
+    try {
+      if (allowMultiple) {
+        final List<XFile>? pickedFiles = await _picker.pickMultiImage();
 
-        for (final file in pickedFiles) {
-          if (capturedPhotos.length >= 5) break; // cap at 5
+        if (pickedFiles != null && pickedFiles.isNotEmpty) {
+          int duplicatesSkipped = 0;
+          int limitReached = 0;
 
-          // Check for duplicate before adding
-          if (await _isDuplicateImage(file)) {
-            duplicatesSkipped++;
-            continue;
+          for (final file in pickedFiles) {
+            if (capturedPhotos.length >= 5) {
+              limitReached = pickedFiles.length - capturedPhotos.length;
+              break;
+            }
+
+            if (await _isDuplicateImage(file)) {
+              duplicatesSkipped++;
+              continue;
+            }
+
+            capturedPhotos.add(file);
+            await _addImageHash(file);
+
+            if (kIsWeb) {
+              Uint8List bytes = await file.readAsBytes();
+              selectedPhotos.add(MemoryImage(bytes));
+            } else {
+              selectedPhotos.add(FileImage(File(file.path)));
+            }
           }
 
-          capturedPhotos.add(file);
-          await _addImageHash(file); // Track the hash
+          if (duplicatesSkipped > 0) {
+            Get.snackbar(
+              'Duplicate Images Skipped',
+              '$duplicatesSkipped duplicate image${duplicatesSkipped > 1 ? 's were' : ' was'} skipped.',
+              backgroundColor: AppColors.orange,
+              colorText: AppColors.whiteColor,
+              duration: const Duration(seconds: 3),
+            );
+          }
+
+          if (limitReached > 0) {
+            Get.snackbar(
+              'Photo Limit Reached',
+              '$limitReached photo${limitReached > 1 ? 's were' : ' was'} not added (limit: 5 photos).',
+              backgroundColor: AppColors.orange,
+              colorText: AppColors.whiteColor,
+              duration: const Duration(seconds: 3),
+            );
+          }
+        }
+      } else {
+        final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+        if (pickedFile != null) {
+          if (await _isDuplicateImage(pickedFile)) {
+            Get.snackbar(
+              'Duplicate Image',
+              'This image has already been selected.',
+              backgroundColor: AppColors.orange,
+              colorText: AppColors.whiteColor,
+              duration: const Duration(seconds: 2),
+            );
+            return;
+          }
+
+          capturedPhotos.add(pickedFile);
+          await _addImageHash(pickedFile);
 
           if (kIsWeb) {
-            Uint8List bytes = await file.readAsBytes();
+            Uint8List bytes = await pickedFile.readAsBytes();
             selectedPhotos.add(MemoryImage(bytes));
           } else {
-            selectedPhotos.add(Image.file(File(file.path)).image);
+            selectedPhotos.add(FileImage(File(pickedFile.path)));
           }
         }
-
-        // Show message if duplicates were found
-        if (duplicatesSkipped > 0) {
-          Get.snackbar(
-            'Duplicate Images Skipped',
-            '$duplicatesSkipped duplicate image${duplicatesSkipped > 1 ? 's were' : ' was'} skipped.',
-            backgroundColor: AppColors.orange,
-            colorText: AppColors.whiteColor,
-            duration: Duration(seconds: 3),
-          );
-        }
       }
-    } else {
-      // Pick a single image
-      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-      if (pickedFile != null) {
-        // Check for duplicate before adding
-        if (await _isDuplicateImage(pickedFile)) {
-          Get.snackbar(
-            'Duplicate Image',
-            'This image has already been selected.',
-            backgroundColor: AppColors.orange,
-            colorText: AppColors.whiteColor,
-            duration: Duration(seconds: 2),
-          );
-          return;
-        }
-
-        capturedPhotos.add(pickedFile);
-        await _addImageHash(pickedFile); // Track the hash
-
-        if (kIsWeb) {
-          Uint8List bytes = await pickedFile.readAsBytes();
-          selectedPhotos.add(MemoryImage(bytes));
-        } else {
-          selectedPhotos.add(Image.file(File(pickedFile.path)).image);
-        }
-      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to pick images: ${e.toString()}',
+        backgroundColor: AppColors.red,
+        colorText: AppColors.whiteColor,
+      );
     }
   }
 
@@ -584,7 +684,7 @@ void _updateManualSize() {
       isCapturingPhotos.value = true;
       capturedPhotos.clear();
       selectedPhotos.clear();
-      _imageHashes.clear(); // Clear hash tracking when starting fresh
+      _imageHashes.clear();
 
       int photoCount = 0;
       bool shouldContinue = true;
@@ -595,28 +695,25 @@ void _updateManualSize() {
         );
 
         if (pickedFile != null) {
-          // Check for duplicate (though unlikely with camera captures)
           if (await _isDuplicateImage(pickedFile)) {
             Get.snackbar(
               'Duplicate Photo',
               'This photo appears to be identical to a previous one. Please take a different photo.',
               backgroundColor: AppColors.orange,
               colorText: AppColors.whiteColor,
-              duration: Duration(seconds: 3),
+              duration: const Duration(seconds: 3),
             );
-            continue; // Don't increment photoCount, try again
+            continue;
           }
 
           capturedPhotos.add(pickedFile);
-          await _addImageHash(pickedFile); // Track the hash
+          await _addImageHash(pickedFile);
 
           if (kIsWeb) {
             Uint8List bytes = await pickedFile.readAsBytes();
             selectedPhotos.add(MemoryImage(bytes));
           } else {
-            selectedPhotos.add(Image.file(
-              File(pickedFile.path),
-            ).image);
+            selectedPhotos.add(FileImage(File(pickedFile.path)));
           }
 
           photoCount++;
@@ -640,7 +737,7 @@ void _updateManualSize() {
     } catch (e) {
       Get.snackbar(
         'Error',
-        'Failed to capture photos: $e',
+        'Failed to capture photos: ${e.toString()}',
         backgroundColor: AppColors.red,
         colorText: AppColors.whiteColor,
       );
@@ -652,7 +749,6 @@ void _updateManualSize() {
   Future<bool> createSession() async {
     try {
       isProcessingLoading.value = true;
-      isLoading.value = false;
 
       if (capturedPhotos.isEmpty) {
         Get.snackbar(
@@ -664,7 +760,7 @@ void _updateManualSize() {
         return false;
       }
 
-      if (selectedCountry.value?.code == null ||
+      if (selectedCountry.value == null ||
           selectedCountry.value!.code.isEmpty) {
         Get.snackbar(
           'Error',
@@ -686,12 +782,13 @@ void _updateManualSize() {
 
       return response.fold(
         (error) {
+          print("object");
           Get.snackbar(
             'Upload Failed',
             error,
             backgroundColor: AppColors.red,
             colorText: AppColors.whiteColor,
-            duration: Duration(seconds: 4),
+            duration: const Duration(seconds: 4),
           );
           return false;
         },
@@ -714,12 +811,11 @@ void _updateManualSize() {
         'Unexpected error occurred: ${e.toString()}',
         backgroundColor: AppColors.red,
         colorText: AppColors.whiteColor,
-        duration: Duration(seconds: 4),
+        duration: const Duration(seconds: 4),
       );
       return false;
     } finally {
       isProcessingLoading.value = false;
-      isLoading.value = false;
     }
   }
 
@@ -737,7 +833,13 @@ void _updateManualSize() {
   }
 
   void _storeSessionData(PhotoCreationModel model) {
-    appStorage.write('photoSession', model.toJson());
+    if (kIsWeb) {
+      try {
+        appStorage.write('photoSession', model.toJson());
+      } catch (e) {
+        debugPrint('Error storing session data: $e');
+      }
+    }
   }
 
   Future<bool> _showContinueDialog(int currentCount,
@@ -753,7 +855,7 @@ void _updateManualSize() {
             Expanded(
               child: Text(
                 cancelled ? 'Camera Cancelled' : 'Photo Captured',
-                style: TextStyle(color: AppColors.whiteColor),
+                style: const TextStyle(color: Colors.white),
               ),
             ),
             IconButton(
@@ -761,20 +863,22 @@ void _updateManualSize() {
                 shouldContinue = false;
                 Get.back();
               },
-              icon: Icon(
+              icon: const Icon(
                 Icons.close,
-                color: AppColors.whiteColor,
+                color: Colors.white,
                 size: 24,
               ),
               padding: EdgeInsets.zero,
-              constraints: BoxConstraints(),
+              constraints: const BoxConstraints(),
             ),
           ],
         ),
-        titlePadding: EdgeInsets.fromLTRB(24, 20, 16, 0),
+        titlePadding: const EdgeInsets.fromLTRB(24, 20, 16, 0),
         content: Text(
-          'You have taken $currentCount photo${currentCount != 1 ? 's' : ''}. ${cancelled ? 'Do you want to try again or' : 'Do you want to'} continue taking more photos?',
-          style: TextStyle(color: AppColors.whiteColor),
+          'You have taken $currentCount photo${currentCount != 1 ? 's' : ''}. '
+          '${cancelled ? 'Do you want to try again or' : 'Do you want to'} '
+          'continue taking more photos?',
+          style: const TextStyle(color: Colors.white),
         ),
         actions: [
           CustomOutlineButton(
@@ -785,7 +889,7 @@ void _updateManualSize() {
             label:
                 'Proceed with $currentCount photo${currentCount != 1 ? 's' : ''}',
           ),
-          SpaceH12(),
+          const SpaceH12(),
           CustomElevatedButton(
             onPressed: () {
               shouldContinue = true;
@@ -802,8 +906,9 @@ void _updateManualSize() {
   }
 
   void removePhoto(int index) {
+    if (index < 0 || index >= selectedPhotos.length) return;
+
     if (index < capturedPhotos.length) {
-      // Remove hash tracking when photo is removed
       _removeImageHash(capturedPhotos[index]);
       capturedPhotos.removeAt(index);
     }
@@ -811,19 +916,9 @@ void _updateManualSize() {
     selectedPhotos.removeAt(index);
   }
 
-  /// NEW: Remove image hash when photo is deleted
-  Future<void> _removeImageHash(XFile imageFile) async {
-    try {
-      final hash = await _generateImageHash(imageFile);
-      _imageHashes.remove(hash);
-    } catch (e) {
-      print('Error removing image hash: $e');
-    }
-  }
-
   void clearAllPhotos() {
     selectedPhotos.clear();
     capturedPhotos.clear();
-    _imageHashes.clear(); // Clear hash tracking
+    _imageHashes.clear();
   }
 }
