@@ -16,6 +16,7 @@ class PhotoCreationModel {
   final String countryFlag;
   final String size;
   final String createdAt;
+  final List<String> originalImages; // ✅ new field
 
   PhotoCreationModel({
     required this.id,
@@ -35,6 +36,7 @@ class PhotoCreationModel {
     required this.canDownloadImage,
     required this.platform,
     required this.createdAt,
+    this.originalImages = const [], // ✅ default empty list
   });
 
   factory PhotoCreationModel.fromJson(Map<String, dynamic> json) {
@@ -62,6 +64,10 @@ class PhotoCreationModel {
           : json["canDownloadImage"]?.toString().toLowerCase() == "true",
       platform: json["platform"]?.toString() ?? "",
       createdAt: json["createdAt"]?.toString() ?? "",
+      originalImages: (json["originalImages"] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [], // ✅ parse array of URLs
     );
   }
 
@@ -84,6 +90,7 @@ class PhotoCreationModel {
       "platform": platform,
       "createdAt": createdAt,
       "size": size,
+      "originalImages": originalImages, // ✅ include in JSON
     };
   }
 }

@@ -68,20 +68,19 @@ class SelectedDetailsWidget extends StatelessWidget {
     );
   }
 
-  String selectedSize(String type, PhotoController controller) {
-    switch (type) {
-      case "visa":
-        return controller.selectedCountry.value?.visaSize ?? "";
-      case "drivingLicense":
-        return controller.selectedCountry.value?.drivingLicense ?? "";
-      case "passport":
-        return controller.selectedCountry.value?.passportSize ?? "";
-      case "manually":
-        return "${controller.manualSize}";
-      default:
-        return "";
-    }
+  // ✅ Fix: Make selectedSize return String instead of double
+String selectedSize(String type, PhotoController controller) {
+  switch (type) {
+    case "visa":
+      return (controller.selectedCountry.value?.visaSize ?? 0.0).toString();
+    case "drivingLicense":
+      return (controller.selectedCountry.value?.drivingLicense ?? 0.0).toString();
+    case "passport":
+      return (controller.selectedCountry.value?.passportSize ?? 0.0).toString();
+    default:
+      return "0.0";
   }
+}
 
   String formatDocumentName(String name) {
     switch (name) {
@@ -98,52 +97,53 @@ class SelectedDetailsWidget extends StatelessWidget {
     }
   }
 
-  Widget _infoRow(String label, String value, {String? flagPath}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: CustomTextTheme.regular14.copyWith(
-              color: AppColors.whiteColor,
-              fontWeight: FontWeight.w400,
-            ),
+// ✅ Keep _infoRow signature consistent
+Widget _infoRow(String label, String value, {String? flagPath}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 20),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: CustomTextTheme.regular14.copyWith(
+            color: AppColors.whiteColor,
+            fontWeight: FontWeight.w400,
           ),
-          Row(
-            children: [
-              if (flagPath != null && flagPath.isNotEmpty) ...[
-                Container(
-                  width: 30,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: CachedNetworkImage(
-                    imageUrl: flagPath,
-                    fit: BoxFit.cover,
-                    errorWidget: (context, url, error) => Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
+        ),
+        Row(
+          children: [
+            if (flagPath != null && flagPath.isNotEmpty) ...[
+              Container(
+                width: 30,
+                height: 20,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: CachedNetworkImage(
+                  imageUrl: flagPath,
+                  fit: BoxFit.cover,
+                  errorWidget: (context, url, error) => Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.circular(4),
                     ),
                   ),
                 ),
-                SpaceW12(),
-              ],
-              Text(
-                value,
-                style: CustomTextTheme.regular14.copyWith(
-                  color: AppColors.whiteColor,
-                  fontWeight: FontWeight.w400,
-                ),
               ),
+              SpaceW12(),
             ],
-          ),
-        ],
-      ),
-    );
-  }
+            Text(
+              value,
+              style: CustomTextTheme.regular14.copyWith(
+                color: AppColors.whiteColor,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
 }

@@ -6,6 +6,7 @@ import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/dashboard/dashboard_controller.dart';
 import 'package:snapid/controllers/profile/profile_controller.dart';
+import 'package:snapid/main.dart';
 import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_dialog_pop.dart';
@@ -166,12 +167,7 @@ class ProfileFragment extends StatelessWidget {
                               ),
                               itemBuilder: (context, index) {
                                 final items = [
-                                  // SettingItem(
-                                  //   svgPath: Assets.history,
-                                  //   title: 'My Orders',
-                                  //   subtitle: 'View History And Manage Downloads',
-                                  //   onTap: () => Get.toNamed(PrimaryRoute.history),
-                                  // ),
+                           
                                   SettingItem(
                                     svgPath: Assets.measurement,
                                     title: 'Measurement Unit',
@@ -188,7 +184,10 @@ class ProfileFragment extends StatelessWidget {
                                         radioOptions: controller.radioOptions,
                                         selectedOption: controller.selectedOption,
                                         onCancel: () => Get.back(),
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          appStorage.write("selectedUnit", controller.selectedOption.value);
+                                          Get.back();
+                                        },
                                       ));
                                     },
                                   ),

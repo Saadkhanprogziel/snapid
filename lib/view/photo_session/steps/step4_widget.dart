@@ -118,17 +118,20 @@ class _Step4WidgetState extends State<Step4Widget> {
         child: Container(
           width: imageUrl.isEmpty ? 350 : 230,
           height: imageUrl.isEmpty ? 250 : 300,
-          decoration: imageUrl.isEmpty
-              ? null
-              : BoxDecoration(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          clipBehavior: Clip.hardEdge,
+          child: 
+               ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                ),
-          child: imageUrl.isEmpty
-              ? Image.asset(
-                  Assets.demoResult2,
-                  fit: BoxFit.contain,
+                  child: imageUrl.isNotEmpty ?CustomCachedImage(imageUrl: imageUrl) :
+                   Image.asset(
+                    Assets.demoResult2,
+                    fit: BoxFit.contain,
+                  ),
                 )
-              : CustomCachedImage(imageUrl: imageUrl),
+              
         ),
       );
     });
@@ -388,7 +391,6 @@ class _Step4WidgetState extends State<Step4Widget> {
               controller: stripeController!.cardEditController,
             ),
           ),
-          
           const SpaceH10(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
