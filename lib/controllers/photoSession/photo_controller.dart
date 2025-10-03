@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/dashboard/dashboard_controller.dart';
+import 'package:snapid/controllers/photoSession/camera_widget.dart';
 import 'package:snapid/main.dart';
 import 'package:snapid/models/countries/countries.dart';
 import 'package:snapid/models/photo_creation/photo_creation_model.dart';
@@ -58,6 +59,7 @@ class PhotoController extends GetxController {
   final RxString searchQuery = ''.obs;
   final RxBool isCapturingPhotos = false.obs;
   final RxString manualSize = "".obs;
+  
 
   // Image hash tracking for duplicate detection
   final Set<String> _imageHashes = <String>{};
@@ -82,7 +84,6 @@ class PhotoController extends GetxController {
 
   @override
   void dispose() {
-    // Proper cleanup to prevent memory leaks
     _debounceTimer?.cancel();
     // searchController.dispose();
     widthController.dispose();
@@ -680,71 +681,68 @@ class PhotoController extends GetxController {
   }
 
   Future<void> capturePhotosSimple() async {
-    try {
-      isCapturingPhotos.value = true;
-      capturedPhotos.clear();
-      selectedPhotos.clear();
-      _imageHashes.clear();
-
-      int photoCount = 0;
-      bool shouldContinue = true;
-
-      while (photoCount < 5 && shouldContinue) {
-        final pickedFile = await _picker.pickImage(
-          source: ImageSource.camera,
+  try {
+    isCapturingPhotos.value = true;
+    
+    // Navigate to camera widget
+   await Get.to(
+  () => CameraWidget(
+    photos: capturedPhotos, // 👈 pass as RxInt
+    maxPhotos: 5,
+    onPhotoTaken: (XFile photo) async {
+      if (await _isDuplicateImage(photo)) {
+        Get.snackbar(
+          'Duplicate Photo',
+          'This photo appears identical to a previous one.',
+          backgroundColor: AppColors.orange,
+          colorText: AppColors.whiteColor,
         );
-
-        if (pickedFile != null) {
-          if (await _isDuplicateImage(pickedFile)) {
-            Get.snackbar(
-              'Duplicate Photo',
-              'This photo appears to be identical to a previous one. Please take a different photo.',
-              backgroundColor: AppColors.orange,
-              colorText: AppColors.whiteColor,
-              duration: const Duration(seconds: 3),
-            );
-            continue;
-          }
-
-          capturedPhotos.add(pickedFile);
-          await _addImageHash(pickedFile);
-
-          if (kIsWeb) {
-            Uint8List bytes = await pickedFile.readAsBytes();
-            selectedPhotos.add(MemoryImage(bytes));
-          } else {
-            selectedPhotos.add(FileImage(File(pickedFile.path)));
-          }
-
-          photoCount++;
-
-          if (photoCount < 5) {
-            shouldContinue = await _showContinueDialog(photoCount);
-          }
-        } else {
-          if (photoCount > 0) {
-            shouldContinue =
-                await _showContinueDialog(photoCount, cancelled: true);
-          } else {
-            break;
-          }
-        }
+        return;
       }
 
-      if (capturedPhotos.isNotEmpty) {
+      capturedPhotos.add(photo); 
+
+      await _generateImageHash(photo);
+
+      if (kIsWeb) {
+        Uint8List bytes = await photo.readAsBytes();
+        selectedPhotos.add(MemoryImage(bytes));
+      } else {
+        selectedPhotos.add(FileImage(File(photo.path)));
+      }
+
+      if (capturedPhotos.length >= 5) {
+        Get.back(); 
         Get.toNamed(PrimaryRoute.selectedPhoto);
+      } else {
+        // Get.snackbar(
+        //   'Photo Captured',
+        //   '${capturedPhotos.length}/5 photos taken',
+        //   duration: const Duration(seconds: 1),
+        //   backgroundColor: AppColors.primaryColor,
+        //   colorText: Colors.white,
+        // );
       }
-    } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to capture photos: ${e.toString()}',
-        backgroundColor: AppColors.red,
-        colorText: AppColors.whiteColor,
-      );
-    } finally {
-      isCapturingPhotos.value = false;
+    },
+  ),
+);
+
+
+    // After camera closes, navigate if we have photos
+    if (capturedPhotos.isNotEmpty) {
+      Get.toNamed(PrimaryRoute.selectedPhoto);
     }
+  } catch (e) {
+    Get.snackbar(
+      'Error',
+      'Failed to open camera: ${e.toString()}',
+      backgroundColor: AppColors.red,
+      colorText: AppColors.whiteColor,
+    );
+  } finally {
+    isCapturingPhotos.value = false;
   }
+}
 
   Future<bool> createSession() async {
     try {
@@ -779,6 +777,7 @@ class PhotoController extends GetxController {
         customHeight: double.tryParse(heightController.text) ?? 0.0,
         customWidth: double.tryParse(widthController.text) ?? 0.0,
       );
+      print("manzar check this ${capturedPhotos[1].path}");
 
       return response.fold(
         (error) {

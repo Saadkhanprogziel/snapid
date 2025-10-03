@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+// import 'package:flutter_svg/flutter_svg.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/photoSession/photo_controller.dart';
@@ -68,14 +68,16 @@ class Step3Widget extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Container(
-                      height: 300,
+                      height: 280,
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: Colors.white24, width: 1),
                       ),
                       child: _buildImageGrid(
-                        controller.photoCreationModelData.value?.originalImages ?? [],
+                        controller
+                                .photoCreationModelData.value?.originalImages ??
+                            [],
                       ),
                     ),
                   ],
@@ -96,17 +98,19 @@ class Step3Widget extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Container(
-                      height: 300,
+                      height: 280,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.primaryColor ?? Colors.blue, width: 2),
+                        border:
+                            Border.all(color: AppColors.primaryColor, width: 2),
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: controller.processedWatermarkedUrl.value.isEmpty
                             ? Image.asset(Assets.demoResult, fit: BoxFit.cover)
                             : CustomCachedImage(
-                                imageUrl: controller.processedWatermarkedUrl.value),
+                                imageUrl:
+                                    controller.processedWatermarkedUrl.value),
                       ),
                     ),
                   ],

@@ -20,8 +20,8 @@ class DioClient {
       headers: {
         'Content-Type': 'application/json',
       },
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 20),
+      connectTimeout: const Duration(seconds: 40),
+      receiveTimeout: const Duration(seconds: 50),
     ),
   );
 
