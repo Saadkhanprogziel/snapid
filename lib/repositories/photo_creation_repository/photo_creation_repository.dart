@@ -12,94 +12,98 @@ import 'dart:io' show File;
 class PhotoCreationRepository {
   final NetworkRepository _networkRepository = NetworkRepository();
 
-  Future<Either<String, PhotoCreationModel>> createPhotoSession({
-    required String countryCode,
-    required String documentType,
-    required List<XFile> userSessionPhotos,
-    required String platform,
-    double? customWidth,
-    double? customHeight,
-  }) async {
-    try {
-      print("Creating photo session with ${userSessionPhotos.length} photos");
-      print("Document Type: $documentType");
+ Future<Either<String, PhotoCreationModel>> createPhotoSession({
+  required String countryCode,
+  required String documentType,
+  required List<XFile> userSessionPhotos,
+  required String platform,
+  double? customWidth,
+  double? customHeight,
+}) async {
+  try {
+    print("Creating photo session with ${userSessionPhotos.length} photos");
+    print("Document Type: $documentType");
 
-      // Prepare fields
-      final fields = <String, dynamic>{
-        'countryCode': countryCode,
-        'platform': platform,
-      };
+    // Prepare fields
+    final fields = <String, dynamic>{
+      'countryCode': countryCode,
+      'platform': platform,
+    };
 
-      if (documentType != 'MANUAL_INPUT') {
-        fields['documentType'] = documentType;
-      }
-
-      if (customWidth != null && customWidth > 0) {
-        fields['customWidth'] = customWidth;
-      }
-      if (customHeight != null && customHeight > 0) {
-        fields['customHeight'] = customHeight;
-      }
-
-      // Prepare files differently for web vs mobile
-      final Map<String, dynamic> multipleFiles = {};
-
-      if (kIsWeb) {
-        final fileList = <Map<String, dynamic>>[];
-
-        for (final photo in userSessionPhotos) {
-          Uint8List bytes = await photo.readAsBytes();
-          fileList.add({
-            'bytes': bytes,
-            'filename': photo.name,
-          });
-        }
-
-        multipleFiles['userSessionPhotos'] = fileList;
-      } else {
-        final files = userSessionPhotos.map((x) => File(x.path)).toList();
-        multipleFiles['userSessionPhotos'] = files;
-      }
-
-      final formData = await _networkRepository.createFormData(
-        fields: fields,
-        multipleFiles: multipleFiles,
-      );
-
-      final token = appStorage.read("token") ?? "";
-      final headers = <String, String>{
-        'Content-Type': 'multipart/form-data',
-        'Authorization': 'Bearer $token',
-      };
-
-      var url = '$apiUrl/session/start-session';
-      final guestId = appStorage.read("guest_id");
-      if (guestId != null && token.isEmpty) {
-        // headers['guestID'] = guestId;
-        url = '$apiUrl/session/start-guest-session/$guestId';
-      }
-
-      final response = await _networkRepository.postMultipart(
-        url: url,
-        formData: formData,
-        headers: headers,
-      );
-
-      if (response.success) {
-        
-          final id = response.data["data"]['id'];
-          print("session_ID $id");
-          appStorage.write("session_id", id);
-        final photoCreationModel =
-            PhotoCreationModel.fromJson(response.data['data']);
-        return Right(photoCreationModel);
-      } else {
-        return Left(response.message);
-      }
-    } catch (e) {
-      return Left('Error creating photo session: ${e.toString()}');
+    if (documentType != 'MANUAL_INPUT') {
+      fields['documentType'] = documentType;
     }
+
+    if (customWidth != null && customWidth > 0) {
+      fields['customWidth'] = customWidth;
+    }
+    if (customHeight != null && customHeight > 0) {
+      fields['customHeight'] = customHeight;
+    }
+
+    // Prepare files - THIS IS THE KEY FIX
+    final Map<String, dynamic> multipleFiles = {};
+
+    if (kIsWeb) {
+      // For web, convert each XFile to MultipartFile with bytes
+      final fileList = <Map<String, dynamic>>[];
+
+      for (int i = 0; i < userSessionPhotos.length; i++) {
+        final photo = userSessionPhotos[i];
+        Uint8List bytes = await photo.readAsBytes();
+        
+        fileList.add({
+          'bytes': bytes,
+          'filename': photo.name.isEmpty ? 'photo_$i.jpg' : photo.name,
+          'contentType': 'image/jpeg', // Add content type
+        });
+      }
+
+      multipleFiles['userSessionPhotos'] = fileList;
+    } else {
+      // For mobile, use file paths
+      final files = userSessionPhotos.map((x) => File(x.path)).toList();
+      multipleFiles['userSessionPhotos'] = files;
+    }
+
+    final formData = await _networkRepository.createFormData(
+      fields: fields,
+      multipleFiles: multipleFiles,
+    );
+
+    final token = appStorage.read("token") ?? "";
+    final headers = <String, String>{
+      'Content-Type': 'multipart/form-data',
+      'Authorization': 'Bearer $token',
+    };
+
+    var url = '$apiUrl/session/start-session';
+    final guestId = appStorage.read("guest_id");
+    if (guestId != null && token.isEmpty) {
+      url = '$apiUrl/session/start-guest-session/$guestId';
+    }
+
+    final response = await _networkRepository.postMultipart(
+      url: url,
+      formData: formData,
+      headers: headers,
+    );
+
+    if (response.success) {
+      final id = response.data["data"]['id'];
+      print("session_ID $id");
+      appStorage.write("session_id", id);
+      
+      final photoCreationModel =
+          PhotoCreationModel.fromJson(response.data['data']);
+      return Right(photoCreationModel);
+    } else {
+      return Left(response.message);
+    }
+  } catch (e) {
+    return Left('Error creating photo session: ${e.toString()}');
   }
+}
 
   Future<Either<String, String>> createPayment(
     String paymentId,

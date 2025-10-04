@@ -59,7 +59,6 @@ class PhotoController extends GetxController {
   final RxString searchQuery = ''.obs;
   final RxBool isCapturingPhotos = false.obs;
   final RxString manualSize = "".obs;
-  
 
   // Image hash tracking for duplicate detection
   final Set<String> _imageHashes = <String>{};
@@ -681,68 +680,70 @@ class PhotoController extends GetxController {
   }
 
   Future<void> capturePhotosSimple() async {
-  try {
-    isCapturingPhotos.value = true;
-    
-    // Navigate to camera widget
-   await Get.to(
-  () => CameraWidget(
-    photos: capturedPhotos, // 👈 pass as RxInt
-    maxPhotos: 5,
-    onPhotoTaken: (XFile photo) async {
-      if (await _isDuplicateImage(photo)) {
-        Get.snackbar(
-          'Duplicate Photo',
-          'This photo appears identical to a previous one.',
-          backgroundColor: AppColors.orange,
-          colorText: AppColors.whiteColor,
-        );
-        return;
-      }
+    selectedPhotos.clear();
+    capturedPhotos.clear();
+    _imageHashes.clear();
+    try {
+      isCapturingPhotos.value = true;
 
-      capturedPhotos.add(photo); 
+      await Get.to(
+        () => CameraWidget(
+          photos: capturedPhotos,
+          maxPhotos: 5,
+          onPhotoTaken: (XFile photo) async {
+            if (await _isDuplicateImage(photo)) {
+              Get.snackbar(
+                'Duplicate Photo',
+                'This photo appears identical to a previous one.',
+                backgroundColor: AppColors.orange,
+                colorText: AppColors.whiteColor,
+              );
+              return;
+              
+            }
 
-      await _generateImageHash(photo);
+            capturedPhotos.add(photo);
 
-      if (kIsWeb) {
-        Uint8List bytes = await photo.readAsBytes();
-        selectedPhotos.add(MemoryImage(bytes));
-      } else {
-        selectedPhotos.add(FileImage(File(photo.path)));
-      }
+            // Add hash (was missing!)
+            await _addImageHash(photo);
 
-      if (capturedPhotos.length >= 5) {
-        Get.back(); 
+            if (kIsWeb) {
+              Uint8List bytes = await photo.readAsBytes();
+              selectedPhotos.add(MemoryImage(bytes));
+            } else {
+              selectedPhotos.add(FileImage(File(photo.path)));
+            }
+
+            if (capturedPhotos.length >= 5) {
+              // Get.back();
+              // Save images before navigating
+              if (kIsWeb) {
+                await _saveImagesToStorage();
+              }
+              Get.toNamed(PrimaryRoute.selectedPhoto);
+            }
+          },
+        ),
+      );
+
+      // After camera closes, save and navigate if we have photos
+      if (capturedPhotos.isNotEmpty) {
+        if (kIsWeb) {
+          await _saveImagesToStorage();
+        }
         Get.toNamed(PrimaryRoute.selectedPhoto);
-      } else {
-        // Get.snackbar(
-        //   'Photo Captured',
-        //   '${capturedPhotos.length}/5 photos taken',
-        //   duration: const Duration(seconds: 1),
-        //   backgroundColor: AppColors.primaryColor,
-        //   colorText: Colors.white,
-        // );
       }
-    },
-  ),
-);
-
-
-    // After camera closes, navigate if we have photos
-    if (capturedPhotos.isNotEmpty) {
-      Get.toNamed(PrimaryRoute.selectedPhoto);
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to open camera: ${e.toString()}',
+        backgroundColor: AppColors.red,
+        colorText: AppColors.whiteColor,
+      );
+    } finally {
+      isCapturingPhotos.value = false;
     }
-  } catch (e) {
-    Get.snackbar(
-      'Error',
-      'Failed to open camera: ${e.toString()}',
-      backgroundColor: AppColors.red,
-      colorText: AppColors.whiteColor,
-    );
-  } finally {
-    isCapturingPhotos.value = false;
   }
-}
 
   Future<bool> createSession() async {
     try {

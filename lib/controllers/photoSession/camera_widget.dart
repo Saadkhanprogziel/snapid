@@ -1,15 +1,18 @@
-// import 'dart:io';
 import 'package:camera/camera.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/theme/text_theme.dart';
 
+// Only available on web
+// ignore: avoid_web_libraries_in_flutter
+// import 'dart:html' as html;
+
 class CameraWidget extends StatefulWidget {
   final Function(XFile) onPhotoTaken;
-  final RxList<XFile> photos;   // 👈 make it RxList
+  final RxList<XFile> photos;
   final int maxPhotos;
 
   const CameraWidget({
@@ -37,10 +40,12 @@ class _CameraWidgetState extends State<CameraWidget>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
-    // Lock orientation to portrait while camera is open
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-    ]);
+    // Lock orientation to portrait while camera is open (mobile only)
+    // if (!kIsWeb) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+      ]);
+    // }
 
     _initializeCamera();
   }
@@ -49,13 +54,15 @@ class _CameraWidgetState extends State<CameraWidget>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
 
-    // Restore all orientations when leaving
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
+    // Restore all orientations when leaving (mobile only)
+    if (!kIsWeb) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
+    }
 
     _controller?.dispose();
     super.dispose();
@@ -78,16 +85,37 @@ class _CameraWidgetState extends State<CameraWidget>
 
   Future<void> _initializeCamera() async {
     try {
+      // if (kIsWeb) {
+      //   // On web, request permissions explicitly first
+      //   try {
+      //     final stream = await html.window.navigator.mediaDevices
+      //         ?.getUserMedia({'video': true});
+
+      //     if (stream != null) {
+      //       // Stop the test stream
+      //       stream.getTracks().forEach((track) => track.stop());
+      //     }
+      //   } catch (e) {
+      //     setState(() {
+      //       _error =
+      //           "Camera access denied. Please allow camera permissions in your browser and refresh the page.";
+      //     });
+      //     return;
+      //   }
+      // }
+
+      // Get available cameras
       _cameras = await availableCameras();
 
       if (_cameras == null || _cameras!.isEmpty) {
         setState(() {
-          _error = 'No cameras available';
+          _error =
+              'No cameras found. Please ensure your camera is connected and permissions are granted.';
         });
         return;
       }
 
-      // Prefer front camera for selfies
+      // Find front camera, fallback to first camera
       _currentCameraIndex = _cameras!.indexWhere(
         (camera) => camera.lensDirection == CameraLensDirection.front,
       );
@@ -99,8 +127,20 @@ class _CameraWidgetState extends State<CameraWidget>
       await _setupCamera(_currentCameraIndex);
     } catch (e) {
       setState(() {
-        _error = 'Failed to initialize camera: ${e.toString()}';
+        _error = kIsWeb
+            ? "Camera initialization failed. Please refresh the page and allow camera permissions."
+            : "Failed to initialize camera: $e";
       });
+
+      if (!kIsWeb) {
+        Get.back();
+        Get.snackbar(
+          'Error',
+          "Failed to initialize the camera",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
     }
   }
 
@@ -112,9 +152,9 @@ class _CameraWidgetState extends State<CameraWidget>
     final camera = _cameras![cameraIndex];
     _controller = CameraController(
       camera,
-      ResolutionPreset.high,
+      kIsWeb ? ResolutionPreset.high : ResolutionPreset.high,
       enableAudio: false,
-      imageFormatGroup: ImageFormatGroup.jpeg,
+      imageFormatGroup: kIsWeb ? ImageFormatGroup.jpeg : ImageFormatGroup.jpeg,
     );
 
     try {
@@ -144,36 +184,31 @@ class _CameraWidgetState extends State<CameraWidget>
   }
 
   Future<void> _capturePhoto() async {
-    if (_controller == null || !_controller!.value.isInitialized) {
-      return;
-    }
-
+    if (_controller == null || !_controller!.value.isInitialized) return;
     if (_isCapturing) return;
 
     try {
-      setState(() {
-        _isCapturing = true;
-      });
+      setState(() => _isCapturing = true);
 
       final XFile photo = await _controller!.takePicture();
+
       widget.onPhotoTaken(photo);
 
-      if (mounted) {
-        setState(() {
-          _isCapturing = false;
-        });
-      }
+      if (mounted) setState(() => _isCapturing = false);
     } catch (e) {
       if (mounted) {
-        setState(() {
-          _isCapturing = false;
-        });
-        Get.snackbar(
-          'Error',
-          'Failed to capture photo: ${e.toString()}',
-          backgroundColor: AppColors.red,
-          colorText: Colors.white,
-        );
+        setState(() => _isCapturing = false);
+
+        if (kIsWeb) {
+          setState(() => _error = 'Failed to capture photo: ${e.toString()}');
+        } else {
+          Get.snackbar(
+            'Error',
+            'Failed to capture photo: ${e.toString()}',
+            backgroundColor: AppColors.red,
+            colorText: Colors.white,
+          );
+        }
       }
     }
   }
@@ -193,19 +228,8 @@ class _CameraWidgetState extends State<CameraWidget>
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Camera Preview FULL SCREEN PORTRAIT
-          Center(
-            child: _controller != null
-                ? FittedBox(
-                    fit: BoxFit.cover,
-                    child: SizedBox(
-                      width: _controller!.value.previewSize!.height,
-                      height: _controller!.value.previewSize!.width,
-                      child: CameraPreview(_controller!),
-                    ),
-                  )
-                : Container(color: Colors.black),
-          ),
+          // Camera Preview
+          _buildCameraPreview(),
 
           if (_isCapturing)
             Container(
@@ -245,13 +269,13 @@ class _CameraWidgetState extends State<CameraWidget>
                         color: AppColors.primaryColor,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: Text(
-                        '${widget.photos.value.length}/${widget.maxPhotos}',
-                        style: CustomTextTheme.regular14.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      child: Obx(() => Text(
+                            '${widget.photos.length}/${widget.maxPhotos}',
+                            style: CustomTextTheme.regular14.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )),
                     ),
                     IconButton(
                       onPressed: () => Get.back(),
@@ -345,22 +369,36 @@ class _CameraWidgetState extends State<CameraWidget>
               ),
             ),
           ),
-
-          // // Guide overlay (face outline)
-          // Center(
-          //   child: Container(
-          //     width: MediaQuery.of(context).size.width * 0.7,
-          //     height: MediaQuery.of(context).size.width * 0.9,
-          //     decoration: BoxDecoration(
-          //       border: Border.all(
-          //         color: Colors.white.withOpacity(0.5),
-          //         width: 2,
-          //       ),
-          //       borderRadius: BorderRadius.circular(200),
-          //     ),
-          //   ),
-          // ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCameraPreview() {
+    if (_controller == null || !_controller!.value.isInitialized) {
+      return Container(color: Colors.black);
+    }
+
+    final size = MediaQuery.of(context).size;
+    final previewSize = _controller!.value.previewSize!;
+    
+    // Calculate the aspect ratios
+    final screenAspectRatio = size.width / size.height;
+    final previewAspectRatio = previewSize.height / previewSize.width;
+
+    // Use OverflowBox to allow the preview to fill the screen without stretching
+    return Center(
+      child: SizedBox(
+        width: size.width,
+        height: size.height,
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: SizedBox(
+            width: previewSize.height,
+            height: previewSize.width,
+            child: CameraPreview(_controller!),
+          ),
+        ),
       ),
     );
   }
@@ -392,20 +430,32 @@ class _CameraWidgetState extends State<CameraWidget>
   }
 
   Widget _buildLoadingWidget() {
-    return Container(
-      color: Colors.black,
-      child: const Center(
-        child: CircularProgressIndicator(
-          color: Colors.white,
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(
+              color: Colors.white,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              kIsWeb ? 'Requesting camera access...' : 'Initializing camera...',
+              style: CustomTextTheme.regular14.copyWith(
+                color: Colors.white,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildErrorWidget() {
-    return Container(
-      color: Colors.black,
-      child: Center(
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
@@ -432,6 +482,16 @@ class _CameraWidgetState extends State<CameraWidget>
                 ),
                 child: const Text('Go Back'),
               ),
+              if (kIsWeb) ...[
+                const SizedBox(height: 16),
+                Text(
+                  'Make sure you\'ve allowed camera permissions in your browser settings.',
+                  style: CustomTextTheme.regular12.copyWith(
+                    color: Colors.white70,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ],
           ),
         ),
