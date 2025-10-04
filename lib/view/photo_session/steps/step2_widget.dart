@@ -460,7 +460,7 @@ class Step2Widget extends StatelessWidget {
                               ),
                               onTap: () {
                                 controller.selectCountry(country);
-                                Get.back();
+                                // Get.back();
                               },
                             );
                           },

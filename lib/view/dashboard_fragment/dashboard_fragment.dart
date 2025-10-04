@@ -284,7 +284,6 @@ class DashboardFragment extends StatelessWidget {
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: [
-                                            
                                             if (isMobile) ...[
                                               GestureDetector(
                                                 child: SvgPicture.asset(

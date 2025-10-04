@@ -250,13 +250,10 @@ class HistoryCustomCard extends StatelessWidget {
     photoController.photoCreationModelData.value = photoCreationModel;
     photoController.sessionId.value = photoCreationModel.id;
     storeSessionData(photoCreationModel);
+    appStorage.write("session_id", photoController.sessionId.value);
     photoController.setStep(4);
 
-    // Get.toNamed(
-    //   PrimaryRoute.photo_creation,
-    //   parameters: {"step": "4"},
-    //   arguments: {'fromHistory': true},
-    // );
+   
   }
 
   void storeSessionData(PhotoCreationModel model) {

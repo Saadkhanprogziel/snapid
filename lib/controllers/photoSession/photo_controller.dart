@@ -391,6 +391,7 @@ class PhotoController extends GetxController {
     try {
       isUserLoading.value = true;
       final response = await authRespository.getUserDetails();
+      final dashboardController = Get.find<DashboardController>();
 
       response.fold(
         (error) {
@@ -398,16 +399,17 @@ class PhotoController extends GetxController {
           isUserLoading.value = false;
         },
         (success) {
-          if (success.credits != 0) {
+          if (success.credits! > 0) {
             canDownload.value = true;
             isUserLoading.value = false;
-
-            try {
-              final dashboardController = Get.find<DashboardController>();
-              dashboardController.refreshUser();
-            } catch (e) {
-              debugPrint('DashboardController not found: $e');
-            }
+          } else {
+            canDownload.value = false;
+            isUserLoading.value = false;
+          }
+          try {
+            dashboardController.refreshUser();
+          } catch (e) {
+            debugPrint('DashboardController not found: $e');
           }
         },
       );
@@ -568,7 +570,7 @@ class PhotoController extends GetxController {
           getUserDetails();
         }
 
-        Get.toNamed(PrimaryRoute.photo_preview);
+        Get.offAllNamed(PrimaryRoute.photo_preview);
       });
     } catch (e) {
       Get.snackbar(
@@ -699,7 +701,6 @@ class PhotoController extends GetxController {
                 colorText: AppColors.whiteColor,
               );
               return;
-              
             }
 
             capturedPhotos.add(photo);

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 // import 'package:flutter_svg/flutter_svg.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/photoSession/photo_controller.dart';
 import 'package:snapid/theme/text_theme.dart';
+import 'package:snapid/utlis/custom_dialog_pop.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
 import 'package:snapid/utlis/custom_outline_button.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
@@ -164,7 +166,24 @@ class Step3Widget extends StatelessWidget {
                             )
                           : CustomElevatedButton(
                               onPressed: () {
-                                controller.goToNextStep();
+                                if (controller.canDownload.value) {
+                                  Get.dialog(CustomDialogPop(
+                                    title: 'Are you sure?',
+                                    message:
+                                        'Downloading this will deduct credits from your account.',
+                                    isIcon: false,
+                                    iconData: Icons.check,
+                                    iconColor: AppColors.whiteColor,
+                                    isActionPopUp: true,
+                                    solidBtnLabel: "Continue",
+                                    onCancel: () => Get.back(),
+                                    onPressed: () {
+                                      controller.goToNextStep();
+                                    },
+                                  ));
+                                } else {
+                                  controller.goToNextStep();
+                                }
                               },
                               text: "Proceed To Download",
                               minHeight: 60,
