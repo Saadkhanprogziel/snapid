@@ -32,10 +32,7 @@ class ImageoDragAndDropState extends State<ImageDragAndDrop> {
       }
     }
   }
-<<<<<<< HEAD
-=======
   
->>>>>>> qa
 
   Future<void> _handleDrop(List<XFile> files) async {
     controller.selectedPhotos.clear();
