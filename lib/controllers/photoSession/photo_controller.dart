@@ -255,35 +255,35 @@ class PhotoController extends GetxController {
     }
   }
 
-  Future<void> _saveImagesToStorage() async {
-    if (!kIsWeb || capturedPhotos.isEmpty) return;
+  // Future<void> _saveImagesToStorage() async {
+  //   if (!kIsWeb || capturedPhotos.isEmpty) return;
 
-    try {
-      List<String> imageDataList = [];
+  //   try {
+  //     List<String> imageDataList = [];
 
-      for (XFile photo in capturedPhotos) {
-        Uint8List bytes = await photo.readAsBytes();
-        String base64String = base64Encode(bytes);
-        imageDataList.add(base64String);
-      }
+  //     for (XFile photo in capturedPhotos) {
+  //       Uint8List bytes = await photo.readAsBytes();
+  //       String base64String = base64Encode(bytes);
+  //       imageDataList.add(base64String);
+  //     }
 
-      await appStorage.write('saved_images', imageDataList);
-      await appStorage.write(
-          'images_timestamp', DateTime.now().millisecondsSinceEpoch);
+  //     await appStorage.write('saved_images', imageDataList);
+  //     await appStorage.write(
+  //         'images_timestamp', DateTime.now().millisecondsSinceEpoch);
 
-      debugPrint('✅ Saved ${imageDataList.length} images to localStorage');
-    } catch (e) {
-      debugPrint('❌ Error saving images to localStorage: $e');
+  //     debugPrint('✅ Saved ${imageDataList.length} images to localStorage');
+  //   } catch (e) {
+  //     debugPrint('❌ Error saving images to localStorage: $e');
 
-      Get.snackbar(
-        'Storage Warning',
-        'Could not save images locally. They will be lost if you refresh the page.',
-        backgroundColor: AppColors.orange,
-        colorText: AppColors.whiteColor,
-        duration: const Duration(seconds: 3),
-      );
-    }
-  }
+  //     Get.snackbar(
+  //       'Storage Warning',
+  //       'Could not save images locally. They will be lost if you refresh the page.',
+  //       backgroundColor: AppColors.orange,
+  //       colorText: AppColors.whiteColor,
+  //       duration: const Duration(seconds: 3),
+  //     );
+  //   }
+  // }
 
   Future<void> _loadSavedImages() async {
     if (!kIsWeb) return;
@@ -361,9 +361,9 @@ class PhotoController extends GetxController {
       return;
     }
 
-    if (kIsWeb) {
-      await _saveImagesToStorage();
-    }
+    // if (kIsWeb) {
+    //   await _saveImagesToStorage();
+    // }
 
     navigateToStep(2);
   }
@@ -719,7 +719,7 @@ class PhotoController extends GetxController {
               // Get.back();
               // Save images before navigating
               if (kIsWeb) {
-                await _saveImagesToStorage();
+                // await _saveImagesToStorage();
               }
               Get.toNamed(PrimaryRoute.selectedPhoto);
             }
@@ -728,12 +728,11 @@ class PhotoController extends GetxController {
       );
 
       // After camera closes, save and navigate if we have photos
-      if (capturedPhotos.isNotEmpty) {
-        if (kIsWeb) {
-          await _saveImagesToStorage();
-        }
-        Get.toNamed(PrimaryRoute.selectedPhoto);
-      }
+      // if (capturedPhotos.isNotEmpty) {
+      //   if (kIsWeb) {
+      //     await _saveImagesToStorage();
+      //   }
+      // }
     } catch (e) {
       Get.snackbar(
         'Error',

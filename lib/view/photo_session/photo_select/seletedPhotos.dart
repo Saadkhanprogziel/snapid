@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/controllers/photoSession/photo_controller.dart';
-import 'package:snapid/routes/routes.dart';
 import 'package:snapid/utlis/custom_elevated_button.dart';
 import 'package:snapid/utlis/custom_header.dart';
 
 class SelectedPhotosScreen extends StatelessWidget {
-  final PhotoController controller = Get.find<PhotoController>();
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +14,7 @@ class SelectedPhotosScreen extends StatelessWidget {
     final bool isMobile = deviceWidth <= 800;
     final bool isDesktop = deviceWidth >= 1000;
     return GetBuilder(
-      init: Get.find<PhotoController>(),
+      init: PhotoController(),
       builder: (controller) {
         return Scaffold(
           body: Stack(
