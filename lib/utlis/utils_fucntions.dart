@@ -1,12 +1,23 @@
-class UtilsFunc {
+import 'package:snapid/main.dart';
 
-  static double converUnit(double value, String unit) {
-    if (unit.toLowerCase() == 'metric') {
-      return value; 
-    } else if (unit.toLowerCase() == 'imperial') {
-      return value * 0.393701;
+class UtilsFunc {
+  static const double dpi = 300.0;
+
+  static double pixelsToInches(double pixels) {
+    return pixels / dpi;
+  }
+
+  static double pixelsToCm(double pixels) {
+    final inches = pixelsToInches(pixels);
+    return inches * 2.54;
+  }
+
+  static double convertUnits(double pixels) {
+    var selectedUnit = appStorage.read("unit") ?? "cm"; 
+    if (selectedUnit == "in" || selectedUnit == "inch" || selectedUnit == "inches") {
+      return pixelsToInches(pixels);
     } else {
-      throw ArgumentError('Unsupported unit: $unit. Use "cm" or "inch".');
+      return pixelsToCm(pixels);
     }
   }
 }

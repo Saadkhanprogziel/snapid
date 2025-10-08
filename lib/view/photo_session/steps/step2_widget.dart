@@ -92,9 +92,9 @@ class Step2Widget extends StatelessWidget {
                               ),
                               width: 34,
                               height: 20,
-                               child: (country.flag.isNotEmpty)
+                               child: (country.countryFlag.isNotEmpty)
                                    ? CachedNetworkImage(
-                                       imageUrl: country.flag,
+                                       imageUrl: country.countryFlag,
                                        fit: BoxFit.cover,
                                      )
                                    : Container(
@@ -106,7 +106,7 @@ class Step2Widget extends StatelessWidget {
                             ),
                             const SizedBox(width: 12),
                             Text(
-                              country.name,
+                              country.countryCode,
                               style: const TextStyle(color: Colors.white),
                             ),
                           ],
@@ -122,6 +122,7 @@ class Step2Widget extends StatelessWidget {
                   ),
                 );
               }),
+              SpaceH25(),
               SpaceH25(),
               Text(
                 "Select Document Type",
@@ -330,9 +331,9 @@ class Step2Widget extends StatelessWidget {
                           ),
                           width: 50,
                           height: 30,
-                           child: (country.flag.isNotEmpty)
+                           child: (country.countryFlag.isNotEmpty)
                                ? CachedNetworkImage(
-                                   imageUrl: country.flag,
+                                   imageUrl: country.countryFlag,
                                    fit: BoxFit.cover,
                                  )
                                : Container(
@@ -343,13 +344,13 @@ class Step2Widget extends StatelessWidget {
                                  ),
                         ),
                          title: Text(
-                           country.name,
+                           country.countryName,
                            style: CustomTextTheme.regular14.copyWith(
                              color: AppColors.whiteColor,
                            ),
                          ),
                         onTap: () {
-                          controller.selectCountry(country);
+                          controller.selectCountry(country,country.countryName);
                           // Get.back();
                         },
                         shape: RoundedRectangleBorder(
@@ -440,9 +441,9 @@ class Step2Widget extends StatelessWidget {
                                 ),
                                 width: 50,
                                 height: 30,
-                                 child: (country.flag.isNotEmpty)
+                                 child: (country.countryFlag.isNotEmpty)
                                      ? CachedNetworkImage(
-                                         imageUrl: country.flag,
+                                         imageUrl: country.countryFlag,
                                          fit: BoxFit.cover,
                                        )
                                      : Container(
@@ -453,13 +454,13 @@ class Step2Widget extends StatelessWidget {
                                        ),
                               ),
                               title: Text(
-                                country.name,
+                                country.countryName,
                                 style: CustomTextTheme.regular14.copyWith(
                                   color: AppColors.whiteColor,
                                 ),
                               ),
                               onTap: () {
-                                controller.selectCountry(country);
+                                controller.selectCountry(country,country.countryCode);
                                 // Get.back();
                               },
                             );

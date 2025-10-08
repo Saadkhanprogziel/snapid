@@ -1,11 +1,11 @@
 import 'package:dartz/dartz.dart';
-import 'package:snapid/models/countries/countries.dart';
+import 'package:snapid/models/countries/country_response.dart';
 import 'package:snapid/network/network_repository.dart';
 
 class CountriesRepository {
   final networkRepository = NetworkRepository();
 
-  Future<Either<String, CountriesResponse>> getCountries({
+  Future<Either<String, CountryResponse>> getCountries({
     int page = 1,
     int pageSize = 10,
     String searchQuery = ""
@@ -20,12 +20,13 @@ class CountriesRepository {
     );
 
     if (!response.failed) {
-    
+      print("object");
       final Map<String, dynamic> data = response.data['data'];
-      CountriesResponse countriesResponse = CountriesResponse.fromJson(data);
+      CountryResponse countriesResponse = CountryResponse.fromJson(data);
       return right(countriesResponse);
     }
 
     return left(response.message);
   }
+
 }

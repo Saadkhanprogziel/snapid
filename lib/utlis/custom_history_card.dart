@@ -15,7 +15,6 @@ import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/history/history_controller.dart';
 import 'package:snapid/main.dart';
 import 'package:snapid/models/photo_creation/photo_creation_model.dart';
-import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
 import 'package:snapid/utlis/custom_spaces.dart';
 import 'package:snapid/utlis/image_utlis/download_helper.dart';

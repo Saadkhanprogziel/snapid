@@ -28,7 +28,7 @@ class ProfileFragment extends StatelessWidget {
       children: [
         SafeArea(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: !isMobile  ? 20 :0),
+            padding: EdgeInsets.symmetric(horizontal: !isMobile ? 20 : 0),
             child: CustomHeader(
               title: "Profile",
               rightIconPath: Assets.bellIcon,
@@ -38,15 +38,14 @@ class ProfileFragment extends StatelessWidget {
             ),
           ),
         ),
-        if(!isMobile)
-        SpaceH120(),
+        if (!isMobile) SpaceH120(),
         Expanded(
           child: Container(
             margin: EdgeInsets.symmetric(horizontal: !isMobile ? 50 : 0),
             width: double.infinity,
             decoration: BoxDecoration(
               color: AppColors.cardColor,
-              borderRadius:  BorderRadius.only(
+              borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(isMobile ? 60 : 25),
                 topRight: Radius.circular(isMobile ? 60 : 25),
               ),
@@ -67,10 +66,12 @@ class ProfileFragment extends StatelessWidget {
                                 width: isMobile ? 120 : 90,
                                 height: isMobile ? 120 : 90,
                                 child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(isMobile ? 10 : 8),
+                                  borderRadius:
+                                      BorderRadius.circular(isMobile ? 10 : 8),
                                   child: Obx(() {
                                     return CachedNetworkImage(
-                                      imageUrl: dashboardController.user.value.profilePicture ??
+                                      imageUrl: dashboardController
+                                              .user.value.profilePicture ??
                                           'https://www.w3schools.com/howto/img_avatar2.png',
                                       fit: BoxFit.cover,
                                     );
@@ -123,7 +124,8 @@ class ProfileFragment extends StatelessWidget {
                                 ),
                                 decoration: BoxDecoration(
                                   color: const Color.fromARGB(61, 82, 79, 112),
-                                  borderRadius: BorderRadius.circular(isMobile ? 16 : 12),
+                                  borderRadius:
+                                      BorderRadius.circular(isMobile ? 16 : 12),
                                 ),
                                 child: Text(
                                   'Credits Remaining: ${dashboardController.user.value.credits ?? 0}',
@@ -159,7 +161,8 @@ class ProfileFragment extends StatelessWidget {
                               shrinkWrap: true,
                               itemCount: 4,
                               physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: isMobile ? 1 : 3,
                                 crossAxisSpacing: 14,
                                 mainAxisSpacing: 14,
@@ -167,41 +170,47 @@ class ProfileFragment extends StatelessWidget {
                               ),
                               itemBuilder: (context, index) {
                                 final items = [
-                           
                                   SettingItem(
                                     svgPath: Assets.measurement,
                                     title: 'Measurement Unit',
                                     subtitle: 'Set Your Preferred Unit.',
                                     onTap: () {
-                                      Get.dialog(CustomDialogPop(
-                                        title: 'Select Measurement Unit',
-                                        message: 'Select how you want photo sizes to be displayed throughout the app.',
-                                        isIcon: false,
-                                        iconData: Icons.check,
-                                        iconColor: AppColors.whiteColor,
-                                        isActionPopUp: true,
-                                        isRadio: true,
-                                        radioOptions: controller.radioOptions,
-                                        selectedOption: controller.selectedOption,
-                                        onCancel: () => Get.back(),
-                                        onPressed: () {
-                                          appStorage.write("selectedUnit", controller.selectedOption.value);
-                                          Get.back();
-                                        },
-                                      ));
+                                      Get.dialog(
+                                        CustomDialogPop(
+                                          title: 'Select Measurement Unit',
+                                          message:
+                                              'Select how you want photo sizes to be displayed throughout the app.',
+                                          isIcon: false,
+                                          iconData: Icons.check,
+                                          iconColor: AppColors.whiteColor,
+                                          isActionPopUp: true,
+                                          isRadio: true,
+                                          
+                                          radioOptions: controller.radioOptions,
+                                          selectedOption:
+                                              controller.selectedOption,
+                                          onCancel: () => Get.back(),
+                                          onPressed: () {
+                                            controller.saveSelectedUnit();
+                                            Get.back();
+                                          },
+                                        ),
+                                      );
                                     },
                                   ),
                                   SettingItem(
                                     icon: Icons.lock_outline,
                                     title: 'Security Setting',
                                     subtitle: 'Update Account Security',
-                                    onTap: () => Get.toNamed(PrimaryRoute.securitySetting),
+                                    onTap: () => Get.toNamed(
+                                        PrimaryRoute.securitySetting),
                                   ),
                                   SettingItem(
                                     icon: Icons.question_mark,
                                     title: 'Help & Support',
                                     subtitle: 'Chat Or Contact Us Directly.',
-                                    onTap: () =>Get.toNamed(PrimaryRoute.help_support),
+                                    onTap: () =>
+                                        Get.toNamed(PrimaryRoute.help_support),
                                   ),
                                   SettingItem(
                                     svgPath: Assets.logout,
@@ -210,14 +219,17 @@ class ProfileFragment extends StatelessWidget {
                                     onTap: () {
                                       Get.dialog(
                                         BackdropFilter(
-                                          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                                          filter: ImageFilter.blur(
+                                              sigmaX: 15, sigmaY: 15),
                                           child: CustomDialogPop(
                                             solidBtnLabel: "Logout",
                                             title: "Log Out ?",
-                                            message: "Are you sure you want to log out of your Snapid account?",
+                                            message:
+                                                "Are you sure you want to log out of your Snapid account?",
                                             svgPath: Assets.logout,
                                             isActionPopUp: true,
-                                            backgroundColor: AppColors.cardColor,
+                                            backgroundColor:
+                                                AppColors.cardColor,
                                             onCancel: () => Get.back(),
                                             onPressed: () {
                                               controller.logout();

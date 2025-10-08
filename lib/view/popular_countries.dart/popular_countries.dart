@@ -13,7 +13,8 @@ class PopularCountries extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PopularCountriesController controller = Get.put(PopularCountriesController());
+    final PopularCountriesController controller =
+        Get.put(PopularCountriesController());
     final double deviceWidth = MediaQuery.of(context).size.width;
     final bool isMobile = deviceWidth <= 800;
 
@@ -52,24 +53,27 @@ class PopularCountries extends StatelessWidget {
                         padding: EdgeInsets.symmetric(horizontal: 8),
                         alignment: Alignment.center,
                         child: Obx(() => TextField(
-                          controller: controller.searchController,
-                          cursorColor: AppColors.whiteColor,
-                          style: TextStyle(color: AppColors.whiteColor),
-                          decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.search, color: AppColors.grey),
-                            suffixIcon: controller.searchQuery.value.isNotEmpty
-                                ? IconButton(
-                                    icon: Icon(Icons.clear, color: AppColors.grey),
-                                    onPressed: controller.clearSearch,
-                                  )
-                                : null,
-                            labelText: 'Search country',
-                            labelStyle: TextStyle(color: AppColors.grey),
-                            hintStyle: CustomTextTheme.regular14
-                                .copyWith(color: AppColors.whiteColor),
-                            border: InputBorder.none,
-                          ),
-                        )),
+                              controller: controller.searchController,
+                              cursorColor: AppColors.whiteColor,
+                              style: TextStyle(color: AppColors.whiteColor),
+                              decoration: InputDecoration(
+                                prefixIcon:
+                                    Icon(Icons.search, color: AppColors.grey),
+                                suffixIcon:
+                                    controller.searchQuery.value.isNotEmpty
+                                        ? IconButton(
+                                            icon: Icon(Icons.clear,
+                                                color: AppColors.grey),
+                                            onPressed: controller.clearSearch,
+                                          )
+                                        : null,
+                                labelText: 'Search country',
+                                labelStyle: TextStyle(color: AppColors.grey),
+                                hintStyle: CustomTextTheme.regular14
+                                    .copyWith(color: AppColors.whiteColor),
+                                border: InputBorder.none,
+                              ),
+                            )),
                       ),
                       SpaceH20(),
                     ],
@@ -77,22 +81,25 @@ class PopularCountries extends StatelessWidget {
                 ),
                 Expanded(
                   child: Obx(() {
-                    if (controller.isLoading.value && controller.countries.isEmpty) {
+                    if (controller.isLoading.value &&
+                        controller.countries.isEmpty) {
                       return Center(
                         child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(AppColors.whiteColor),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              AppColors.whiteColor),
                         ),
                       );
                     }
 
-                    if (controller.countries.isEmpty && !controller.isLoading.value) {
+                    if (controller.countries.isEmpty &&
+                        !controller.isLoading.value) {
                       return Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              controller.searchQuery.value.isNotEmpty 
-                                  ? Icons.search_off 
+                              controller.searchQuery.value.isNotEmpty
+                                  ? Icons.search_off
                                   : Icons.public_off,
                               size: 64,
                               color: AppColors.grey,
@@ -122,7 +129,6 @@ class PopularCountries extends StatelessWidget {
                         ),
                       );
                     }
-
                     return RefreshIndicator(
                       onRefresh: controller.refreshCountries,
                       color: AppColors.whiteColor,
@@ -147,14 +153,16 @@ class PopularCountries extends StatelessWidget {
                                       SizedBox(width: 8),
                                       Text(
                                         "Results for '${controller.searchQuery.value}'",
-                                        style: CustomTextTheme.regular14.copyWith(
+                                        style:
+                                            CustomTextTheme.regular14.copyWith(
                                           color: AppColors.grey,
                                         ),
                                       ),
                                       Spacer(),
                                       Text(
                                         "${controller.countries.length} found",
-                                        style: CustomTextTheme.regular14.copyWith(
+                                        style:
+                                            CustomTextTheme.regular14.copyWith(
                                           color: AppColors.grey,
                                         ),
                                       ),
@@ -167,16 +175,17 @@ class PopularCountries extends StatelessWidget {
                                 (context, index) {
                                   final country = controller.countries[index];
                                   return PopularCountryCard(
-                                    countryName: country.name,
-                                    flagAsset: country.flag,
-                                    passportSize: country.passportSize,
-                                    visaSize: country.visaSize,
+                                    countryName: country.countryName,
+                                    flagAsset: country.countryFlag,
+                                    passportSize: country.passport,
+                                    visaSize: country.visa,
                                     drivingLicense: country.drivingLicense,
                                   );
                                 },
                                 childCount: controller.countries.length,
                               ),
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: isMobile ? 1 : 2,
                                 crossAxisSpacing: 20,
                                 mainAxisSpacing: 20,
@@ -192,12 +201,15 @@ class PopularCountries extends StatelessWidget {
                                     child: Column(
                                       children: [
                                         CircularProgressIndicator(
-                                          valueColor: AlwaysStoppedAnimation<Color>(AppColors.whiteColor),
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  AppColors.whiteColor),
                                         ),
                                         SizedBox(height: 10),
                                         Text(
                                           "Loading more countries...",
-                                          style: CustomTextTheme.regular12.copyWith(
+                                          style: CustomTextTheme.regular12
+                                              .copyWith(
                                             color: AppColors.grey,
                                           ),
                                         ),
@@ -207,7 +219,8 @@ class PopularCountries extends StatelessWidget {
                                 ),
                               ),
                             // End of data indicator
-                            if (!controller.hasMoreData.value && controller.countries.isNotEmpty)
+                            if (!controller.hasMoreData.value &&
+                                controller.countries.isNotEmpty)
                               SliverToBoxAdapter(
                                 child: Padding(
                                   padding: const EdgeInsets.all(20),
@@ -221,10 +234,12 @@ class PopularCountries extends StatelessWidget {
                                         ),
                                         SizedBox(height: 8),
                                         Text(
-                                          controller.searchQuery.value.isNotEmpty
+                                          controller
+                                                  .searchQuery.value.isNotEmpty
                                               ? "All matching countries loaded"
                                               : "You've reached the end",
-                                          style: CustomTextTheme.regular14.copyWith(
+                                          style: CustomTextTheme.regular14
+                                              .copyWith(
                                             color: AppColors.grey,
                                           ),
                                         ),
@@ -251,3 +266,4 @@ class PopularCountries extends StatelessWidget {
     );
   }
 }
+

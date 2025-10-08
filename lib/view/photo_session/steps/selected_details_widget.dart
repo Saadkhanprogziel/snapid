@@ -40,8 +40,8 @@ class SelectedDetailsWidget extends StatelessWidget {
           Obx(() {
             return _infoRow(
               "Country:",
-              controller.selectedCountry.value?.name ?? imageData?.countryName ?? "Select Country",
-              flagPath: controller.selectedCountry.value?.flag  ?? imageData?.countryFlag,
+              controller.selectedCountry.value?.countryName ?? imageData?.countryName ?? "Select Country",
+              flagPath: controller.selectedCountry.value?.countryFlag  ?? imageData?.countryFlag,
             );
           }),
           const Divider(color: Colors.white12),
@@ -72,11 +72,11 @@ class SelectedDetailsWidget extends StatelessWidget {
 String selectedSize(String type, PhotoController controller) {
   switch (type) {
     case "visa":
-      return (controller.selectedCountry.value?.visaSize ?? 0.0).toString();
+      return (controller.selectedCountry.value?.visa ?? 0.0).toString();
     case "drivingLicense":
       return (controller.selectedCountry.value?.drivingLicense ?? 0.0).toString();
     case "passport":
-      return (controller.selectedCountry.value?.passportSize ?? 0.0).toString();
+      return (controller.selectedCountry.value?.visa ?? 0.0).toString();
     default:
       return "0.0";
   }

@@ -30,7 +30,7 @@ class CustomDialogPop extends StatelessWidget {
     Key? key,
     required this.title,
     required this.message,
-    this.solidBtnLabel = "Submit",
+    this.solidBtnLabel = "Save",
     this.outlineLabel = "Cancel",
     this.isIcon = false,
     this.isActionPopUp = false,

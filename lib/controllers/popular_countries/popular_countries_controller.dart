@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:snapid/models/countries/countries.dart';
+import 'package:snapid/models/countries/country_response.dart';
 import 'package:snapid/repositories/countries/countries_repository.dart';
 
 class PopularCountriesController extends GetxController {
@@ -9,15 +9,17 @@ class PopularCountriesController extends GetxController {
   TextEditingController searchController = TextEditingController();
   final CountriesRepository countriesRepository = CountriesRepository();
 
+  // Changed to store list of Country
   var countries = <Country>[].obs;
   var pagination = <Pagination>[].obs;
+
   var isLoading = false.obs;
   var isLoadingMore = false.obs;
   var hasMoreData = true.obs;
   var currentPage = 1.obs;
   var searchQuery = ''.obs;
+
   final int pageSize = 10;
-  
   Timer? _debounceTimer;
 
   @override
@@ -43,10 +45,8 @@ class PopularCountriesController extends GetxController {
   }
 
   void _onSearchChanged(String query) {
-    // Cancel previous timer
     if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
-    
-    // Start new timer
+
     _debounceTimer = Timer(const Duration(milliseconds: 500), () {
       if (searchQuery.value != query) {
         searchQuery.value = query;
@@ -56,7 +56,6 @@ class PopularCountriesController extends GetxController {
   }
 
   void _performSearch() {
-    // Reset pagination for new search
     currentPage.value = 1;
     hasMoreData.value = true;
     countries.clear();
@@ -86,35 +85,48 @@ class PopularCountriesController extends GetxController {
 
     try {
       final result = await countriesRepository.getCountries(
-        page: currentPage.value, 
+        page: currentPage.value,
         pageSize: pageSize,
-        searchQuery: searchQuery.value
+        searchQuery: searchQuery.value,
       );
-      
+
       result.fold(
         (error) {
-          Get.snackbar("Error", error,
-              backgroundColor: Colors.redAccent, colorText: Colors.white);
+          Get.snackbar(
+            "Error",
+            error,
+            backgroundColor: Colors.redAccent,
+            colorText: Colors.white,
+          );
         },
         (success) {
-          print("Fetched ${success.countries.length} countries for page ${currentPage.value}");
-          
-          if (success.countries.length < pageSize) {
+          print("Fetched ${success.formatted.length} countries for page ${currentPage.value}");
+
+          // Check if there's more data
+          if (success.formatted.length < pageSize) {
             hasMoreData.value = false;
           }
 
+          // ✅ FIXED: Map<String, Country> → List<Country>
           if (isRefresh || currentPage.value == 1) {
-            countries.value =  success.countries;
+            countries.value = success.formatted.values.toList();
           } else {
-            countries.addAll(success.countries);
+            countries.addAll(success.formatted.values);
           }
-          
+
+          // Update pagination data
+          pagination.add(success.pagination);
+
           currentPage.value++;
         },
       );
     } catch (e) {
-      Get.snackbar("Error", "Failed to fetch countries",
-          backgroundColor: Colors.redAccent, colorText: Colors.white);
+      Get.snackbar(
+        "Error",
+        "Failed to fetch countries",
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
     } finally {
       isLoading.value = false;
       isLoadingMore.value = false;
@@ -122,9 +134,8 @@ class PopularCountriesController extends GetxController {
   }
 
   void _scrollListener() {
-    if (scrollController!.position.pixels >= 
+    if (scrollController!.position.pixels >=
         scrollController!.position.maxScrollExtent - 200) {
-      // Load more when user is 200px from bottom
       if (hasMoreData.value && !isLoadingMore.value && !isLoading.value) {
         fetchCountries();
       }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/colors.dart';
+import 'package:snapid/routes/routes.dart';
 import 'package:snapid/theme/text_theme.dart';
 
 // Only available on web
@@ -360,7 +361,7 @@ class _CameraWidgetState extends State<CameraWidget>
                         ),
                         _buildControlButton(
                           icon: Icons.photo_library,
-                          onTap: () => Get.back(),
+                          onTap: () => Get.toNamed(PrimaryRoute.selectedPhoto),
                         ),
                       ],
                     ),

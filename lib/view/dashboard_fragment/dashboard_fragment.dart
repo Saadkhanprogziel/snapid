@@ -399,6 +399,7 @@ class DashboardFragment extends StatelessWidget {
                           ),
                         );
                       }
+
                       return ListView.builder(
                           itemCount: controller.countries.length,
                           scrollDirection: Axis.horizontal,
@@ -409,11 +410,11 @@ class DashboardFragment extends StatelessWidget {
                             return Row(
                               children: [
                                 CountryCard(
-                                  countryName: country.name,
-                                  flagAsset: country.flag,
-                                  passportSize: country.passportSize,
+                                  countryName: country.countryName,
+                                  flagAsset: country.countryFlag,
+                                  passportSize: country.passport,
                                   drivingLicense: country.drivingLicense,
-                                  visaSize: country.visaSize,
+                                  visaSize: country.visa,
                                 ),
                                 SizedBox(width: 16),
                               ],
@@ -601,6 +602,7 @@ class DashboardFragment extends StatelessWidget {
                   ),
                 ),
               ),
+              
               SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

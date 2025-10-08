@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:flutter_stripe_web/card_field.dart';
+// import 'package:flutter_stripe/flutter_stripe.dart';
+// import 'package:flutter_stripe_web/card_field.dart';
 import 'package:get/get.dart';
 import 'package:snapid/constant/assets.dart';
 import 'package:snapid/controllers/photoSession/photo_controller.dart';
@@ -356,17 +356,17 @@ class _Step4WidgetState extends State<Step4Widget> {
   }
 
   Widget _buildPaymentMethodSection(PhotoController photocontroller) {
-    if (!kIsWeb) {
-      return _buildPlatformNotSupportedMessage();
-    }
+    // if (!kIsWeb) {
+    //   return _buildPlatformNotSupportedMessage();
+    // }
 
-    if (!isStripeInitialized) {
-      return _buildLoadingState();
-    }
+    // if (!isStripeInitialized) {
+    //   return _buildLoadingState();
+    // }
 
-    if (stripeController == null) {
-      return _buildErrorState();
-    }
+    // if (stripeController == null) {
+    //   return _buildErrorState();
+    // }
 
     return Obx(() {
       if (widget.controller.canDownload.value) {
@@ -381,195 +381,195 @@ class _Step4WidgetState extends State<Step4Widget> {
         ),
         child: Column(
           children: [
-            _buildPaymentForm(),
-            const SpaceH20(),
-            _buildPaymentButton(photocontroller),
+            // _buildPaymentForm(),
+            // const SpaceH20(),
+            // _buildPaymentButton(photocontroller),
           ],
         ),
       );
     });
   }
 
-  Widget _buildPlatformNotSupportedMessage() {
-    return Container(
-      margin: const EdgeInsets.all(12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.cardColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: const Text(
-        "Payment processing is only available on web platform",
-        style: TextStyle(color: Colors.white),
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
+  // Widget _buildPlatformNotSupportedMessage() {
+  //   return Container(
+  //     margin: const EdgeInsets.all(12),
+  //     padding: const EdgeInsets.all(16),
+  //     decoration: BoxDecoration(
+  //       color: AppColors.cardColor,
+  //       borderRadius: BorderRadius.circular(12),
+  //     ),
+  //     child: const Text(
+  //       "Payment processing is only available on web platform",
+  //       style: TextStyle(color: Colors.white),
+  //       textAlign: TextAlign.center,
+  //     ),
+  //   );
+  // }
 
-  Widget _buildLoadingState() {
-    return Container(
-      margin: const EdgeInsets.all(12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.cardColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: const Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircularProgressIndicator(color: Colors.white),
-            SizedBox(height: 8),
-            Text(
-              "Initializing payment system...",
-              style: TextStyle(color: Colors.white),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget _buildLoadingState() {
+  //   return Container(
+  //     margin: const EdgeInsets.all(12),
+  //     padding: const EdgeInsets.all(16),
+  //     decoration: BoxDecoration(
+  //       color: AppColors.cardColor,
+  //       borderRadius: BorderRadius.circular(12),
+  //     ),
+  //     child: const Center(
+  //       child: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         children: [
+  //           CircularProgressIndicator(color: Colors.white),
+  //           SizedBox(height: 8),
+  //           Text(
+  //             "Initializing payment system...",
+  //             style: TextStyle(color: Colors.white),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  Widget _buildErrorState() {
-    return Container(
-      margin: const EdgeInsets.all(12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.cardColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            "Payment system failed to initialize",
-            style: TextStyle(color: Colors.red),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          ElevatedButton(
-            onPressed: _initializeStripe,
-            child: const Text("Retry"),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildErrorState() {
+  //   return Container(
+  //     margin: const EdgeInsets.all(12),
+  //     padding: const EdgeInsets.all(16),
+  //     decoration: BoxDecoration(
+  //       color: AppColors.cardColor,
+  //       borderRadius: BorderRadius.circular(12),
+  //     ),
+  //     child: Column(
+  //       mainAxisSize: MainAxisSize.min,
+  //       children: [
+  //         const Text(
+  //           "Payment system failed to initialize",
+  //           style: TextStyle(color: Colors.red),
+  //           textAlign: TextAlign.center,
+  //         ),
+  //         const SizedBox(height: 8),
+  //         ElevatedButton(
+  //           onPressed: _initializeStripe,
+  //           child: const Text("Retry"),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
-  Widget _buildPaymentForm() {
-    return Container(
-      margin: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            margin:
-                const EdgeInsets.only(top: 12, bottom: 15, left: 20, right: 20),
-            child: WebCardField(
-              style: CardStyle(),
-              controller: stripeController!.cardEditController,
-            ),
-          ),
-          const SpaceH10(),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            child: TextFormField(
-              controller: stripeController!.email,
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(
-                labelText: "Email",
-                labelStyle: TextStyle(color: Colors.grey.shade500),
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue.shade300, width: 2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(color: Colors.red, width: 1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                focusedErrorBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(color: Colors.red, width: 2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your email';
-                }
-                if (!GetUtils.isEmail(value)) {
-                  return 'Enter a valid email address';
-                }
-                return null;
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildPaymentForm() {
+  //   return Container(
+  //     margin: const EdgeInsets.all(12),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(12),
+  //     ),
+  //     child: Column(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         Container(
+  //           margin:
+  //               const EdgeInsets.only(top: 12, bottom: 15, left: 20, right: 20),
+  //           child: WebCardField(
+  //             style: CardStyle(),
+  //             controller: stripeController!.cardEditController,
+  //           ),
+  //         ),
+  //         const SpaceH10(),
+  //         Padding(
+  //           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+  //           child: TextFormField(
+  //             controller: stripeController!.email,
+  //             keyboardType: TextInputType.emailAddress,
+  //             decoration: InputDecoration(
+  //               labelText: "Email",
+  //               labelStyle: TextStyle(color: Colors.grey.shade500),
+  //               contentPadding:
+  //                   const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+  //               enabledBorder: OutlineInputBorder(
+  //                 borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
+  //                 borderRadius: BorderRadius.circular(8),
+  //               ),
+  //               focusedBorder: OutlineInputBorder(
+  //                 borderSide: BorderSide(color: Colors.blue.shade300, width: 2),
+  //                 borderRadius: BorderRadius.circular(8),
+  //               ),
+  //               errorBorder: OutlineInputBorder(
+  //                 borderSide: const BorderSide(color: Colors.red, width: 1),
+  //                 borderRadius: BorderRadius.circular(8),
+  //               ),
+  //               focusedErrorBorder: OutlineInputBorder(
+  //                 borderSide: const BorderSide(color: Colors.red, width: 2),
+  //                 borderRadius: BorderRadius.circular(8),
+  //               ),
+  //             ),
+  //             validator: (value) {
+  //               if (value == null || value.isEmpty) {
+  //                 return 'Please enter your email';
+  //               }
+  //               if (!GetUtils.isEmail(value)) {
+  //                 return 'Enter a valid email address';
+  //               }
+  //               return null;
+  //             },
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
-  Widget _buildPaymentButton(PhotoController photocontroller) {
-    return Obx(() {
-      final isLoading = stripeController?.isStripeLoading.value ?? false;
+  // Widget _buildPaymentButton(PhotoController photocontroller) {
+  //   return Obx(() {
+  //     final isLoading = stripeController?.isStripeLoading.value ?? false;
 
-      return isLoading
-          ? const CircularProgressIndicator(color: Colors.white)
-          : SizedBox(
-              width: 200,
-              child: CustomElevatedButton(
-                onPressed: () => _handlePayment(photocontroller),
-                text: "Make Payment",
-              ),
-            );
-    });
-  }
+  //     return isLoading
+  //         ? const CircularProgressIndicator(color: Colors.white)
+  //         : SizedBox(
+  //             width: 200,
+  //             child: CustomElevatedButton(
+  //               onPressed: () => _handlePayment(photocontroller),
+  //               text: "Make Payment",
+  //             ),
+  //           );
+  //   });
+  // }
 
-  void _handlePayment(PhotoController photocontroller) {
-    if (token != null) {
-      if (photocontroller.selectedPackage.value.isEmpty) {
-        Get.snackbar(
-          "Error",
-          "Please select a subscription plan",
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
-        return;
-      }
-    }
+  // void _handlePayment(PhotoController photocontroller) {
+  //   if (token != null) {
+  //     if (photocontroller.selectedPackage.value.isEmpty) {
+  //       Get.snackbar(
+  //         "Error",
+  //         "Please select a subscription plan",
+  //         backgroundColor: Colors.red,
+  //         colorText: Colors.white,
+  //       );
+  //       return;
+  //     }
+  //   }
 
-    // Validate email
-    final email = stripeController?.email.text.trim() ?? '';
-    if (email.isEmpty) {
-      Get.snackbar(
-        "Error",
-        "Please enter your email address",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-      return;
-    }
+  //   // Validate email
+  //   final email = stripeController?.email.text.trim() ?? '';
+  //   if (email.isEmpty) {
+  //     Get.snackbar(
+  //       "Error",
+  //       "Please enter your email address",
+  //       backgroundColor: Colors.red,
+  //       colorText: Colors.white,
+  //     );
+  //     return;
+  //   }
 
-    if (!GetUtils.isEmail(email)) {
-      Get.snackbar(
-        "Error",
-        "Please enter a valid email address",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-      return;
-    }
+  //   if (!GetUtils.isEmail(email)) {
+  //     Get.snackbar(
+  //       "Error",
+  //       "Please enter a valid email address",
+  //       backgroundColor: Colors.red,
+  //       colorText: Colors.white,
+  //     );
+  //     return;
+  //   }
 
-    // Proceed with payment
-    stripeController?.createPaymentMethodWeb();
-  }
+  //   // Proceed with payment
+  //   stripeController?.createPaymentMethodWeb();
+  // }
 }

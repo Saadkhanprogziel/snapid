@@ -10,7 +10,7 @@ import 'package:snapid/constant/colors.dart';
 import 'package:snapid/controllers/dashboard/dashboard_controller.dart';
 import 'package:snapid/controllers/photoSession/camera_widget.dart';
 import 'package:snapid/main.dart';
-import 'package:snapid/models/countries/countries.dart';
+import 'package:snapid/models/countries/country_response.dart';
 import 'package:snapid/models/photo_creation/photo_creation_model.dart';
 import 'package:snapid/repositories/auth/auth_respository.dart';
 import 'package:snapid/repositories/countries/countries_repository.dart';
@@ -43,8 +43,14 @@ class PhotoController extends GetxController {
   final Rx<Unit> selectedUnit = Unit.cm.obs;
   final Rx<DocumentType> selectedType = DocumentType.visa.obs;
   final Rxn<Country> selectedCountry = Rxn<Country>();
+  final Rxn<String> selectedCountryCode =
+      Rxn<String>(); // Store country code separately
   final RxBool canDownload = false.obs;
   final RxList<Country> countries = <Country>[].obs;
+  
+
+  final Rxn<CountryResponse> countryResponse =
+      Rxn<CountryResponse>(); // Changed to single object
   final RxString selectedPackage = "".obs;
   final RxBool isLoading = false.obs;
   final RxBool isUserLoading = false.obs;
@@ -84,11 +90,12 @@ class PhotoController extends GetxController {
   @override
   void dispose() {
     _debounceTimer?.cancel();
-    // searchController.dispose();
     widthController.dispose();
     heightController.dispose();
     super.dispose();
   }
+
+  
 
   void _updateManualSize() {
     final width = widthController.text.trim();
@@ -119,7 +126,6 @@ class PhotoController extends GetxController {
   }
 
   void _performSearch() {
-    countries.clear();
     fetchCountries();
   }
 
@@ -142,7 +148,8 @@ class PhotoController extends GetxController {
               backgroundColor: Colors.redAccent, colorText: Colors.white);
         },
         (success) {
-          countries.value = success.countries;
+          countryResponse.value = success;
+          countries.value = success.formatted.values.toList();
         },
       );
     } catch (e) {
@@ -161,7 +168,6 @@ class PhotoController extends GetxController {
       return digest.toString();
     } catch (e) {
       debugPrint('Error generating image hash: $e');
-      // Fallback to timestamp-based identifier
       return '${imageFile.name}_${DateTime.now().millisecondsSinceEpoch}';
     }
   }
@@ -230,6 +236,7 @@ class PhotoController extends GetxController {
 
         String? countryCode = appStorage.read('selectedCountryCode');
         if (countryCode != null) {
+          selectedCountryCode.value = countryCode;
           debugPrint('Loaded country code: $countryCode');
         }
 
@@ -255,36 +262,6 @@ class PhotoController extends GetxController {
     }
   }
 
-  // Future<void> _saveImagesToStorage() async {
-  //   if (!kIsWeb || capturedPhotos.isEmpty) return;
-
-  //   try {
-  //     List<String> imageDataList = [];
-
-  //     for (XFile photo in capturedPhotos) {
-  //       Uint8List bytes = await photo.readAsBytes();
-  //       String base64String = base64Encode(bytes);
-  //       imageDataList.add(base64String);
-  //     }
-
-  //     await appStorage.write('saved_images', imageDataList);
-  //     await appStorage.write(
-  //         'images_timestamp', DateTime.now().millisecondsSinceEpoch);
-
-  //     debugPrint('✅ Saved ${imageDataList.length} images to localStorage');
-  //   } catch (e) {
-  //     debugPrint('❌ Error saving images to localStorage: $e');
-
-  //     Get.snackbar(
-  //       'Storage Warning',
-  //       'Could not save images locally. They will be lost if you refresh the page.',
-  //       backgroundColor: AppColors.orange,
-  //       colorText: AppColors.whiteColor,
-  //       duration: const Duration(seconds: 3),
-  //     );
-  //   }
-  // }
-
   Future<void> _loadSavedImages() async {
     if (!kIsWeb) return;
 
@@ -293,7 +270,6 @@ class PhotoController extends GetxController {
       int? timestamp = appStorage.read('images_timestamp');
 
       if (savedImages != null && timestamp != null) {
-        // Check if images are less than 1 hour old
         int timeDiff = DateTime.now().millisecondsSinceEpoch - timestamp;
 
         if (timeDiff > 3600000) {
@@ -361,10 +337,6 @@ class PhotoController extends GetxController {
       return;
     }
 
-    // if (kIsWeb) {
-    //   await _saveImagesToStorage();
-    // }
-
     navigateToStep(2);
   }
 
@@ -373,6 +345,7 @@ class PhotoController extends GetxController {
       currentStep.value = 1;
       clearAllPhotos();
       selectedCountry.value = null;
+      selectedCountryCode.value = null;
       photoCreationModelData.value = null;
       processedWatermarkedUrl.value = '';
       sessionId.value = '';
@@ -420,12 +393,13 @@ class PhotoController extends GetxController {
     }
   }
 
-  void selectCountry(Country country) {
+  void selectCountry(Country country, String countryCode) {
     selectedCountry.value = country;
+    selectedCountryCode.value = countryCode;
 
     if (kIsWeb) {
-      appStorage.write('selectedCountryCode', country.code);
-      appStorage.write('selectedCountryName', country.name);
+      appStorage.write('selectedCountryCode', countryCode);
+      appStorage.write('selectedCountryName', country.countryName);
     }
 
     Get.back();
@@ -438,6 +412,8 @@ class PhotoController extends GetxController {
       appStorage.write('selectedDocumentType', type.toString());
     }
   }
+
+  
 
   void changeUnit(Unit unit) {
     selectedUnit.value = unit;
@@ -460,7 +436,8 @@ class PhotoController extends GetxController {
 
     // Step 2 validation
     if (currentStep.value == 2) {
-      if (selectedCountry.value == null) {
+      if (selectedCountryCode.value == null ||
+          selectedCountryCode.value!.isEmpty) {
         Get.snackbar(
           'Missing Information',
           'Please select a country before proceeding.',
@@ -704,8 +681,6 @@ class PhotoController extends GetxController {
             }
 
             capturedPhotos.add(photo);
-
-            // Add hash (was missing!)
             await _addImageHash(photo);
 
             if (kIsWeb) {
@@ -716,23 +691,11 @@ class PhotoController extends GetxController {
             }
 
             if (capturedPhotos.length >= 5) {
-              // Get.back();
-              // Save images before navigating
-              if (kIsWeb) {
-                // await _saveImagesToStorage();
-              }
               Get.toNamed(PrimaryRoute.selectedPhoto);
             }
           },
         ),
       );
-
-      // After camera closes, save and navigate if we have photos
-      // if (capturedPhotos.isNotEmpty) {
-      //   if (kIsWeb) {
-      //     await _saveImagesToStorage();
-      //   }
-      // }
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -759,8 +722,8 @@ class PhotoController extends GetxController {
         return false;
       }
 
-      if (selectedCountry.value == null ||
-          selectedCountry.value!.code.isEmpty) {
+      if (selectedCountryCode.value == null ||
+          selectedCountryCode.value!.isEmpty) {
         Get.snackbar(
           'Error',
           'Please select a valid country',
@@ -771,18 +734,16 @@ class PhotoController extends GetxController {
       }
 
       final response = await photoCreationRepository.createPhotoSession(
-        countryCode: selectedCountry.value!.code,
+        countryCode: selectedCountryCode.value!,
         documentType: _mapDocumentType(selectedType.value),
         userSessionPhotos: capturedPhotos,
         platform: 'WEB_APP',
         customHeight: double.tryParse(heightController.text) ?? 0.0,
         customWidth: double.tryParse(widthController.text) ?? 0.0,
       );
-      print("manzar check this ${capturedPhotos[1].path}");
 
       return response.fold(
         (error) {
-          print("object");
           Get.snackbar(
             'Upload Failed',
             error,
